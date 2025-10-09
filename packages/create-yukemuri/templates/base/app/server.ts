@@ -5,6 +5,166 @@ import type { Context } from 'hono'
 
 const app = new Hono()
 
+// 静的ファイルの提供
+app.get('/manifest.json', (c: Context) => {
+  return c.json({
+    name: "Yukemari Application",
+    short_name: "Yukemari",
+    description: "A PWA built with Yukemari framework",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#f9fafb",
+    theme_color: "#3b82f6",
+    orientation: "portrait-primary",
+    scope: "/",
+    icons: [
+      {
+        src: "/icons/icon-72x72.png",
+        sizes: "72x72",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-96x96.png",
+        sizes: "96x96",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-128x128.png",
+        sizes: "128x128",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-144x144.png",
+        sizes: "144x144",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-152x152.png",
+        sizes: "152x152",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-384x384.png",
+        sizes: "384x384",
+        type: "image/png",
+        purpose: "maskable any"
+      },
+      {
+        src: "/icons/icon-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable any"
+      }
+    ],
+    categories: ["productivity", "utilities"],
+    lang: "ja",
+    dir: "ltr"
+  })
+})
+
+// Service Worker
+app.get('/sw.js', (c: Context) => {
+  c.header('Content-Type', 'application/javascript')
+  c.header('Service-Worker-Allowed', '/')
+  return c.text(`
+// Service Worker
+app.get('/sw.js', (c: Context) => {
+  c.header('Content-Type', 'application/javascript')
+  c.header('Service-Worker-Allowed', '/')
+  return c.text(\`
+// Yukemuri PWA Service Worker ♨️
+const CACHE_NAME = 'yukemari-v1'
+const STATIC_CACHE_URLS = [
+  '/',
+  '/manifest.json',
+  '/icons/icon.svg'
+]
+
+// インストール時
+self.addEventListener('install', (event) => {
+  console.log('♨️ Service Worker: Installing...')
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(STATIC_CACHE_URLS))
+      .then(() => self.skipWaiting())
+  )
+})
+
+// アクティベート時
+self.addEventListener('activate', (event) => {
+  console.log('♨️ Service Worker: Activating...')
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              return caches.delete(cacheName)
+            }
+          })
+        )
+      })
+      .then(() => self.clients.claim())
+  )
+})
+
+// フェッチ時
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        return response || fetch(event.request)
+      })
+      .catch(() => {
+        if (event.request.destination === 'document') {
+          return caches.match('/')
+        }
+      })
+  )
+})
+
+console.log('♨️ Yukemuri Service Worker loaded')
+  \`)
+})
+
+// アイコンファイルの提供
+app.get('/icons/:filename', (c: Context) => {
+  const filename = c.req.param('filename')
+  c.header('Content-Type', 'image/svg+xml')
+  
+  // シンプルな温泉アイコンデザイン
+  return c.text(\`<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="#3b82f6"/>
+  <g transform="translate(256, 256)">
+    <!-- 湯気 -->
+    <path d="M-80 -60 Q-80 -80 -60 -80 Q-40 -80 -40 -60 Q-40 -40 -60 -40 Q-80 -40 -80 -60" 
+          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M-20 -60 Q-20 -80 0 -80 Q20 -80 20 -60 Q20 -40 0 -40 Q-20 -40 -20 -60" 
+          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M40 -60 Q40 -80 60 -80 Q80 -80 80 -60 Q80 -40 60 -40 Q40 -40 40 -60" 
+          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <!-- 温泉プール -->
+    <ellipse cx="0" cy="20" rx="120" ry="80" fill="white"/>
+    <ellipse cx="0" cy="10" rx="100" ry="60" fill="#3b82f6"/>
+  </g>
+</svg>\`)
+})
+
+// Main page with SSR
+  `)
+})
+
 // Main page with SSR
 app.get('/', (c: Context) => {
   const html = render(App())
@@ -15,6 +175,20 @@ app.get('/', (c: Context) => {
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Yukemari App ♨️</title>
+      
+      <!-- PWA Meta Tags -->
+      <meta name="description" content="A PWA built with Yukemari framework" />
+      <meta name="theme-color" content="#3b82f6" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content="Yukemari" />
+      
+      <!-- Web App Manifest -->
+      <link rel="manifest" href="/manifest.json" />
+      
+      <!-- Icons -->
+      <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+      <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     </head>
     <body class="bg-gray-50 min-h-screen">
       <div id="app">${html}</div>
