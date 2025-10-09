@@ -1,0 +1,49 @@
+{
+  "name": "create-yukemuri",
+  "version": "0.1.0",
+  "description": "Create Yukemuri application",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "create-yukemuri": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@yukemuri/core": "workspace:*",
+    "commander": "^11.0.0",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.0",
+    "inquirer": "^9.2.0",
+    "fs-extra": "^11.1.0",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/inquirer": "^9.0.0",
+    "@types/mustache": "^4.2.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.50.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
+  "keywords": [
+    "create",
+    "yukemuri",
+    "template",
+    "cli"
+  ],
+  "license": "MIT"
+}

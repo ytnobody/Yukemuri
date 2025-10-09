@@ -1,0 +1,13 @@
+{
+  "name": "plugins-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No plugins to build yet'",
+    "dev": "echo 'No plugins to develop yet'",
+    "test": "echo 'No plugins to test yet'",
+    "lint": "echo 'No plugins to lint yet'",
+    "type-check": "echo 'No plugins to type-check yet'",
+    "clean": "echo 'No plugins to clean yet'"
+  }
+}
