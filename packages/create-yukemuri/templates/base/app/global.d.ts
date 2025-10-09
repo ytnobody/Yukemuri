@@ -31,6 +31,28 @@ declare module '@hono/vite-dev-server' {
   export default plugin
 }
 
+// UnoCSS modules (実際のプロジェクトでは型定義が提供される)
+declare module 'unocss' {
+  export function defineConfig(config: any): any
+  export function presetUno(): any
+  export function presetTypography(): any
+}
+
+declare module 'unocss/vite' {
+  const plugin: any
+  export default plugin
+}
+
+declare module '@unocss/preset-uno' {
+  export default function presetUno(): any
+}
+
+declare module '@unocss/preset-typography' {
+  export default function presetTypography(): any
+}
+
+declare module 'uno.css' {}
+
 declare module 'preact-render-to-string' {
   export function render(vnode: any): string
 }

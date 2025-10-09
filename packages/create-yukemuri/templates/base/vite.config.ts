@@ -1,20 +1,18 @@
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import devServer from '@hono/vite-dev-server'
+import UnoCSS from 'unocss/vite'
 
 export default defineConfig(({ mode }: { mode: string }) => {
   if (mode === 'client') {
     return {
-      plugins: [preact()],
+      plugins: [preact(), UnoCSS()],
       build: {
-        lib: {
-          entry: './app/client.ts',
-          formats: ['es'],
-          fileName: 'client'
-        },
         rollupOptions: {
+          input: './app/client.ts',
           output: {
-            entryFileNames: 'static/client.js'
+            entryFileNames: 'static/client.js',
+            format: 'es' as const
           }
         }
       }
@@ -24,18 +22,18 @@ export default defineConfig(({ mode }: { mode: string }) => {
   return {
     plugins: [
       preact(),
+      UnoCSS(),
       devServer({
         entry: 'app/server.ts'
       })
     ],
     build: {
-      lib: {
-        entry: './app/server.ts',
-        formats: ['es'],
-        fileName: 'server'
-      },
       rollupOptions: {
-        external: ['hono', 'preact', 'preact/render-to-string']
+        input: './app/server.ts',
+        external: ['hono', 'preact', 'preact-render-to-string'],
+        output: {
+          format: 'es' as const
+        }
       }
     }
   }

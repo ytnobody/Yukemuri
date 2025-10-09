@@ -1,6 +1,6 @@
-# Yukemari Application
+# Yukemari Application ♨️
 
-This is a new PWA built with Yukemari framework powered by HonoX.
+This is a new PWA built with Yukemari framework powered by Hono + Preact.
 
 ## Getting Started
 

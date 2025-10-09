@@ -104,7 +104,7 @@ async function createProject(
       console.log(chalk.cyan(`  cd ${projectName}`));
       console.log(chalk.cyan('  npm install'));
       console.log(chalk.cyan('  npm run dev'));
-      console.log('\nHappy coding! 🚀');
+      console.log('\nHappy coding! ♨️');
 
     } catch (error) {
       spinner.fail(chalk.red('Failed to create project'));

@@ -1,10 +1,10 @@
-# Yukemuri
+# Yukemuri ♨️
 
 Internet edge framework for rapid building your PWA
 
 ## 概要
 
-Yukemariは、小・中規模のサービスベンダーや個人開発者向けに開発速度を劇的に向上させるメタフレームワークです。
+Yukemariは、小・中規模のサービスベンダーや個人開発者向けに開発速度を劇的に向上させるメタフレームワークです。湯けむりのように、温かく心地よい開発体験を提供します。
 
 ## 特徴
 
