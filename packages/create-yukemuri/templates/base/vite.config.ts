@@ -25,7 +25,19 @@ export default defineConfig(({ mode }: { mode: string }) => {
       UnoCSS(),
       devServer({
         entry: 'app/server.ts'
-      })
+      }),
+      {
+        name: 'configure-server',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url === '/sw.js') {
+              res.setHeader('Content-Type', 'application/javascript; charset=utf-8')
+              res.setHeader('Service-Worker-Allowed', '/')
+            }
+            next()
+          })
+        }
+      }
     ],
     publicDir: 'public', // 静的ファイルディレクトリを明示
     server: {

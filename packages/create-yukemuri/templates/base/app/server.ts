@@ -2,6 +2,8 @@ import { Hono } from 'hono'
 import { render } from 'preact-render-to-string'
 import App from './routes/index'
 import type { Context } from 'hono'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 const app = new Hono()
 
@@ -10,80 +12,81 @@ app.get('/manifest.json', (c: Context) => {
   return c.json({
     name: "Yukemuri Application",
     short_name: "Yukemuri",
-    description: "A PWA built with Yukemuri framework",
+    description: "Internet edge PWA framework ♨️",
     start_url: "/",
     display: "standalone",
-    background_color: "#f9fafb",
+    background_color: "#ffffff",
     theme_color: "#3b82f6",
     orientation: "portrait-primary",
     scope: "/",
-    icons: [
+    prefer_related_applications: false,
+      icons: [
       {
-        src: "/icons/icon-72x72.svg",
+        src: "/icons/icon-72x72.png",
         sizes: "72x72",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-96x96.svg",
+        src: "/icons/icon-96x96.png",
         sizes: "96x96",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-128x128.svg",
+        src: "/icons/icon-128x128.png",
         sizes: "128x128",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-144x144.svg",
+        src: "/icons/icon-144x144.png",
         sizes: "144x144",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-152x152.svg",
+        src: "/icons/icon-152x152.png",
         sizes: "152x152",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-192x192.svg",
+        src: "/icons/icon-192x192.png",
         sizes: "192x192",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any maskable"
       },
       {
-        src: "/icons/icon-384x384.svg",
+        src: "/icons/icon-384x384.png",
         sizes: "384x384",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any"
       },
       {
-        src: "/icons/icon-512x512.svg",
+        src: "/icons/icon-512x512.png",
         sizes: "512x512",
-        type: "image/svg+xml",
-        purpose: "maskable any"
+        type: "image/png",
+        purpose: "any maskable"
       }
     ],
     categories: ["productivity", "utilities"],
     lang: "ja",
-    dir: "ltr"
+    dir: "ltr",
+    display_override: ["window-controls-overlay", "standalone"],
+    edge_side_panel: {},
+    handle_links: "preferred"
   })
 })
 
 // Service Worker
 app.get('/sw.js', (c: Context) => {
-  c.header('Content-Type', 'application/javascript')
-  c.header('Service-Worker-Allowed', '/')
-  return c.text(`
-// Yukemuri PWA Service Worker ♨️
+  const swContent = `// Yukemuri PWA Service Worker ♨️
 const CACHE_NAME = 'yukemuri-v1'
 const STATIC_CACHE_URLS = [
   '/',
   '/manifest.json',
-  '/icons/icon.svg'
+  '/icons/icon-192x192.png'
 ]
 
 // インストール時
@@ -91,7 +94,23 @@ self.addEventListener('install', (event) => {
   console.log('♨️ Service Worker: Installing...')
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_CACHE_URLS))
+      .then((cache) => {
+        // Try bulk add first; if it fails (404/invalid), fall back to per-resource fetch+put
+        return cache.addAll(STATIC_CACHE_URLS).catch((err) => {
+          console.warn('♨️ Service Worker: cache.addAll failed, falling back to individual caching', err)
+          return Promise.all(STATIC_CACHE_URLS.map((url) =>
+            fetch(url)
+              .then((resp) => {
+                if (!resp.ok) throw new Error('fetch failed: ' + url + ' status:' + resp.status)
+                return cache.put(url, resp.clone())
+              })
+              .catch((e) => {
+                console.warn('♨️ Service Worker: failed to cache', url, e)
+                return null
+              })
+          ))
+        })
+      })
       .then(() => self.skipWaiting())
   )
 })
@@ -130,19 +149,23 @@ self.addEventListener('fetch', (event) => {
 })
 
 console.log('♨️ Yukemuri Service Worker loaded')
-  `)
+`
+
+  return new Response(swContent, {
+    headers: {
+      'Content-Type': 'application/javascript; charset=utf-8',
+      'Service-Worker-Allowed': '/'
+    }
+  })
 })
 
 // 静的ファイルの配信（Viteが処理しない場合のフォールバック）
 app.get('/icons/*', (c: Context) => {
   const iconPath = c.req.path
-  c.header('Content-Type', 'image/svg+xml')
-  c.header('Cache-Control', 'public, max-age=31536000') // 1年キャッシュ
-  
   console.log('📁 Serving icon:', iconPath)
-  
-  // シンプルな温泉アイコンデザイン
-  return c.text(`<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  if (iconPath.endsWith('.svg')) {
+    const svg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="512" height="512" rx="128" fill="#3b82f6"/>
   <g transform="translate(256, 256)">
     <!-- 湯気 -->
@@ -156,7 +179,34 @@ app.get('/icons/*', (c: Context) => {
     <ellipse cx="0" cy="20" rx="120" ry="80" fill="white"/>
     <ellipse cx="0" cy="10" rx="100" ry="60" fill="#3b82f6"/>
   </g>
-</svg>`)
+</svg>`
+
+    return new Response(svg, {
+      headers: {
+        'Content-Type': 'image/svg+xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=31536000'
+      }
+    })
+  }
+
+  if (iconPath.endsWith('.png')) {
+    try {
+      const rel = iconPath.startsWith('/') ? iconPath.slice(1) : iconPath
+      const filePath = join(process.cwd(), 'public', rel)
+      const data = readFileSync(filePath)
+      return new Response(data, {
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=31536000'
+        }
+      })
+    } catch (e) {
+  console.error('📛 Failed to read icon file', e)
+  return new Response('Not Found', { status: 404 })
+    }
+  }
+
+  return new Response('Not Found', { status: 404 })
 })
 
 // Main page with SSR
@@ -180,13 +230,14 @@ app.get('/', (c: Context) => {
       <!-- Web App Manifest -->
       <link rel="manifest" href="/manifest.json" />
       
-      <!-- Icons -->
-      <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
-      <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+  <!-- Icons -->
+  <link rel="icon" type="image/png" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     </head>
     <body class="bg-gray-50 min-h-screen">
       <div id="app">${html}</div>
       <script type="module" src="/app/client.ts"></script>
+      <script src="/debug-pwa.js"></script>
     </body>
     </html>
   `)
@@ -209,3 +260,54 @@ app.get('/api/health', (c: Context) => {
 console.log('♨️ Yukemuri app initialized')
 
 export default app
+
+// PWA デバッグルート
+app.get('/debug-pwa.js', (c: Context) => {
+  c.header('Content-Type', 'application/javascript; charset=utf-8')
+  return c.text(`
+// PWA デバッグ用のスクリプト
+console.log('=== PWA Debug Info ===');
+
+// 1. Service Worker のチェック
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    console.log('📋 Service Worker registrations:', registrations.length);
+    registrations.forEach((reg, index) => {
+      console.log(\`  \${index + 1}. \${reg.scope} - State: \${reg.active?.state || 'inactive'}\`);
+    });
+  });
+} else {
+  console.log('❌ Service Worker not supported');
+}
+
+// 2. Manifest のチェック
+fetch('/manifest.json')
+  .then(response => response.json())
+  .then(manifest => {
+    console.log('📄 Manifest loaded:', manifest.name);
+    console.log('   Start URL:', manifest.start_url);
+    console.log('   Display:', manifest.display);
+    console.log('   Icons:', manifest.icons.length);
+  })
+  .catch(error => console.log('❌ Manifest error:', error));
+
+// 3. PWA install criteria
+setTimeout(() => {
+  console.log('🔍 PWA Install Criteria Check:');
+  console.log('  - HTTPS:', location.protocol === 'https:' || location.hostname === 'localhost');
+  console.log('  - Service Worker:', 'serviceWorker' in navigator);
+  console.log('  - Manifest Link:', !!document.querySelector('link[rel="manifest"]'));
+  console.log('  - Icons in Manifest: checking...');
+  
+  // beforeinstallprompt イベントのリスナー追加
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🎉 beforeinstallprompt event fired! PWA is installable!');
+    console.log('   Event:', e);
+    e.preventDefault();
+    window.deferredPrompt = e;
+  });
+  
+  console.log('✨ PWA debug setup complete. Watch for beforeinstallprompt event.');
+}, 3000);
+  `)
+})

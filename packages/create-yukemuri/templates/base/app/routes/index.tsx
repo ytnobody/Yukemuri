@@ -147,17 +147,47 @@ function PWAFeatures() {
     const handleBeforeInstallPrompt = (e: Event) => {
       addDebugLog('beforeinstallprompt event fired')
       e.preventDefault()
+      // @ts-ignore
+      window.deferredPrompt = e
       setIsInstallable(true)
+      addDebugLog('Install prompt deferred and ready')
     }
 
     const handleAppInstalled = () => {
       addDebugLog('appinstalled event fired')
       setIsInstalled(true)
       setIsInstallable(false)
+      // @ts-ignore
+      window.deferredPrompt = null
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
+
+    // PWA インストール可能性を定期的にチェック
+    const checkInstallability = () => {
+      // Service Worker が登録されているかチェック
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(registration => {
+          if (registration) {
+            addDebugLog('Service Worker is registered')
+          } else {
+            addDebugLog('Service Worker not registered yet')
+          }
+        })
+      }
+
+      // Manifest が読み込まれているかチェック
+      const manifestLink = document.querySelector('link[rel="manifest"]')
+      if (manifestLink) {
+        addDebugLog('Manifest link found in head')
+      } else {
+        addDebugLog('Manifest link not found - this may prevent PWA installation')
+      }
+    }
+
+    // 2秒後にインストール可能性をチェック
+    setTimeout(checkInstallability, 2000)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -167,17 +197,28 @@ function PWAFeatures() {
 
   const handleInstallApp = async () => {
     addDebugLog('Install app button clicked')
-    const deferredPrompt = (window as any).deferredPrompt
+    // @ts-ignore
+    const deferredPrompt = window.deferredPrompt
     if (deferredPrompt) {
       addDebugLog('Showing install prompt')
-      deferredPrompt.prompt()
-      const result = await deferredPrompt.userChoice
-      addDebugLog(`Install result: ${result.outcome}`)
-      if (result.outcome === 'accepted') {
-        setIsInstallable(false)
+      try {
+        deferredPrompt.prompt()
+        const result = await deferredPrompt.userChoice
+        addDebugLog(`Install result: ${result.outcome}`)
+        if (result.outcome === 'accepted') {
+          addDebugLog('User accepted the install prompt')
+          setIsInstallable(false)
+        } else {
+          addDebugLog('User dismissed the install prompt')
+        }
+        // @ts-ignore
+        window.deferredPrompt = null
+      } catch (error) {
+        addDebugLog(`Install prompt error: ${error.message}`)
       }
     } else {
       addDebugLog('No deferred prompt available')
+      alert('インストールプロンプトが利用できません。\n\nブラウザのアドレスバーの「アプリをインストール」アイコンを探してください。')
     }
   }
 
@@ -477,8 +518,15 @@ function PWAFeatures() {
           <div>
             <h4 className="font-medium text-gray-900">App Installation</h4>
             <p className="text-sm text-gray-600">
-              {isInstalled ? 'App is installed' : 'App can be installed as PWA'}
+              {isInstalled ? 'App is installed as PWA' : 
+               isInstallable ? 'App is ready to install' : 
+               'App will be installable after PWA criteria are met'}
             </p>
+            {!isInstalled && !isInstallable && (
+              <p className="text-xs text-gray-500 mt-1">
+                ブラウザのアドレスバーに「📱 アプリをインストール」アイコンが表示されます
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             {isInstalled && (
@@ -493,6 +541,11 @@ function PWAFeatures() {
               >
                 📱 Install App
               </button>
+            )}
+            {!isInstallable && !isInstalled && (
+              <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+                ⏳ Loading...
+              </span>
             )}
           </div>
         </div>
