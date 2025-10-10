@@ -404,6 +404,59 @@ function PWAFeatures() {
     alert('⏰ 10秒後に通知が表示されます。\n\nページをバックグラウンドに送って、通知が来るかテストしてください！')
   }
 
+  // デスクトップ通知 + ダイアログ併用テスト
+  const sendVisibleNotification = () => {
+    addDebugLog('Visible notification test started')
+    
+    if (!('Notification' in window)) {
+      alert('通知APIが利用できません')
+      return
+    }
+    
+    if (Notification.permission !== 'granted') {
+      alert('通知許可が必要です')
+      return
+    }
+    
+    try {
+      // デスクトップ通知
+      const notification = new Notification('Yukemuri 確認テスト ♨️', {
+        body: 'デスクトップ通知 + アラートダイアログの両方でテストします',
+        tag: 'visible-test'
+      })
+      
+      addDebugLog('Visible notification created')
+      
+      notification.onshow = () => {
+        addDebugLog('Visible notification shown')
+        // 通知が表示されたらアラートも表示
+        setTimeout(() => {
+          alert('✅ デスクトップ通知が正常に表示されました！\n\n通知が見えない場合は、Windows の通知設定や集中モードを確認してください。')
+        }, 100)
+      }
+      
+      notification.onerror = (e) => {
+        addDebugLog(`Visible notification error: ${e}`)
+        alert('❌ 通知の表示に失敗しました')
+      }
+      
+      notification.onclick = () => {
+        addDebugLog('Visible notification clicked')
+        notification.close()
+      }
+      
+      // 通知が表示されない場合のフォールバック
+      setTimeout(() => {
+        alert('📋 通知テスト完了\n\nWindows で通知が見えない場合：\n1. Windows設定 > システム > 通知 を確認\n2. 集中モードがオフか確認\n3. ブラウザの通知設定を確認')
+        notification.close()
+      }, 2000)
+      
+    } catch (error) {
+      addDebugLog(`Visible notification failed: ${error.message}`)
+      alert(`通知作成失敗: ${error.message}`)
+    }
+  }
+
   return (
     <div className="card mb-8">
       <h3 className="text-xl font-semibold text-gray-900 mb-4">PWA Features ♨️</h3>
@@ -506,57 +559,4 @@ function PWAFeatures() {
     </div>
   )
 }
-
-  // デスクトップ通知 + ダイアログ併用テスト
-  const sendVisibleNotification = () => {
-    addDebugLog('Visible notification test started')
-    
-    if (!('Notification' in window)) {
-      alert('通知APIが利用できません')
-      return
-    }
-    
-    if (Notification.permission !== 'granted') {
-      alert('通知許可が必要です')
-      return
-    }
-    
-    try {
-      // デスクトップ通知
-      const notification = new Notification('Yukemuri 確認テスト ♨️', {
-        body: 'デスクトップ通知 + アラートダイアログの両方でテストします',
-        tag: 'visible-test'
-      })
-      
-      addDebugLog('Visible notification created')
-      
-      notification.onshow = () => {
-        addDebugLog('Visible notification shown')
-        // 通知が表示されたらアラートも表示
-        setTimeout(() => {
-          alert('✅ デスクトップ通知が正常に表示されました！\n\n通知が見えない場合は、Windows の通知設定や集中モードを確認してください。')
-        }, 100)
-      }
-      
-      notification.onerror = (e) => {
-        addDebugLog(`Visible notification error: ${e}`)
-        alert('❌ 通知の表示に失敗しました')
-      }
-      
-      notification.onclick = () => {
-        addDebugLog('Visible notification clicked')
-        notification.close()
-      }
-      
-      // 通知が表示されない場合のフォールバック
-      setTimeout(() => {
-        alert('📋 通知テスト完了\n\nWindows で通知が見えない場合：\n1. Windows設定 > システム > 通知 を確認\n2. 集中モードがオフか確認\n3. ブラウザの通知設定を確認')
-        notification.close()
-      }, 2000)
-      
-    } catch (error) {
-      addDebugLog(`Visible notification failed: ${error.message}`)
-      alert(`通知作成失敗: ${error.message}`)
-    }
-  }
 
