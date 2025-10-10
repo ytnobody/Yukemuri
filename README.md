@@ -1,40 +1,102 @@
 # Yukemuri ♨️
 
-Internet edge framework for rapid building your PWA
+A modern PWA framework for edge computing that delivers a soothing development experience like hot spring steam.
 
-## 概要
+## Overview
 
-Yukemariは、小・中規模のサービスベンダーや個人開発者向けに開発速度を劇的に向上させるメタフレームワークです。湯けむりのように、温かく心地よい開発体験を提供します。
+Yukemuri is a meta-framework designed to dramatically improve development speed for small to medium-scale service providers and individual developers. Like the gentle steam (yukemuri) from hot springs, it provides a warm and comfortable development experience.
 
-## 特徴
+## Features
 
-- **エッジファースト**: Cloudflare Workers上で動作
-- **型安全**: TypeScript + HonoXベース  
-- **高速データベース**: Turso (エッジ最適化SQLite)
-- **プラグインシステム**: 必要な機能を段階的に追加
-- **ゼロコンフィグ**: すぐに開発を始められる
+- **🚀 Edge-First**: Built for Cloudflare Workers and edge computing
+- **🔒 Type-Safe**: TypeScript + Hono framework foundation
+- **📱 PWA Ready**: Built-in Service Worker, offline support, and installable apps
+- **⚛️ Modern UI**: Preact + UnoCSS for fast, reactive interfaces
+- **🎨 Zero Config**: Start developing immediately with sensible defaults
+- **🔧 Plugin System**: Extensible architecture for adding features
 
-## クイックスタート
+## Quick Start
 
 ```bash
-# 新しいプロジェクトを作成
+# Create a new project
 npx create-yukemuri my-app
 cd my-app
 
-# 開発サーバーを起動
-npm run dev
+# Install dependencies
+npm install
 
-# プラグインを追加
-yukemuri add auth-google
-yukemuri add payment-stripe
+# Start development server
+npm run dev
 ```
 
-## パッケージ構成
+Your PWA will be available at `http://localhost:5173` with:
+- ✅ Service Worker registration
+- ✅ Web App Manifest
+- ✅ Offline capability
+- ✅ Install prompts
+- ✅ Push notifications support
 
-- `@yukemuri/core` - コアフレームワーク
-- `create-yukemuri` - プロジェクト作成ツール
-- `@yukemuri/plugin-*` - 公式プラグイン
+## Project Structure
 
-## ライセンス
+```
+my-app/
+├── app/
+│   ├── client.ts          # Client-side entry point
+│   ├── server.ts          # Server-side Hono app
+│   ├── routes/            # React components
+│   └── utils/             # PWA utilities
+├── public/
+│   ├── manifest.json      # Web App Manifest
+│   ├── sw.js              # Service Worker
+│   └── icons/             # App icons
+└── vite.config.ts         # Vite configuration
+```
 
-MIT
+## Package Structure
+
+- `packages/core` - Core framework (under development)
+- `packages/create-yukemuri` - Project scaffolding tool
+- `packages/plugins` - Official plugins (planned)
+
+## Development
+
+This is a monorepo managed with pnpm:
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Link create-yukemuri globally for testing
+pnpm --filter create-yukemuri link --global
+```
+
+## Technology Stack
+
+- **Runtime**: Cloudflare Workers / Node.js
+- **Framework**: Hono (lightweight web framework)
+- **Frontend**: Preact (React-compatible, smaller bundle)
+- **Styling**: UnoCSS (instant atomic CSS)
+- **Build Tool**: Vite (fast build and HMR)
+- **PWA**: Service Worker + Web App Manifest
+
+## Roadmap
+
+- [x] Project scaffolding with `create-yukemuri`
+- [x] Basic PWA template with Service Worker
+- [x] Development server setup
+- [ ] Core framework implementation
+- [ ] Plugin system architecture
+- [ ] Database integration (Turso/SQLite)
+- [ ] Authentication plugins
+- [ ] Deployment helpers
+
+## Contributing
+
+We welcome contributions! Please see our contributing guidelines for more details.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
