@@ -7,7 +7,7 @@ import { join } from 'path'
 
 const app = new Hono()
 
-// 静的ファイルの提供
+// Static file serving
 app.get('/manifest.json', (c: Context) => {
   return c.json({
     name: "Yukemuri Application",
@@ -89,7 +89,7 @@ const STATIC_CACHE_URLS = [
   '/icons/icon-192x192.png'
 ]
 
-// インストール時
+// Install event
 self.addEventListener('install', (event) => {
   console.log('♨️ Service Worker: Installing...')
   event.waitUntil(
@@ -115,7 +115,7 @@ self.addEventListener('install', (event) => {
   )
 })
 
-// アクティベート時
+// Activate event
 self.addEventListener('activate', (event) => {
   console.log('♨️ Service Worker: Activating...')
   event.waitUntil(
@@ -133,7 +133,7 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// フェッチ時
+// Fetch event
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
@@ -159,7 +159,7 @@ console.log('♨️ Yukemuri Service Worker loaded')
   })
 })
 
-// 静的ファイルの配信（Viteが処理しない場合のフォールバック）
+// Static file distribution (fallback when Vite doesn't handle)
 app.get('/icons/*', (c: Context) => {
   const iconPath = c.req.path
   console.log('📁 Serving icon:', iconPath)
@@ -168,14 +168,14 @@ app.get('/icons/*', (c: Context) => {
     const svg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="512" height="512" rx="128" fill="#3b82f6"/>
   <g transform="translate(256, 256)">
-    <!-- 湯気 -->
+    <!-- Steam -->
     <path d="M-80 -60 Q-80 -80 -60 -80 Q-40 -80 -40 -60 Q-40 -40 -60 -40 Q-80 -40 -80 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
     <path d="M-20 -60 Q-20 -80 0 -80 Q20 -80 20 -60 Q20 -40 0 -40 Q-20 -40 -20 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
     <path d="M40 -60 Q40 -80 60 -80 Q80 -80 80 -60 Q80 -40 60 -40 Q40 -40 40 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
-    <!-- 温泉プール -->
+    <!-- Hot spring pool -->
     <ellipse cx="0" cy="20" rx="120" ry="80" fill="white"/>
     <ellipse cx="0" cy="10" rx="100" ry="60" fill="#3b82f6"/>
   </g>
@@ -194,7 +194,7 @@ app.get('/icons/*', (c: Context) => {
       const rel = iconPath.startsWith('/') ? iconPath.slice(1) : iconPath
       const filePath = join(process.cwd(), 'public', rel)
       const data = readFileSync(filePath)
-      return new Response(data, {
+      return new Response(new Uint8Array(data), {
         headers: {
           'Content-Type': 'image/png',
           'Cache-Control': 'public, max-age=31536000'
@@ -261,14 +261,14 @@ console.log('♨️ Yukemuri app initialized')
 
 export default app
 
-// PWA デバッグルート
+// PWA debug routes
 app.get('/debug-pwa.js', (c: Context) => {
   c.header('Content-Type', 'application/javascript; charset=utf-8')
   return c.text(`
-// PWA デバッグ用のスクリプト
+// PWA debug script
 console.log('=== PWA Debug Info ===');
 
-// 1. Service Worker のチェック
+// 1. Service Worker check
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(registrations => {
     console.log('📋 Service Worker registrations:', registrations.length);
@@ -280,7 +280,7 @@ if ('serviceWorker' in navigator) {
   console.log('❌ Service Worker not supported');
 }
 
-// 2. Manifest のチェック
+// 2. Manifest check
 fetch('/manifest.json')
   .then(response => response.json())
   .then(manifest => {
@@ -299,7 +299,7 @@ setTimeout(() => {
   console.log('  - Manifest Link:', !!document.querySelector('link[rel="manifest"]'));
   console.log('  - Icons in Manifest: checking...');
   
-  // beforeinstallprompt イベントのリスナー追加
+  // Add beforeinstallprompt event listener
   window.addEventListener('beforeinstallprompt', (e) => {
     console.log('🎉 beforeinstallprompt event fired! PWA is installable!');
     console.log('   Event:', e);

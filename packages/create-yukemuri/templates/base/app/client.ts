@@ -10,7 +10,7 @@ if (app) {
 
 console.log('♨️ Yukemuri client initialized')
 
-// Service Worker の登録（即座に実行 - loadイベントを待たない）
+// Service Worker registration (execute immediately - don't wait for load event)
 async function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     console.log('♨️ Service Worker API is available')
@@ -26,7 +26,7 @@ async function registerServiceWorker() {
       console.log('   Scope:', registration.scope)
       console.log('   Registration:', registration)
       
-      // アクティブなService Workerの状態をチェック
+      // Check active Service Worker status
       if (registration.active) {
         console.log('♨️ Service Worker is active:', registration.active.state)
       }

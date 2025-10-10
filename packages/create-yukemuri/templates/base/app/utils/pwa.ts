@@ -30,7 +30,7 @@ export class YukeuriPWA {
   private async init() {
     console.log('♨️ Initializing Yukemuri PWA...')
     
-    // Service Worker の登録
+    // Register Service Worker
     if ('serviceWorker' in navigator) {
       try {
         this.swRegistration = await navigator.serviceWorker.register('/sw.js', {
@@ -38,7 +38,7 @@ export class YukeuriPWA {
         })
         console.log('✅ Service Worker registered:', this.swRegistration.scope)
         
-        // 更新チェック
+        // Check for updates
         this.swRegistration.addEventListener('updatefound', () => {
           console.log('🔄 Service Worker update found')
           this.handleServiceWorkerUpdate()
@@ -48,7 +48,7 @@ export class YukeuriPWA {
       }
     }
 
-    // PWAインストールプロンプトの処理
+    // Setup PWA install prompt handling
     this.setupInstallPrompt()
   }
 
@@ -59,7 +59,7 @@ export class YukeuriPWA {
       this.installPrompt = e as any as PWAInstallPrompt
       window.deferredPrompt = this.installPrompt
       
-      // カスタムインストールボタンを表示
+      // Show custom install button
       this.showInstallButton()
     })
 
@@ -71,19 +71,19 @@ export class YukeuriPWA {
     })
   }
 
-  // PWAがインストール可能かチェック
+  // Check if PWA is installable
   isInstallable(): boolean {
     return !!this.installPrompt
   }
 
-  // PWAがインストール済みかチェック
+  // Check if PWA is already installed
   isInstalled(): boolean {
     return window.matchMedia('(display-mode: standalone)').matches ||
            window.matchMedia('(display-mode: fullscreen)').matches ||
            (window.navigator as any).standalone === true
   }
 
-  // デバッグ: PWAの状態を確認
+  // Debug: Check PWA status
   getPWAStatus() {
     return {
       hasServiceWorker: !!this.swRegistration,
@@ -95,7 +95,7 @@ export class YukeuriPWA {
     }
   }
 
-  // PWAインストールプロンプトを表示
+  // Show PWA install prompt
   async showInstallPrompt(): Promise<boolean> {
     if (!this.installPrompt) {
       console.warn('⚠️ Install prompt not available')
@@ -121,7 +121,7 @@ export class YukeuriPWA {
     }
   }
 
-  // Push通知の許可を要求
+  // Request push notification permission
   async requestNotificationPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
       console.warn('⚠️ This browser does not support notifications')
@@ -136,14 +136,14 @@ export class YukeuriPWA {
       return 'denied'
     }
 
-    // 許可を要求
+    // Request permission
     const permission = await Notification.requestPermission()
     console.log('🔔 Notification permission:', permission)
     
     return permission
   }
 
-  // Push通知の購読（VAPID対応版）
+  // Subscribe to push notifications (VAPID-compatible)
   async subscribeToPush(): Promise<PushSubscription | null> {
     if (!this.swRegistration) {
       console.error('❌ Service Worker not registered')
@@ -151,14 +151,14 @@ export class YukeuriPWA {
     }
 
     try {
-      // 環境変数からVAPID公開鍵を取得
+      // Get VAPID public key from environment variables
       const vapidPublicKey = (import.meta as any).env?.VITE_VAPID_PUBLIC_KEY
 
       if (!vapidPublicKey) {
-        console.log('💡 VAPID公開鍵が設定されていません')
-        console.log('💡 プッシュ通知を有効にするには:')
-        console.log('1. .envファイルに VITE_VAPID_PUBLIC_KEY=your_public_key を追加')
-        console.log('2. VAPIDキーペアを生成: npm run generate-vapid')
+        console.log('💡 VAPID public key not configured')
+        console.log('💡 To enable push notifications:')
+        console.log('1. Add VITE_VAPID_PUBLIC_KEY=your_public_key to .env file')
+        console.log('2. Generate VAPID key pair: npm run generate-vapid')
         return null
       }
 
@@ -175,7 +175,7 @@ export class YukeuriPWA {
     }
   }
 
-  // テスト通知を送信
+  // Send test notification
   async sendTestNotification(title: string = 'Yukemari ♨️', body: string = 'PWA notification test') {
     const permission = await this.requestNotificationPermission()
     
@@ -191,8 +191,8 @@ export class YukeuriPWA {
 
   private handleServiceWorkerUpdate() {
     if (this.swRegistration?.waiting) {
-      // 新しいService Workerが利用可能
-      if (confirm('🔄 アプリの新しいバージョンが利用可能です。今すぐ更新しますか？')) {
+      // New Service Worker is available
+      if (confirm('🔄 A new version of the app is available. Would you like to update now?')) {
         this.swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' })
         window.location.reload()
       }
@@ -200,7 +200,7 @@ export class YukeuriPWA {
   }
 
   private showInstallButton() {
-    // カスタムインストールボタンの表示ロジック
+    // Custom install button display logic
     const installButton = document.getElementById('pwa-install-button')
     if (installButton) {
       installButton.style.display = 'block'
@@ -208,7 +208,7 @@ export class YukeuriPWA {
   }
 
   private hideInstallButton() {
-    // カスタムインストールボタンの非表示ロジック
+    // Custom install button hide logic
     const installButton = document.getElementById('pwa-install-button')
     if (installButton) {
       installButton.style.display = 'none'
@@ -231,5 +231,5 @@ export class YukeuriPWA {
   }
 }
 
-// グローバルインスタンス
+// Global instance
 export const pwa = YukeuriPWA.getInstance()

@@ -1,6 +1,6 @@
 /// <reference types="preact" />
 
-// Hono modules (実際のプロジェクトでは型定義が提供される)
+// Hono modules (type definitions are provided in actual projects)
 declare module 'hono' {
   export class Hono {
     constructor()
@@ -20,7 +20,7 @@ declare module 'hono' {
   }
 }
 
-// Vite plugins (実際のプロジェクトでは型定義が提供される)
+// Vite plugins (type definitions are provided in actual projects)
 declare module '@preact/preset-vite' {
   const plugin: any
   export default plugin
@@ -31,7 +31,7 @@ declare module '@hono/vite-dev-server' {
   export default plugin
 }
 
-// UnoCSS modules (実際のプロジェクトでは型定義が提供される)
+// UnoCSS modules (type definitions are provided in actual projects)
 declare module 'unocss' {
   export function defineConfig(config: any): any
   export function presetUno(): any

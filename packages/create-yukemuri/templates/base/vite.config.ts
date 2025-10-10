@@ -39,10 +39,10 @@ export default defineConfig(({ mode }: { mode: string }) => {
         }
       }
     ],
-    publicDir: 'public', // 静的ファイルディレクトリを明示
+    publicDir: 'public', // Explicitly specify static file directory
     server: {
       fs: {
-        // プロジェクトルート以外のファイルアクセスを許可
+        // Allow file access outside project root
         allow: ['..']
       }
     },

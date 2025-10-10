@@ -112,7 +112,7 @@ function PWAFeatures() {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [debugInfo, setDebugInfo] = useState<string[]>([])
 
-  // デバッグログ用関数
+  // Debug log function
   const addDebugLog = (message: string) => {
     console.log('🐛 DEBUG:', message)
     setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${message}`])
@@ -121,18 +121,18 @@ function PWAFeatures() {
   useEffect(() => {
     addDebugLog('PWAFeatures component mounted')
     
-    // PWA状態をチェック
+    // Check PWA status
     const checkPWAStatus = () => {
       addDebugLog('Checking PWA status...')
       
-      // インストール状態をチェック
+      // Check installation status
       const installed = window.matchMedia('(display-mode: standalone)').matches ||
                        window.matchMedia('(display-mode: fullscreen)').matches ||
                        (window.navigator as any).standalone === true
       setIsInstalled(installed)
       addDebugLog(`Install status: ${installed}`)
       
-      // 通知許可状態をチェック
+      // Check notification permission status
       if ('Notification' in window) {
         setNotificationPermission(Notification.permission)
         addDebugLog(`Notification permission: ${Notification.permission}`)
@@ -143,7 +143,7 @@ function PWAFeatures() {
 
     checkPWAStatus()
 
-    // Install prompt イベントリスナー
+    // Install prompt event listener
     const handleBeforeInstallPrompt = (e: Event) => {
       addDebugLog('beforeinstallprompt event fired')
       e.preventDefault()
@@ -164,9 +164,9 @@ function PWAFeatures() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
 
-    // PWA インストール可能性を定期的にチェック
+    // Check PWA installability periodically
     const checkInstallability = () => {
-      // Service Worker が登録されているかチェック
+      // Check if Service Worker is registered
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistration().then(registration => {
           if (registration) {
@@ -177,7 +177,7 @@ function PWAFeatures() {
         })
       }
 
-      // Manifest が読み込まれているかチェック
+      // Check if Manifest is loaded
       const manifestLink = document.querySelector('link[rel="manifest"]')
       if (manifestLink) {
         addDebugLog('Manifest link found in head')
@@ -186,7 +186,7 @@ function PWAFeatures() {
       }
     }
 
-    // 2秒後にインストール可能性をチェック
+    // Check installability after 2 seconds
     setTimeout(checkInstallability, 2000)
 
     return () => {
@@ -218,7 +218,7 @@ function PWAFeatures() {
       }
     } else {
       addDebugLog('No deferred prompt available')
-      alert('インストールプロンプトが利用できません。\n\nブラウザのアドレスバーの「アプリをインストール」アイコンを探してください。')
+      alert('Install prompt is not available.\n\nPlease look for the "Install app" icon in your browser\'s address bar.')
     }
   }
 
@@ -228,7 +228,7 @@ function PWAFeatures() {
     try {
       if (!('Notification' in window)) {
         addDebugLog('Notification API not supported')
-        alert('このブラウザは通知をサポートしていません')
+        alert('This browser does not support notifications')
         return
       }
 
@@ -240,7 +240,7 @@ function PWAFeatures() {
       if (permission === 'granted') {
         addDebugLog('Permission granted, creating welcome notification')
         
-        // シンプルなテスト通知
+        // Simple test notification
         try {
           const notification = new Notification('Yukemuri ♨️', {
             body: 'Notifications enabled successfully!',
@@ -274,13 +274,13 @@ function PWAFeatures() {
         
       } else if (permission === 'denied') {
         addDebugLog('Permission denied')
-        alert('通知が拒否されました。ブラウザの設定で許可してください。')
+        alert('Notifications were denied. Please allow them in your browser settings.')
       } else {
         addDebugLog('Permission not determined')
       }
     } catch (error) {
       addDebugLog(`Error requesting permission: ${error.message}`)
-      alert('通知の設定中にエラーが発生しました: ' + error.message)
+      alert('An error occurred while setting up notifications: ' + error.message)
     }
   }
 
@@ -289,17 +289,17 @@ function PWAFeatures() {
     
     if (notificationPermission !== 'granted') {
       addDebugLog('Permission not granted, showing alert')
-      alert('通知が許可されていません。まず通知を有効にしてください。')
+      alert('Notifications are not allowed. Please enable notifications first.')
       return
     }
 
     try {
       const messages = [
-        { title: 'Yukemuri ♨️', body: 'こんにちは！温泉フレームワークからお知らせです。' },
-        { title: 'PWA更新 ♨️', body: 'アプリが最新版に更新されました！' },
-        { title: 'オフライン対応 ♨️', body: 'インターネットが切断されてもご利用いただけます。' },
-        { title: 'Yukemuri Tips ♨️', body: 'PWA機能をフル活用して快適な開発を！' },
-        { title: 'Hot Springs ♨️', body: '温泉のようにリラックスできる開発体験をお届け。' }
+        { title: 'Yukemuri ♨️', body: 'Hello! This is a notification from the hot spring framework.' },
+        { title: 'PWA Update ♨️', body: 'The app has been updated to the latest version!' },
+        { title: 'Offline Support ♨️', body: 'You can use this even when the internet is disconnected.' },
+        { title: 'Yukemuri Tips ♨️', body: 'Make full use of PWA features for comfortable development!' },
+        { title: 'Hot Springs ♨️', body: 'Delivering a relaxing development experience like hot springs.' }
       ]
       
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
@@ -335,30 +335,30 @@ function PWAFeatures() {
       
     } catch (error) {
       addDebugLog(`Failed to send test notification: ${error.message}`)
-      alert('通知の送信に失敗しました: ' + error.message)
+      alert('Failed to send notification: ' + error.message)
     }
   }
 
-  // シンプルな即座通知テスト
+  // Simple immediate notification test
   const sendImmediateNotification = () => {
     addDebugLog('Immediate notification test started')
     
     if (!('Notification' in window)) {
       addDebugLog('Notification API not available')
-      alert('通知APIが利用できません')
+      alert('Notification API is not available')
       return
     }
     
     if (Notification.permission !== 'granted') {
       addDebugLog('Permission not granted for immediate notification')
-      alert('通知許可が必要です')
+      alert('Notification permission is required')
       return
     }
     
     try {
       addDebugLog('Creating immediate notification...')
-      const notification = new Notification('即座テスト ♨️', {
-        body: 'この通知は即座に表示されるはずです',
+      const notification = new Notification('Immediate Test ♨️', {
+        body: 'This notification should be displayed immediately',
         tag: 'immediate-test'
       })
       
@@ -378,21 +378,21 @@ function PWAFeatures() {
     }
   }
 
-  // 10秒後遅延通知テスト
+  // 10-second delayed notification test
   const sendDelayedNotification = () => {
     addDebugLog('Delayed notification test started (10 seconds)')
     
     if (!('Notification' in window)) {
-      alert('通知APIが利用できません')
+      alert('Notification API is not available')
       return
     }
     
     if (Notification.permission !== 'granted') {
-      alert('通知許可が必要です')
+      alert('Notification permission is required')
       return
     }
     
-    // カウントダウン表示
+    // Countdown display
     let countdown = 10
     const countdownInterval = setInterval(() => {
       addDebugLog(`Delayed notification in ${countdown} seconds...`)
@@ -403,15 +403,15 @@ function PWAFeatures() {
       }
     }, 1000)
     
-    // 10秒後に通知を送信
+    // Send notification after 10 seconds
     setTimeout(() => {
       try {
         addDebugLog('Creating delayed notification now!')
         
-        const notification = new Notification('Yukemuri 遅延通知 ♨️', {
-          body: '10秒後に表示される通知テストです。バックグラウンドからの通知確認！',
+        const notification = new Notification('Yukemuri Delayed Notification ♨️', {
+          body: 'This is a 10-second delayed notification test. Background notification verification!',
           tag: 'delayed-test',
-          requireInteraction: true // 手動で閉じる必要がある
+          requireInteraction: true // Requires manual closing
         })
         
         addDebugLog('Delayed notification created')
@@ -426,7 +426,7 @@ function PWAFeatures() {
         
         notification.onclick = () => {
           addDebugLog('Delayed notification clicked')
-          window.focus() // ウィンドウをフォーカス
+          window.focus() // Focus window
           notification.close()
         }
         
@@ -441,28 +441,28 @@ function PWAFeatures() {
       }
     }, 10000) // 10秒 = 10000ms
     
-    // 即座にユーザーにフィードバック
-    alert('⏰ 10秒後に通知が表示されます。\n\nページをバックグラウンドに送って、通知が来るかテストしてください！')
+    // Immediate user feedback
+    alert('⏰ A notification will appear in 10 seconds.\n\nPlease put the page in the background and test if the notification comes!')
   }
 
-  // デスクトップ通知 + ダイアログ併用テスト
+  // Desktop notification + dialog combined test
   const sendVisibleNotification = () => {
     addDebugLog('Visible notification test started')
     
     if (!('Notification' in window)) {
-      alert('通知APIが利用できません')
+      alert('Notification API is not available')
       return
     }
     
     if (Notification.permission !== 'granted') {
-      alert('通知許可が必要です')
+      alert('Notification permission is required')
       return
     }
     
     try {
-      // デスクトップ通知
-      const notification = new Notification('Yukemuri 確認テスト ♨️', {
-        body: 'デスクトップ通知 + アラートダイアログの両方でテストします',
+      // Desktop notification
+      const notification = new Notification('Yukemuri Verification Test ♨️', {
+        body: 'Testing with both desktop notification and alert dialog',
         tag: 'visible-test'
       })
       
@@ -470,15 +470,15 @@ function PWAFeatures() {
       
       notification.onshow = () => {
         addDebugLog('Visible notification shown')
-        // 通知が表示されたらアラートも表示
+        // Show alert when notification is displayed
         setTimeout(() => {
-          alert('✅ デスクトップ通知が正常に表示されました！\n\n通知が見えない場合は、Windows の通知設定や集中モードを確認してください。')
+          alert('✅ Desktop notification displayed successfully!\n\nIf you cannot see the notification, please check Windows notification settings or focus mode.')
         }, 100)
       }
       
       notification.onerror = (e) => {
         addDebugLog(`Visible notification error: ${e}`)
-        alert('❌ 通知の表示に失敗しました')
+        alert('❌ Failed to display notification')
       }
       
       notification.onclick = () => {
@@ -486,15 +486,15 @@ function PWAFeatures() {
         notification.close()
       }
       
-      // 通知が表示されない場合のフォールバック
+      // Fallback if notification is not displayed
       setTimeout(() => {
-        alert('📋 通知テスト完了\n\nWindows で通知が見えない場合：\n1. Windows設定 > システム > 通知 を確認\n2. 集中モードがオフか確認\n3. ブラウザの通知設定を確認')
+        alert('📋 Notification test completed\n\nIf notifications are not visible on Windows:\n1. Check Windows Settings > System > Notifications\n2. Check if focus mode is off\n3. Check browser notification settings')
         notification.close()
       }, 2000)
       
     } catch (error) {
       addDebugLog(`Visible notification failed: ${error.message}`)
-      alert(`通知作成失敗: ${error.message}`)
+      alert(`Notification creation failed: ${error.message}`)
     }
   }
 
@@ -513,7 +513,7 @@ function PWAFeatures() {
       </div>
       
       <div className="space-y-4">
-        {/* インストール状態 */}
+        {/* Installation Status */}
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div>
             <h4 className="font-medium text-gray-900">App Installation</h4>
@@ -524,7 +524,7 @@ function PWAFeatures() {
             </p>
             {!isInstalled && !isInstallable && (
               <p className="text-xs text-gray-500 mt-1">
-                ブラウザのアドレスバーに「📱 アプリをインストール」アイコンが表示されます
+                The "📱 Install App" icon will appear in your browser's address bar
               </p>
             )}
           </div>
@@ -550,7 +550,7 @@ function PWAFeatures() {
           </div>
         </div>
 
-        {/* 通知機能 */}
+        {/* Notification Features */}
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div>
             <h4 className="font-medium text-gray-900">Push Notifications</h4>
@@ -575,13 +575,13 @@ function PWAFeatures() {
                   onClick={sendImmediateNotification}
                   className="btn-secondary text-sm"
                 >
-                  ⚡ 即座テスト
+                  ⚡ Immediate Test
                 </button>
                 <button 
                   onClick={sendDelayedNotification}
                   className="btn-secondary text-sm"
                 >
-                  ⏰ 10秒後テスト
+                  ⏰ 10-second Test
                 </button>
               </>
             )}
@@ -596,7 +596,7 @@ function PWAFeatures() {
           </div>
         </div>
 
-        {/* オフライン機能 */}
+        {/* Offline Features */}
         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
           <div>
             <h4 className="font-medium text-gray-900">Offline Support</h4>
