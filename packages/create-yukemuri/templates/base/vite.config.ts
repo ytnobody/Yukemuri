@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite'
 import UnoCSS from 'unocss/vite'
+import devServer from '@hono/vite-dev-server'
 
 export default defineConfig(({ mode }) => {
   if (mode === 'client') {
     return {
+      plugins: [UnoCSS()],
       build: {
         rollupOptions: {
           input: './app/client.ts',
@@ -19,6 +21,22 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       UnoCSS(),
+      devServer({
+        entry: 'app/server.ts',
+        exclude: [
+          /^\/@vite\//,           // Vite client files
+          /^\/app\/client\.ts$/,  // Client entry point
+          /^\/node_modules\//,    // Node modules
+          /^\/src\//,             // Source files
+          /^\/@fs\//,             // Vite file system access
+          /^\/virtual:/,          // Virtual modules like uno.css
+          /^\/@unocss\//,         // UnoCSS dev endpoints
+          /^\/__uno\.css$/,       // UnoCSS virtual CSS file
+          /^\/app\/routes\//,     // Route files (let Vite handle them)
+          /\.tsx?$/,              // TypeScript files
+          /\.jsx?$/               // JavaScript files
+        ]
+      }),
       {
         name: 'dynamic-host-handler',
         configureServer(server) {
