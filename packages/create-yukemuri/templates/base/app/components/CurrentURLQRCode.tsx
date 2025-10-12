@@ -23,7 +23,7 @@ export default function CurrentURLQRCode() {
 
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">現在のページのQRコード</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Current Page QR Code</h3>
       <QRCodeComponent 
         value={currentURL} 
         size={200}

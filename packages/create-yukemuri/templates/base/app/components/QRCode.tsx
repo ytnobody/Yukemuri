@@ -26,7 +26,7 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
         setQrDataURL(dataURL)
         setError('')
       } catch (err) {
-        setError('QRコードの生成に失敗しました')
+        setError('Failed to generate QR code')
         console.error('QR code generation error:', err)
       }
     }
