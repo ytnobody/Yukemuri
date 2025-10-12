@@ -1,6 +1,6 @@
 import { hydrate } from 'preact'
 import App from './routes/index'
-import 'uno.css'
+import 'virtual:uno.css'
 
 // SSRされたHTMLをハイドレート
 const app = document.getElementById('app')

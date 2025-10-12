@@ -230,12 +230,72 @@ app.get('/', (c: Context) => {
       <!-- Web App Manifest -->
       <link rel="manifest" href="/manifest.json" />
       
-  <!-- Icons -->
+      <!-- Minimal CSS for styling -->
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; background: #f9fafb; min-height: 100vh; }
+        .container { max-width: 64rem; margin: 0 auto; padding: 2rem 1rem; }
+        h1 { font-size: 2.25rem; font-weight: 700; text-align: center; margin-bottom: 1rem; color: #1f2937; }
+        h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #374151; }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #374151; }
+        h4 { font-size: 1.125rem; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
+        p { margin-bottom: 1.5rem; color: #6b7280; }
+        .text-center { text-align: center; }
+        .text-8xl { font-size: 6rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .card { background: white; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .btn { display: inline-block; padding: 0.5rem 1rem; margin: 0.25rem; border: none; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s; text-decoration: none; }
+        .btn-primary { background: #3b82f6; color: white; } .btn-primary:hover { background: #2563eb; }
+        .btn-danger { background: #ef4444; color: white; } .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #6b7280; color: white; } .btn-secondary:hover { background: #4b5563; }
+        .flex { display: flex; }
+        .gap-3 { gap: 0.75rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .bg-yellow-50 { background: #fefce8; }
+        .border-yellow-200 { border-color: #fde047; }
+        .text-yellow-900 { color: #713f12; }
+        .text-yellow-800 { color: #92400e; }
+        .bg-gray-50 { background: #f9fafb; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .underline { text-decoration: underline; }
+        .text-primary-600 { color: #2563eb; }
+        .hover\\:text-primary-800:hover { color: #1e40af; }
+        strong { color: #2563eb; }
+        a { color: #2563eb; text-decoration: none; }
+        a:hover { color: #1e40af; text-decoration: underline; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .rounded-full { border-radius: 9999px; }
+        .bg-orange-100 { background: #fed7aa; }
+        .text-orange-800 { color: #9a3412; }
+        .bg-blue-100 { background: #dbeafe; }
+        .text-blue-800 { color: #1e40af; }
+        .ml-2 { margin-left: 0.5rem; }
+        .mr-3 { margin-right: 0.75rem; }
+        .mt-1 { margin-top: 0.25rem; }
+      </style>
+      
+      <!-- Icons -->
   <link rel="icon" type="image/png" href="/icons/icon-192x192.png" />
   <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     </head>
     <body class="bg-gray-50 min-h-screen">
       <div id="app">${html}</div>
+      ${process.env.NODE_ENV !== 'production' ? '<script type="module" src="/@vite/client"></script>' : ''}
       <script type="module" src="/app/client.ts"></script>
       <script src="/debug-pwa.js"></script>
     </body>

@@ -1,5 +1,8 @@
 /// <reference types="preact" />
 
+// UnoCSS virtual modules
+declare module 'virtual:uno.css'
+
 // Hono modules (type definitions are provided in actual projects)
 declare module 'hono' {
   export class Hono {

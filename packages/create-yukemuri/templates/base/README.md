@@ -21,29 +21,53 @@ For accessing from other devices or external services:
 # Enable access from any host (LAN access)
 npm run dev:host
 
-# Use with ngrok
-ngrok http 5173
-
-# For ngrok with custom domain, set environment variables:
-HMR_HOST=your-domain.ngrok.io npm run dev
+# Quick ngrok tunnel (easiest method)
+npm run tunnel
 ```
 
-**ngrok HTTPS setup:**
+**Prerequisites:**
 ```bash
-# Copy .env.example to .env and configure:
-cp .env.example .env
+# Install ngrok globally first
+npm install -g ngrok
 
-# Edit .env file:
-HMR_HOST=your-domain.ngrok.io
-HMR_PROTOCOL=wss
-HMR_PORT=443
+# Get authtoken from https://ngrok.com and set it
+ngrok authtoken YOUR_TOKEN
+```
+
+**Advanced HMR configuration:**
+```bash
+# For external access with HMR
+HMR_HOST=your-domain.ngrok.io HMR_PROTOCOL=wss HMR_PORT=443 npm run dev
 ```
 
 The development server will automatically:
 - ✅ Enable CORS for all origins
 - ✅ Show available network addresses  
 - ✅ Configure HMR for external access
-- ✅ Support both HTTP and HTTPS ngrok tunnels
+- ✅ Support HTTPS ngrok tunnels
+
+**Ngrok Features:**
+- 🌍 **Public URL**: Share your app with anyone
+- 📱 **PWA Testing**: Test install prompts on mobile devices
+- 🔔 **Push Notifications**: Test real push notifications
+- 🔄 **Live Reload**: HMR works through the tunnel
+
+**Troubleshooting:**
+
+If ngrok fails:
+```bash
+# Option 1: Setup ngrok manually
+npm install -g ngrok
+ngrok authtoken YOUR_TOKEN  # Get from https://ngrok.com
+ngrok http 5173
+
+# Option 2: Use LAN access only
+npm run dev:host
+```
+
+Common ngrok issues:
+- **"failed to start tunnel"**: Sign up at ngrok.com and set authtoken
+- **"connection refused"**: Make sure dev server is running first
 
 ### Build
 
