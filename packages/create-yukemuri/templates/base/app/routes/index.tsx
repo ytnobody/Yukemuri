@@ -2,39 +2,11 @@ import { h, Fragment } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
 
 export default function App() {
-  useEffect(() => {
-    // UnoCSSロード後にスタイルを強制適用
-    const forceEmojiStyle = () => {
-      const emojiElements = document.querySelectorAll('.yukemuri-emoji')
-      emojiElements.forEach(element => {
-        const htmlElement = element as HTMLElement
-        htmlElement.style.fontSize = '6rem'
-        htmlElement.style.lineHeight = '1'
-        htmlElement.style.display = 'block'
-      })
-    }
-    
-    // 初回とUnoCSSロード後に適用
-    forceEmojiStyle()
-    setTimeout(forceEmojiStyle, 100)
-    setTimeout(forceEmojiStyle, 500)
-  }, [])
-
   return (
     <div className="container">
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .yukemuri-emoji {
-            font-size: 6rem !important;
-            line-height: 1 !important;
-            display: block !important;
-          }
-        `
-      }} />
-      
       <div className="text-center mb-8">
-        <div className="mb-6">
-          <div className="text-8xl yukemuri-emoji mb-4" style={{ fontSize: '6rem', lineHeight: '1', display: 'block' }}>♨️</div>
+        <div className="text-8xl">
+          <div>♨️</div>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           Welcome to Yukemuri!

@@ -15,18 +15,14 @@ export default defineConfig({
     }
   },
   presets: [
-    presetUno({
-      // text-8xlを含む大きなフォントサイズも有効化
-      scale: {
-        fontSize: {
-          '8xl': '6rem',
-          '9xl': '8rem'
-        }
-      }
-    }),
+    presetUno(),
     presetTypography()
   ],
   theme: {
+    fontSize: {
+      '8xl': '6rem',
+      '9xl': '8rem'
+    },
     colors: {
       primary: {
         50: '#eff6ff',
