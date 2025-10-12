@@ -1,5 +1,6 @@
 import { h, Fragment } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
+import CurrentURLQRCode from '../components/CurrentURLQRCode'
 
 export default function App() {
   return (
@@ -15,6 +16,8 @@ export default function App() {
           This is a Hono + Preact powered PWA framework.
         </p>
       </div>
+      
+      <CurrentURLQRCode />
       
       <Counter />
       
