@@ -9,7 +9,9 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "create": "pnpm --filter create-yukemuri build && node packages/create-yukemuri/dist/index.js",
+    "setup": "pnpm install && pnpm build && pnpm --filter create-yukemuri link --global"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

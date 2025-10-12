@@ -66,18 +66,58 @@ const __dirname = path.dirname(__filename);
 )
 
 program
-  .name('create-yukemari')
-  .description('Create a new Yukemari application')
-  .version(packageJson.version)
-  .argument('[project-name]', 'Name of the project to create')
-  .option('-t, --template <template>', 'Template to use', 'base')
-  .action(async (projectName?: string, options?: { template?: string }) => {
-  if (projectName) {
-    await createProject(projectName);
-  } else {
-    console.error('Project name is required');
-    process.exit(1);
-  }
+  .name('create-yukemuri')
+  .description('Create a new Yukemuri application')
+  .version('0.1.0')
+  .argument('[name]', 'project name')
+  .action(async (name?: string) => {
+    let projectName = name;
+    
+    // If no project name provided, prompt for it
+    if (!projectName) {
+      const answers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'projectName',
+          message: 'What is your project name?',
+          default: 'my-yukemuri-app',
+          validate: (input: string) => {
+            if (!input.trim()) return 'Project name is required';
+            if (!/^[a-z0-9-_]+$/.test(input)) return 'Project name should only contain lowercase letters, numbers, hyphens, and underscores';
+            return true;
+          }
+        }
+      ]);
+      projectName = answers.projectName;
+    }
+    
+    // At this point projectName is guaranteed to be a string
+    const finalProjectName = projectName as string;
+    
+    // Validate project name format
+    if (!/^[a-z0-9-_]+$/.test(finalProjectName)) {
+      console.error(chalk.red('Error: Project name should only contain lowercase letters, numbers, hyphens, and underscores'));
+      process.exit(1);
+    }
+    
+    const spinner = ora('Creating Yukemuri project...').start();
+    
+    try {
+      await createProject(finalProjectName);
+      spinner.succeed(chalk.green(`Project ${finalProjectName} created successfully! ♨️`));
+      
+      console.log();
+      console.log(chalk.cyan('Next steps:'));
+      console.log(chalk.gray(`  cd ${finalProjectName}`));
+      console.log(chalk.gray('  npm install'));
+      console.log(chalk.gray('  npm run dev'));
+      console.log();
+      console.log(chalk.yellow('Happy coding! ♨️'));
+    } catch (error) {
+      spinner.fail(chalk.red('Failed to create project'));
+      console.error(error);
+      process.exit(1);
+    }
   });
 
 async function createProject(projectName: string) {
