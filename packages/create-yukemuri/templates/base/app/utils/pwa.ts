@@ -11,8 +11,8 @@ declare global {
   }
 }
 
-export class YukeuriPWA {
-  private static instance: YukeuriPWA
+export class YukemuriPWA {
+  private static instance: YukemuriPWA
   private swRegistration: ServiceWorkerRegistration | null = null
   private installPrompt: PWAInstallPrompt | null = null
 
@@ -20,11 +20,11 @@ export class YukeuriPWA {
     this.init()
   }
 
-  static getInstance(): YukeuriPWA {
-    if (!YukeuriPWA.instance) {
-      YukeuriPWA.instance = new YukeuriPWA()
+  static getInstance(): YukemuriPWA {
+    if (!YukemuriPWA.instance) {
+      YukemuriPWA.instance = new YukemuriPWA()
     }
-    return YukeuriPWA.instance
+    return YukemuriPWA.instance
   }
 
   private async init() {
@@ -232,4 +232,4 @@ export class YukeuriPWA {
 }
 
 // Global instance
-export const pwa = YukeuriPWA.getInstance()
+export const pwa = YukemuriPWA.getInstance()
