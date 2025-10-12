@@ -73,6 +73,54 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
+// Push event for notifications
+self.addEventListener('push', (event) => {
+  console.log('♨️ Service Worker: Push event received')
+  
+  let options = {
+    body: 'Hello from Yukemuri ♨️',
+    icon: '/icons/icon-192x192.png',
+    tag: 'yukemuri-push',
+    badge: '/icons/icon-192x192.png',
+    requireInteraction: false,
+    actions: [
+      { action: 'open', title: 'Open App' },
+      { action: 'close', title: 'Close' }
+    ]
+  }
+
+  if (event.data) {
+    try {
+      const data = event.data.json()
+      options = { ...options, ...data }
+    } catch (e) {
+      options.body = event.data.text()
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification('Yukemuri ♨️', options)
+  )
+})
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  console.log('♨️ Service Worker: Notification clicked')
+  
+  event.notification.close()
+  
+  if (event.action === 'open' || !event.action) {
+    event.waitUntil(
+      clients.openWindow('/')
+    )
+  }
+})
+
+// Notification close event
+self.addEventListener('notificationclose', (event) => {
+  console.log('♨️ Service Worker: Notification closed')
+})
+
 console.log('♨️ Yukemuri Service Worker loaded')
 `
 }

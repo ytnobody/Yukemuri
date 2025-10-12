@@ -114,6 +114,7 @@ function PWAFeatures() {
   const [isInstalled, setIsInstalled] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [debugInfo, setDebugInfo] = useState<string[]>([])
+  const [serviceWorkerRegistration, setServiceWorkerRegistration] = useState<ServiceWorkerRegistration | null>(null)
 
   // Debug log function
   const addDebugLog = (message: string) => {
@@ -141,6 +142,16 @@ function PWAFeatures() {
         addDebugLog(`Notification permission: ${Notification.permission}`)
       } else {
         addDebugLog('Notification API not available')
+      }
+      
+      // Get Service Worker registration
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+          setServiceWorkerRegistration(registration)
+          addDebugLog('Service Worker registration obtained')
+        }).catch((error) => {
+          addDebugLog(`Service Worker registration error: ${error.message}`)
+        })
       }
     }
 
@@ -287,7 +298,7 @@ function PWAFeatures() {
     }
   }
 
-  const sendTestNotification = () => {
+  const sendTestNotification = async () => {
     addDebugLog('Test notification button clicked')
     
     if (notificationPermission !== 'granted') {
@@ -308,9 +319,30 @@ function PWAFeatures() {
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       addDebugLog(`Sending notification: ${randomMessage.title}`)
       
+      // Try Service Worker notification first (better for Android PWA)
+      if ('serviceWorker' in navigator && serviceWorkerRegistration) {
+        addDebugLog('Using Service Worker notification')
+        try {
+          await serviceWorkerRegistration.showNotification(randomMessage.title, {
+            body: randomMessage.body,
+            icon: '/icons/icon-192x192.png',
+            tag: 'yukemuri-test',
+            badge: '/icons/icon-192x192.png',
+            requireInteraction: false
+          })
+          addDebugLog('Service Worker notification sent successfully')
+          return
+        } catch (swError) {
+          addDebugLog(`Service Worker notification failed: ${swError.message}`)
+        }
+      }
+      
+      // Fallback to regular notification
+      addDebugLog('Using regular notification as fallback')
       const notification = new Notification(randomMessage.title, {
         body: randomMessage.body,
         tag: 'yukemuri-test',
+        icon: '/icons/icon-192x192.png',
         requireInteraction: false
       })
       
@@ -343,7 +375,7 @@ function PWAFeatures() {
   }
 
   // Simple immediate notification test
-  const sendImmediateNotification = () => {
+  const sendImmediateNotification = async () => {
     addDebugLog('Immediate notification test started')
     
     if (!('Notification' in window)) {
@@ -352,7 +384,7 @@ function PWAFeatures() {
       return
     }
     
-    if (Notification.permission !== 'granted') {
+    if (notificationPermission !== 'granted') {
       addDebugLog('Permission not granted for immediate notification')
       alert('Notification permission is required')
       return
@@ -360,9 +392,31 @@ function PWAFeatures() {
     
     try {
       addDebugLog('Creating immediate notification...')
+      
+      // Try Service Worker notification first (better for Android PWA)
+      if (serviceWorkerRegistration) {
+        addDebugLog('Using Service Worker for immediate notification')
+        try {
+          await serviceWorkerRegistration.showNotification('Immediate Test ♨️', {
+            body: 'This notification should be displayed immediately',
+            icon: '/icons/icon-192x192.png',
+            tag: 'immediate-test',
+            badge: '/icons/icon-192x192.png',
+            requireInteraction: false
+          })
+          addDebugLog('Immediate Service Worker notification sent successfully')
+          return
+        } catch (swError) {
+          addDebugLog(`Immediate Service Worker notification failed: ${swError.message}`)
+        }
+      }
+      
+      // Fallback to regular notification
+      addDebugLog('Using regular notification as fallback for immediate test')
       const notification = new Notification('Immediate Test ♨️', {
         body: 'This notification should be displayed immediately',
-        tag: 'immediate-test'
+        tag: 'immediate-test',
+        icon: '/icons/icon-192x192.png'
       })
       
       addDebugLog('Immediate notification created')
@@ -382,7 +436,7 @@ function PWAFeatures() {
   }
 
   // 10-second delayed notification test
-  const sendDelayedNotification = () => {
+  const sendDelayedNotification = async () => {
     addDebugLog('Delayed notification test started (10 seconds)')
     
     if (!('Notification' in window)) {
@@ -390,7 +444,7 @@ function PWAFeatures() {
       return
     }
     
-    if (Notification.permission !== 'granted') {
+    if (notificationPermission !== 'granted') {
       alert('Notification permission is required')
       return
     }
@@ -407,13 +461,34 @@ function PWAFeatures() {
     }, 1000)
     
     // Send notification after 10 seconds
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         addDebugLog('Creating delayed notification now!')
         
+        // Try Service Worker notification first (better for Android PWA)
+        if (serviceWorkerRegistration) {
+          addDebugLog('Using Service Worker for delayed notification')
+          try {
+            await serviceWorkerRegistration.showNotification('Yukemuri Delayed Notification ♨️', {
+              body: 'This is a 10-second delayed notification test. Background notification verification!',
+              icon: '/icons/icon-192x192.png',
+              tag: 'delayed-test',
+              badge: '/icons/icon-192x192.png',
+              requireInteraction: true
+            })
+            addDebugLog('Delayed Service Worker notification sent successfully')
+            return
+          } catch (swError) {
+            addDebugLog(`Delayed Service Worker notification failed: ${swError.message}`)
+          }
+        }
+        
+        // Fallback to regular notification
+        addDebugLog('Using regular notification as fallback for delayed test')
         const notification = new Notification('Yukemuri Delayed Notification ♨️', {
           body: 'This is a 10-second delayed notification test. Background notification verification!',
           tag: 'delayed-test',
+          icon: '/icons/icon-192x192.png',
           requireInteraction: true // Requires manual closing
         })
         
