@@ -1,13 +1,18 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { readFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { existsSync } from 'fs'
+import { fileURLToPath } from 'url'
 import { renderPage } from './document'
 import { generateServiceWorker } from './utils/service-worker'
 import App from './routes/index'
 import api from './api'
 import 'virtual:uno.css'
+
+// ES modules equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const app = new Hono()
 
