@@ -31,14 +31,14 @@ async function generateIconFiles(projectPath: string) {
   const iconSvg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="512" height="512" rx="128" fill="#3b82f6"/>
   <g transform="translate(256, 256)">
-    <!-- 湯気 -->
+    <!-- Steam -->
     <path d="M-80 -60 Q-80 -80 -60 -80 Q-40 -80 -40 -60 Q-40 -40 -60 -40 Q-80 -40 -80 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
     <path d="M-20 -60 Q-20 -80 0 -80 Q20 -80 20 -60 Q20 -40 0 -40 Q-20 -40 -20 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
     <path d="M40 -60 Q40 -80 60 -80 Q80 -80 80 -60 Q80 -40 60 -40 Q40 -40 40 -60" 
           stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
-    <!-- 温泉プール -->
+    <!-- Hot spring pool -->
     <ellipse cx="0" cy="20" rx="120" ry="80" fill="white"/>
     <ellipse cx="0" cy="10" rx="100" ry="60" fill="#3b82f6"/>
   </g>
@@ -51,7 +51,7 @@ async function generateIconFiles(projectPath: string) {
     await fs.writeFile(iconPath, iconSvg)
   }
 
-  // メインアイコンファイルも作成
+  // Generate main icon file as well
   await fs.writeFile(path.join(iconsDir, 'icon.svg'), iconSvg)
   
   console.log('✔ Generated PWA icon files')
@@ -125,19 +125,19 @@ async function createProject(projectName: string) {
   const templatePath = path.join(__dirname, '../templates/base')
 
   try {
-    // プロジェクトディレクトリを作成
+    // Create project directory
     await fs.mkdir(projectPath, { recursive: true })
     
-    // テンプレートファイルをコピー
+    // Copy template files
     await copyDirectory(templatePath, projectPath)
     
-    // package.jsonのプロジェクト名を更新
+    // Update project name in package.json
     const packageJsonPath = path.join(projectPath, 'package.json')
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'))
     packageJson.name = projectName
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2))
     
-    // アイコンファイルを生成
+    // Generate icon files
     await generateIconFiles(projectPath)
     
     console.log(`✔ Project ${projectName} created successfully!`)
