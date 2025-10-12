@@ -13,6 +13,38 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) to view your application.
 
+### External Access (LAN, ngrok, etc.)
+
+For accessing from other devices or external services:
+
+```bash
+# Enable access from any host (LAN access)
+npm run dev:host
+
+# Use with ngrok
+ngrok http 5173
+
+# For ngrok with custom domain, set environment variables:
+HMR_HOST=your-domain.ngrok.io npm run dev
+```
+
+**ngrok HTTPS setup:**
+```bash
+# Copy .env.example to .env and configure:
+cp .env.example .env
+
+# Edit .env file:
+HMR_HOST=your-domain.ngrok.io
+HMR_PROTOCOL=wss
+HMR_PORT=443
+```
+
+The development server will automatically:
+- ✅ Enable CORS for all origins
+- ✅ Show available network addresses  
+- ✅ Configure HMR for external access
+- ✅ Support both HTTP and HTTPS ngrok tunnels
+
 ### Build
 
 ```bash
