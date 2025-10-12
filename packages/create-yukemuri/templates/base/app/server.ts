@@ -2,9 +2,11 @@ import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { existsSync } from 'fs'
 import { renderPage } from './document'
 import { generateServiceWorker } from './utils/service-worker'
 import App from './routes/index'
+import api from './api'
 import 'virtual:uno.css'
 
 const app = new Hono()
@@ -24,51 +26,51 @@ app.get('/manifest.json', (c: Context) => {
     prefer_related_applications: false,
       icons: [
       {
-        src: "/icons/icon-72x72.png",
+        src: "/static/icons/icon-72x72.svg",
         sizes: "72x72",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-96x96.png",
+        src: "/static/icons/icon-96x96.svg",
         sizes: "96x96",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-128x128.png",
+        src: "/static/icons/icon-128x128.svg",
         sizes: "128x128",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-144x144.png",
+        src: "/static/icons/icon-144x144.svg",
         sizes: "144x144",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-152x152.png",
+        src: "/static/icons/icon-152x152.svg",
         sizes: "152x152",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-192x192.png",
+        src: "/static/icons/icon-192x192.svg",
         sizes: "192x192",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any maskable"
       },
       {
-        src: "/icons/icon-384x384.png",
+        src: "/static/icons/icon-384x384.svg",
         sizes: "384x384",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icons/icon-512x512.png",
+        src: "/static/icons/icon-512x512.svg",
         sizes: "512x512",
-        type: "image/png",
+        type: "image/svg+xml",
         purpose: "any maskable"
       }
     ],
@@ -92,54 +94,56 @@ app.get('/sw.js', (c: Context) => {
   })
 })
 
-// Static file distribution (fallback when Vite doesn't handle)
-app.get('/icons/*', (c: Context) => {
-  const iconPath = c.req.path
-  console.log('📁 Serving icon:', iconPath)
-
-  if (iconPath.endsWith('.svg')) {
-    const svg = `<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="128" fill="#3b82f6"/>
-  <g transform="translate(256, 256)">
-    <!-- Steam -->
-    <path d="M-80 -60 Q-80 -80 -60 -80 Q-40 -80 -40 -60 Q-40 -40 -60 -40 Q-80 -40 -80 -60" 
-          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
-    <path d="M-20 -60 Q-20 -80 0 -80 Q20 -80 20 -60 Q20 -40 0 -40 Q-20 -40 -20 -60" 
-          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
-    <path d="M40 -60 Q40 -80 60 -80 Q80 -80 80 -60 Q80 -40 60 -40 Q40 -40 40 -60" 
-          stroke="white" stroke-width="12" fill="none" stroke-linecap="round"/>
-    <!-- Hot spring pool -->
-    <ellipse cx="0" cy="20" rx="120" ry="80" fill="white"/>
-    <ellipse cx="0" cy="10" rx="100" ry="60" fill="#3b82f6"/>
-  </g>
-</svg>`
-
-    return new Response(svg, {
-      headers: {
-        'Content-Type': 'image/svg+xml; charset=utf-8',
-        'Cache-Control': 'public, max-age=31536000'
+// Static file serving from app/static
+app.get('/static/*', (c: Context) => {
+  const filePath = c.req.path.replace('/static', '')
+  const fullPath = join(__dirname, 'static', filePath)
+  
+  console.log('📁 Serving static file:', filePath)
+  
+  try {
+    if (existsSync(fullPath)) {
+      const content = readFileSync(fullPath, 'utf-8')
+      
+      // Determine content type based on file extension
+      let contentType = 'text/plain'
+      if (filePath.endsWith('.svg')) {
+        contentType = 'image/svg+xml; charset=utf-8'
+      } else if (filePath.endsWith('.png')) {
+        contentType = 'image/png'
+      } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+        contentType = 'image/jpeg'
+      } else if (filePath.endsWith('.css')) {
+        contentType = 'text/css; charset=utf-8'
+      } else if (filePath.endsWith('.js')) {
+        contentType = 'application/javascript; charset=utf-8'
       }
-    })
-  }
-
-  if (iconPath.endsWith('.png')) {
-    try {
-      const rel = iconPath.startsWith('/') ? iconPath.slice(1) : iconPath
-      const filePath = join(process.cwd(), 'public', rel)
-      const data = readFileSync(filePath)
-      return new Response(new Uint8Array(data), {
+      
+      return new Response(content, {
         headers: {
-          'Content-Type': 'image/png',
+          'Content-Type': contentType,
           'Cache-Control': 'public, max-age=31536000'
         }
       })
-    } catch (e) {
-  console.error('📛 Failed to read icon file', e)
-  return new Response('Not Found', { status: 404 })
     }
+  } catch (error) {
+    console.error('Error serving static file:', error)
   }
-
+  
   return new Response('Not Found', { status: 404 })
+})
+
+// Legacy icon route (fallback - redirect to static)
+app.get('/icons/*', (c: Context) => {
+  const iconPath = c.req.path.replace('/icons', '/static/icons')
+  console.log('📁 Redirecting icon request to:', iconPath)
+  
+  return new Response(null, {
+    status: 301,
+    headers: {
+      'Location': iconPath
+    }
+  })
 })
 
 // Main page with SSR
