@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import type { Context } from 'hono'
 
 // Import individual handler functions
 import { getAllUsers, getUserById } from './users'

@@ -6,7 +6,6 @@ import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { renderPage } from './document'
 import { generateServiceWorker } from './utils/service-worker'
-import App from './routes/index'
 import api from './api'
 import 'virtual:uno.css'
 
@@ -16,7 +15,11 @@ const __dirname = dirname(__filename)
 
 const app = new Hono()
 
-// Static file serving
+// ============================================
+// PWA Essential Routes
+// ============================================
+
+// Web App Manifest
 app.get('/manifest.json', (c: Context) => {
   return c.json({
     name: "Yukemuri Application",
@@ -29,7 +32,7 @@ app.get('/manifest.json', (c: Context) => {
     orientation: "portrait-primary",
     scope: "/",
     prefer_related_applications: false,
-      icons: [
+    icons: [
       {
         src: "/static/icons/icon-72x72.svg",
         sizes: "72x72",
@@ -99,12 +102,14 @@ app.get('/sw.js', (c: Context) => {
   })
 })
 
-// Static file serving from app/static
+// ============================================
+// Static File Serving
+// ============================================
+
+// Static files from app/static
 app.get('/static/*', (c: Context) => {
   const filePath = c.req.path.replace('/static', '')
   const fullPath = join(__dirname, 'static', filePath)
-  
-  console.log('📁 Serving static file:', filePath)
   
   try {
     if (existsSync(fullPath)) {
@@ -138,11 +143,9 @@ app.get('/static/*', (c: Context) => {
   return new Response('Not Found', { status: 404 })
 })
 
-// Legacy icon route (fallback - redirect to static)
+// Legacy icon route redirect (backward compatibility)
 app.get('/icons/*', (c: Context) => {
   const iconPath = c.req.path.replace('/icons', '/static/icons')
-  console.log('📁 Redirecting icon request to:', iconPath)
-  
   return new Response(null, {
     status: 301,
     headers: {
@@ -151,76 +154,22 @@ app.get('/icons/*', (c: Context) => {
   })
 })
 
+// ============================================
+// API Routes
+// ============================================
+
+// Mount API routes using Hono's route method for grouping
+app.route('/api', api)
+
+// ============================================
+// Application Routes
+// ============================================
+
 // Main page with SSR
 app.get('/', (c: Context) => {
   return c.html(renderPage())
 })
 
-// API route
-app.get('/api/users', (c: Context) => {
-  return c.json({
-    users: [
-      { id: 1, name: 'Alice', email: 'alice@example.com' },
-      { id: 2, name: 'Bob', email: 'bob@example.com' }
-    ]
-  })
-})
-
-app.get('/api/health', (c: Context) => {
-  return c.json({ status: 'OK', timestamp: new Date().toISOString() })
-})
-
 console.log('♨️ Yukemuri app initialized')
 
 export default app
-
-// PWA debug routes
-app.get('/debug-pwa.js', (c: Context) => {
-  c.header('Content-Type', 'application/javascript; charset=utf-8')
-  return c.text(`
-// PWA debug script
-console.log('=== PWA Debug Info ===');
-
-// 1. Service Worker check
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    console.log('📋 Service Worker registrations:', registrations.length);
-    registrations.forEach((reg, index) => {
-      console.log(\`  \${index + 1}. \${reg.scope} - State: \${reg.active?.state || 'inactive'}\`);
-    });
-  });
-} else {
-  console.log('❌ Service Worker not supported');
-}
-
-// 2. Manifest check
-fetch('/manifest.json')
-  .then(response => response.json())
-  .then(manifest => {
-    console.log('📄 Manifest loaded:', manifest.name);
-    console.log('   Start URL:', manifest.start_url);
-    console.log('   Display:', manifest.display);
-    console.log('   Icons:', manifest.icons.length);
-  })
-  .catch(error => console.log('❌ Manifest error:', error));
-
-// 3. PWA install criteria
-setTimeout(() => {
-  console.log('🔍 PWA Install Criteria Check:');
-  console.log('  - HTTPS:', location.protocol === 'https:' || location.hostname === 'localhost');
-  console.log('  - Service Worker:', 'serviceWorker' in navigator);
-  console.log('  - Manifest Link:', !!document.querySelector('link[rel="manifest"]'));
-  console.log('  - Icons in Manifest: checking...');
-  
-  // Add beforeinstallprompt event listener
-  window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('🎉 beforeinstallprompt event fired! PWA is installable!');
-    console.log('   Event:', e);
-    e.preventDefault();
-    window.deferredPrompt = e;
-  });
-  
-  console.log('✨ PWA debug setup complete. Watch for beforeinstallprompt event.');
-}, 3000);
-  `)
-})
