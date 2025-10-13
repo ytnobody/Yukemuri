@@ -6,12 +6,16 @@ import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { renderPage } from './document'
 import { generateServiceWorker } from './utils/service-worker'
+import { createFileRouter } from './utils/file-router'
 import api from './api'
 import 'virtual:uno.css'
 
 // ES modules equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+
+// Initialize file-based router
+const fileRouter = createFileRouter(join(__dirname, 'routes'))
 
 const app = new Hono()
 
@@ -165,8 +169,16 @@ app.route('/api', api)
 // Application Routes
 // ============================================
 
-// Main page with SSR
-app.get('/', (c: Context) => {
+// SPA routing - serve the same page for all non-API routes
+app.get('*', (c: Context) => {
+  // Skip API routes and static files
+  const path = c.req.path
+  if (path.startsWith('/api/') || path.startsWith('/static/') || path.startsWith('/icons/') || path === '/manifest.json' || path === '/sw.js') {
+    // Let other handlers deal with these
+    return
+  }
+  
+  // Serve SPA for all other routes
   return c.html(renderPage())
 })
 

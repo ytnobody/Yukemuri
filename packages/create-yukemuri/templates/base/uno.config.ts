@@ -44,7 +44,7 @@ export default defineConfig({
     'btn-danger': 'btn bg-red-500 text-white hover:bg-red-600',
     'btn-secondary': 'btn bg-gray-500 text-white hover:bg-gray-600',
     'card': 'border border-gray-200 rounded-lg p-6 shadow-sm bg-white',
-    'container': 'max-w-4xl mx-auto px-4 py-8'
+    'container': 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'
   },
   rules: [
     // カスタムtext-8xlルール（6rem = 96px）
