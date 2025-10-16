@@ -113,6 +113,37 @@ npm run deploy
 - 🏝️ **Islands Architecture**: Selective hydration for performance
 - 📱 **PWA Ready**: Progressive Web App capabilities
 
+## Yukemuri Framework APIs
+
+This project includes the Yukemuri framework with powerful client-side APIs:
+
+- **🛠️ PWA Management**: Install prompts, service workers, app status
+- **🔔 Notifications**: Push notifications with permission management
+- **📱 QR Code Generation**: Generate and share QR codes
+- **💾 Storage Management**: Type-safe local, session, and persistent storage
+
+**📖 [View Complete API Documentation](./YUKEMURI_API.md)**
+
+Quick example:
+```typescript
+import { yu } from './lib/yukemuri'
+
+// PWA installation
+await yu.pwa.install()
+
+// Send notification
+await yu.notifications.sendNotification('Hello!', {
+  body: 'Welcome to our app'
+})
+
+// Generate QR code
+const qrCode = await yu.qr.generate('https://myapp.com')
+
+// Type-safe storage
+const settings = yu.storage.local('user-settings', { theme: 'light' })
+settings.set({ theme: 'dark' })
+```
+
 ## API Endpoints
 
 - `GET /` - Home page with UI
