@@ -191,42 +191,128 @@ class PWAManagerImpl implements PWAManager {
 class NotificationManagerImpl implements NotificationManager {
   
   async requestPermission(): Promise<NotificationPermission> {
-    if (typeof window === 'undefined') return 'default'
+    console.log('🔔 NotificationManager: requestPermission called')
+    
+    if (typeof window === 'undefined') {
+      console.log('🔔 Window is undefined, returning default')
+      return 'default'
+    }
 
+    // Check if notifications are supported
     if (!('Notification' in window)) {
       console.warn('⚠️ This browser does not support notifications')
+      alert('このブラウザは通知機能をサポートしていません。')
       return 'denied'
     }
 
+    console.log('🔔 Current Notification.permission:', Notification.permission)
+    console.log('🔔 Browser User Agent:', navigator.userAgent)
+    console.log('🔔 Is HTTPS:', location.protocol === 'https:')
+
+    // Check current permission status
     if (Notification.permission === 'granted') {
+      console.log('🔔 Permission already granted')
       return 'granted'
     }
 
     if (Notification.permission === 'denied') {
+      console.log('🔔 Permission previously denied')
+      console.log('🔔 User needs to manually enable notifications in browser settings')
+      alert('通知が拒否されています。ブラウザの設定（アドレスバーの🔒または🛡️アイコン）から通知を有効にしてください。\n\n手順:\n1. アドレスバーの左側のアイコンをクリック\n2. 「通知」を「許可」に変更\n3. ページを再読み込み')
       return 'denied'
     }
 
-    const permission = await Notification.requestPermission()
-    console.log('🔔 Notification permission:', permission)
+    console.log('🔔 Permission status is default, requesting permission...')
     
-    return permission
+    // Ensure we're in a user interaction context
+    if (!document.hasFocus()) {
+      console.warn('⚠️ Document does not have focus, permission request might fail')
+    }
+
+    try {
+      console.log('🔔 Calling Notification.requestPermission()...')
+      
+      // Check if the old callback style is needed (older browsers)
+      let permission: NotificationPermission
+      
+      if (typeof Notification.requestPermission === 'function') {
+        // Modern promise-based API
+        if (Notification.requestPermission.length === 0) {
+          permission = await Notification.requestPermission()
+        } else {
+          // Fallback for older browsers with callback
+          permission = await new Promise((resolve) => {
+            Notification.requestPermission((result) => {
+              resolve(result as NotificationPermission)
+            })
+          })
+        }
+      } else {
+        console.error('❌ Notification.requestPermission is not a function')
+        return 'denied'
+      }
+      
+      console.log('🔔 Notification permission result:', permission)
+      
+      // Additional verification
+      const finalPermission = Notification.permission
+      console.log('🔔 Final Notification.permission after request:', finalPermission)
+      
+      if (permission !== finalPermission) {
+        console.warn('⚠️ Permission mismatch detected, using final permission:', finalPermission)
+      }
+      
+      return finalPermission
+    } catch (error) {
+      console.error('❌ Error requesting notification permission:', error)
+      console.error('❌ Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
+      
+      // Try to get current permission even if request failed
+      const fallbackPermission = Notification.permission
+      console.log('🔔 Fallback permission check:', fallbackPermission)
+      
+      return fallbackPermission
+    }
   }
 
   async sendNotification(title: string, options?: NotificationOptions): Promise<void> {
+    console.log('📢 NotificationManager: sendNotification called', title, options)
+    
     if (typeof window === 'undefined') return
 
     const permission = await this.requestPermission()
+    console.log('📢 Permission check result:', permission)
     
     if (permission === 'granted') {
-      new Notification(title, {
-        body: options?.body,
-        icon: options?.icon || '/icons/icon-192x192.png',
-        badge: options?.badge || '/icons/icon-72x72.png',
-        tag: options?.tag || 'yukemuri-notification',
-        data: options?.data
-      })
+      console.log('📢 Creating notification...')
+      try {
+        const notification = new Notification(title, {
+          body: options?.body,
+          icon: options?.icon || '/icons/icon-192x192.png',
+          badge: options?.badge || '/icons/icon-72x72.png',
+          tag: options?.tag || 'yukemuri-notification',
+          data: options?.data
+        })
+        
+        notification.onclick = () => {
+          console.log('📢 Notification clicked')
+          window.focus()
+        }
+        
+        notification.onerror = (error) => {
+          console.error('❌ Notification error:', error)
+        }
+        
+        console.log('✅ Notification created successfully')
+      } catch (error) {
+        console.error('❌ Error creating notification:', error)
+      }
     } else {
-      console.warn('⚠️ Notification permission not granted')
+      console.warn('⚠️ Notification permission not granted:', permission)
     }
   }
 

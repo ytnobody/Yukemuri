@@ -141,25 +141,66 @@ function PWAFeatures() {
   }
 
   const requestNotificationPermission = async () => {
-    console.log('♨️ Requesting notification permission with Yukemuri API')
+    console.log('♨️ [HOME] Requesting notification permission with Yukemuri API')
+    console.log('♨️ [HOME] User interaction context check')
+    console.log('♨️ [HOME] Document.hasFocus():', document.hasFocus())
+    console.log('♨️ [HOME] Document.visibilityState:', document.visibilityState)
+    console.log('♨️ [HOME] Window.focus():', window === window.top)
     
     try {
+      // Ensure page has focus
+      if (!document.hasFocus()) {
+        console.log('🔔 [HOME] Page does not have focus, requesting focus...')
+        window.focus()
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+
+      // Check if browser supports notifications
+      if (!('Notification' in window)) {
+        console.error('❌ [HOME] Browser does not support notifications')
+        alert('このブラウザは通知をサポートしていません')
+        return
+      }
+
+      console.log('🔔 [HOME] Current permission before request:', Notification.permission)
+      console.log('🔔 [HOME] Browser info:', {
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'SSR',
+        isHTTPS: typeof location !== 'undefined' ? location.protocol === 'https:' : false,
+        host: typeof location !== 'undefined' ? location.host : 'SSR'
+      })
+      
+      // Show user what we're about to do
+      const confirmRequest = confirm('通知許可をリクエストします。ブラウザのダイアログで「許可」を選択してください。')
+      if (!confirmRequest) {
+        console.log('🔔 [HOME] User cancelled permission request')
+        return
+      }
+      
       const permission = await yu.notifications.requestPermission()
+      console.log('🔔 [HOME] Permission result:', permission)
       setNotificationPermission(permission)
       
       if (permission === 'granted') {
-        console.log('✅ Notification permission granted')
+        console.log('✅ [HOME] Notification permission granted')
         
         // Send test notification using yu.notifications API
+        console.log('📢 [HOME] Sending test notification...')
         await yu.notifications.sendNotification('Yukemuri ♨️', {
           body: 'Notifications enabled successfully with Yukemuri API!',
           icon: '/icons/icon-192x192.png'
         })
+        console.log('✅ [HOME] Test notification sent')
+        alert('✅ 通知が有効になりました！テスト通知を送信しました。')
+      } else if (permission === 'denied') {
+        console.log('❌ [HOME] Notification permission denied')
+        alert('❌ 通知が拒否されました。ブラウザの設定から通知を有効にしてください。\n\n手順:\n1. アドレスバーの🔒アイコンをクリック\n2. 「通知」を「許可」に変更\n3. ページを再読み込み')
       } else {
-        console.log('❌ Notification permission denied')
+        console.log('⚠️ [HOME] Notification permission default/dismissed')
+        alert('⚠️ 通知の許可が得られませんでした。もう一度お試しください。')
       }
     } catch (error) {
-      console.error('❌ Notification permission error:', error)
+      console.error('❌ [HOME] Notification permission error:', error)
+      alert('❌ 通知の設定でエラーが発生しました: ' + error.message)
     }
   }
 
@@ -205,14 +246,83 @@ function PWAFeatures() {
         <div>
           <h3 className="font-semibold mb-2">🔔 Push Notifications</h3>
           <p className="text-sm text-gray-600 mb-2">
-            Status: {notificationPermission}
+            Status: <span className={`font-semibold ${
+              notificationPermission === 'granted' ? 'text-green-600' :
+              notificationPermission === 'denied' ? 'text-red-600' : 'text-yellow-600'
+            }`}>
+              {notificationPermission === 'granted' ? '✅ Granted' :
+               notificationPermission === 'denied' ? '❌ Denied' : '⚠️ Not Set'}
+            </span>
           </p>
-          <button
-            onClick={requestNotificationPermission}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Enable Notifications
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={requestNotificationPermission}
+              className={`px-4 py-2 rounded text-white ${
+                notificationPermission === 'granted'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : notificationPermission === 'denied'
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+              disabled={notificationPermission === 'granted'}
+            >
+              {notificationPermission === 'granted' ? 'Already Enabled' :
+               notificationPermission === 'denied' ? 'Try Again' : 'Enable Notifications'}
+            </button>
+            {notificationPermission === 'granted' && (
+              <button
+                onClick={() => {
+                  console.log('📢 [HOME] Sending manual test notification')
+                  yu.notifications.sendNotification('Test Notification ♨️', {
+                    body: 'Manual test notification from Yukemuri!',
+                    icon: '/icons/icon-192x192.png'
+                  })
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Send Test
+              </button>
+            )}
+          </div>
+          {notificationPermission === 'denied' && (
+            <p className="text-xs text-red-600 mt-2">
+              ⚠️ 通知が拒否されています。ブラウザの設定（アドレスバーの🔒アイコン）から通知を有効にしてください。
+            </p>
+          )}
+          
+          {/* Notification Diagnostics */}
+          <div className="mt-4 p-3 bg-gray-50 rounded text-xs">
+            <h4 className="font-semibold mb-2">🔧 通知診断情報</h4>
+            <div className="space-y-1">
+              <div>サポート状況: {typeof window !== 'undefined' && 'Notification' in window ? '✅ サポート' : '❌ 未サポート'}</div>
+              <div>現在の許可: {notificationPermission}</div>
+              <div>HTTPS: {typeof location !== 'undefined' && location.protocol === 'https:' ? '✅' : '❌'}</div>
+              <div>フォーカス: {typeof document !== 'undefined' && document.hasFocus() ? '✅' : '❌'}</div>
+              <div>ブラウザ: {typeof navigator !== 'undefined' ? navigator.userAgent.split(' ').pop() : 'Unknown'}</div>
+            </div>
+            <button
+              onClick={() => {
+                if (typeof window === 'undefined') {
+                  alert('サーバーサイドレンダリング中のため診断情報を取得できません。')
+                  return
+                }
+                
+                const info = {
+                  supported: 'Notification' in window,
+                  permission: typeof Notification !== 'undefined' ? Notification.permission : 'undefined',
+                  https: typeof location !== 'undefined' ? location.protocol === 'https:' : false,
+                  focus: document.hasFocus(),
+                  userAgent: navigator.userAgent,
+                  host: typeof location !== 'undefined' ? location.host : 'SSR'
+                }
+                console.log('🔧 Notification Diagnostics:', info)
+                alert('診断情報をコンソールに出力しました。F12を押してConsoleタブを確認してください。')
+              }}
+              className="mt-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-xs"
+            >
+              診断情報を表示
+            </button>
+          </div>
         </div>
       </div>
     </div>

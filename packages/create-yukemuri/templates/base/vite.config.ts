@@ -25,16 +25,17 @@ export default defineConfig(({ mode }) => {
         entry: 'app/server.ts',
         exclude: [
           /^\/@vite\//,           // Vite client files
-          /^\/app\/client\.ts$/,  // Client entry point
+          /^\/app\/client\.ts$/,  // Client entry point - let Vite handle it
+          /^\/app\/.*\.tsx?$/,    // App TypeScript files - let Vite handle
           /^\/node_modules\//,    // Node modules
           /^\/src\//,             // Source files
           /^\/@fs\//,             // Vite file system access
           /^\/virtual:/,          // Virtual modules like uno.css
           /^\/@unocss\//,         // UnoCSS dev endpoints
           /^\/__uno\.css$/,       // UnoCSS virtual CSS file
-          /^\/app\/routes\//,     // Route files (let Vite handle them)
-          /\.tsx?$/,              // TypeScript files
-          /\.jsx?$/               // JavaScript files
+          /^\/static\//,          // Static files
+          /^\/public\//,          // Public files
+          // Don't exclude route files - let server handle them
         ]
       }),
       {

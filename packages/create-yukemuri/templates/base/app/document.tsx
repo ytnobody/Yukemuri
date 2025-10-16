@@ -1,4 +1,4 @@
-import { h } from 'preact'
+import { h, Fragment } from 'preact'
 import { render } from 'preact-render-to-string'
 import App from './routes/index'
 import 'virtual:uno.css'
@@ -20,6 +20,7 @@ function Document({ children, title = "Yukemuri App ♨️", description = "A PW
         {/* PWA Meta Tags */}
         <meta name="description" content={description} />
         <meta name="theme-color" content="#3b82f6" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Yukemuri" />
@@ -34,9 +35,14 @@ function Document({ children, title = "Yukemuri App ♨️", description = "A PW
       <body class="bg-gray-50 min-h-screen">
         <div id="app">{children}</div>
         {process.env.NODE_ENV !== 'production' && (
-          <script type="module" src="/@vite/client"></script>
+          <>
+            <script type="module" src="/@vite/client"></script>
+            <script type="module" src="/app/client.ts"></script>
+          </>
         )}
-        <script type="module" src="/app/client.ts"></script>
+        {process.env.NODE_ENV === 'production' && (
+          <script type="module" src="/static/client.js"></script>
+        )}
       </body>
     </html>
   )
