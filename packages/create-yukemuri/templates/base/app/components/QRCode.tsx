@@ -81,20 +81,22 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
 
   return (
     <div className={`text-center ${className}`}>
-      <div className="relative inline-block">
+      <div className="inline-block">
         <img 
           src={qrDataURL} 
           alt={`QR Code for ${value}`}
           className="mx-auto rounded shadow-sm"
           style={{ width: `${size}px`, height: `${size}px` }}
         />
-        <button
-          onClick={handleDownload}
-          className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded text-xs hover:bg-opacity-70 transition-opacity"
-          title="Download QR Code"
-        >
-          📥
-        </button>
+        <div className="mt-2">
+          <button
+            onClick={handleDownload}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors"
+            title="Download QR Code"
+          >
+            📥 ダウンロード
+          </button>
+        </div>
       </div>
       <p className="text-sm text-gray-600 mt-2 break-all">{value}</p>
     </div>

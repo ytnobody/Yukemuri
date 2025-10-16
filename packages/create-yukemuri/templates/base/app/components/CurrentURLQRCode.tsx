@@ -120,27 +120,27 @@ export default function CurrentURLQRCode() {
     <div className="mb-8">
       <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Current Page QR Code</h3>
       <div className="text-center">
-        <div className="relative inline-block mb-4">
+        <div className="inline-block mb-4">
           <img 
             src={qrDataURL} 
             alt={`QR Code for ${currentURL}`}
             className="mx-auto rounded shadow-sm"
             style={{ width: '200px', height: '200px' }}
           />
-          <div className="absolute top-2 right-2 flex space-x-1">
+          <div className="mt-2 flex justify-center space-x-2">
             <button
               onClick={handleDownload}
-              className="bg-black bg-opacity-50 text-white p-2 rounded text-sm hover:bg-opacity-70 transition-opacity"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors"
               title="Download QR Code"
             >
-              📥
+              📥 ダウンロード
             </button>
             <button
               onClick={handleShare}
-              className="bg-black bg-opacity-50 text-white p-2 rounded text-sm hover:bg-opacity-70 transition-opacity"
+              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors"
               title="Share URL"
             >
-              🔗
+              🔗 共有
             </button>
           </div>
         </div>
