@@ -94,7 +94,7 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
             className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors"
             title="Download QR Code"
           >
-            📥 ダウンロード
+            📥 Download
           </button>
         </div>
       </div>

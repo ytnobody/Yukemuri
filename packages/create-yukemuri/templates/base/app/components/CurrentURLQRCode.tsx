@@ -133,14 +133,14 @@ export default function CurrentURLQRCode() {
               className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors"
               title="Download QR Code"
             >
-              📥 ダウンロード
+              📥 Download
             </button>
             <button
               onClick={handleShare}
               className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors"
               title="Share URL"
             >
-              🔗 共有
+              🔗 Share
             </button>
           </div>
         </div>

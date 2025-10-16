@@ -158,7 +158,7 @@ function PWAFeatures() {
       // Check if browser supports notifications
       if (!('Notification' in window)) {
         console.error('❌ [HOME] Browser does not support notifications')
-        alert('このブラウザは通知をサポートしていません')
+        alert('This browser does not support notifications')
         return
       }
 
@@ -170,7 +170,7 @@ function PWAFeatures() {
       })
       
       // Show user what we're about to do
-      const confirmRequest = confirm('通知許可をリクエストします。ブラウザのダイアログで「許可」を選択してください。')
+      const confirmRequest = confirm('We will request notification permission. Please select "Allow" in the browser dialog.')
       if (!confirmRequest) {
         console.log('🔔 [HOME] User cancelled permission request')
         return
@@ -190,17 +190,17 @@ function PWAFeatures() {
           icon: '/icons/icon-192x192.png'
         })
         console.log('✅ [HOME] Test notification sent')
-        alert('✅ 通知が有効になりました！テスト通知を送信しました。')
+        alert('✅ Notifications enabled! Test notification sent.')
       } else if (permission === 'denied') {
         console.log('❌ [HOME] Notification permission denied')
-        alert('❌ 通知が拒否されました。ブラウザの設定から通知を有効にしてください。\n\n手順:\n1. アドレスバーの🔒アイコンをクリック\n2. 「通知」を「許可」に変更\n3. ページを再読み込み')
+        alert('❌ Notifications denied. Please enable notifications in browser settings.\n\nSteps:\n1. Click the 🔒 icon in the address bar\n2. Change "Notifications" to "Allow"\n3. Reload the page')
       } else {
         console.log('⚠️ [HOME] Notification permission default/dismissed')
-        alert('⚠️ 通知の許可が得られませんでした。もう一度お試しください。')
+        alert('⚠️ Notification permission not granted. Please try again.')
       }
     } catch (error) {
       console.error('❌ [HOME] Notification permission error:', error)
-      alert('❌ 通知の設定でエラーが発生しました: ' + error.message)
+      alert('❌ Notification setup error: ' + error.message)
     }
   }
 
@@ -286,24 +286,24 @@ function PWAFeatures() {
           </div>
           {notificationPermission === 'denied' && (
             <p className="text-xs text-red-600 mt-2">
-              ⚠️ 通知が拒否されています。ブラウザの設定（アドレスバーの🔒アイコン）から通知を有効にしてください。
+              ⚠️ Notifications are denied. Please enable notifications in browser settings (click the 🔒 icon in the address bar).
             </p>
           )}
           
           {/* Notification Diagnostics */}
           <div className="mt-4 p-3 bg-gray-50 rounded text-xs">
-            <h4 className="font-semibold mb-2">🔧 通知診断情報</h4>
+            <h4 className="font-semibold mb-2">🔧 Notification Diagnostics</h4>
             <div className="space-y-1">
-              <div>サポート状況: {typeof window !== 'undefined' && 'Notification' in window ? '✅ サポート' : '❌ 未サポート'}</div>
-              <div>現在の許可: {notificationPermission}</div>
+              <div>Support: {typeof window !== 'undefined' && 'Notification' in window ? '✅ Supported' : '❌ Not Supported'}</div>
+              <div>Current Permission: {notificationPermission}</div>
               <div>HTTPS: {typeof location !== 'undefined' && location.protocol === 'https:' ? '✅' : '❌'}</div>
-              <div>フォーカス: {typeof document !== 'undefined' && document.hasFocus() ? '✅' : '❌'}</div>
-              <div>ブラウザ: {typeof navigator !== 'undefined' ? navigator.userAgent.split(' ').pop() : 'Unknown'}</div>
+              <div>Focus: {typeof document !== 'undefined' && document.hasFocus() ? '✅' : '❌'}</div>
+              <div>Browser: {typeof navigator !== 'undefined' ? navigator.userAgent.split(' ').pop() : 'Unknown'}</div>
             </div>
             <button
               onClick={() => {
                 if (typeof window === 'undefined') {
-                  alert('サーバーサイドレンダリング中のため診断情報を取得できません。')
+                  alert('Cannot get diagnostic information during server-side rendering.')
                   return
                 }
                 
@@ -316,11 +316,11 @@ function PWAFeatures() {
                   host: typeof location !== 'undefined' ? location.host : 'SSR'
                 }
                 console.log('🔧 Notification Diagnostics:', info)
-                alert('診断情報をコンソールに出力しました。F12を押してConsoleタブを確認してください。')
+                alert('Diagnostic information has been output to the console. Press F12 and check the Console tab.')
               }}
               className="mt-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-xs"
             >
-              診断情報を表示
+              Show Diagnostics
             </button>
           </div>
         </div>
