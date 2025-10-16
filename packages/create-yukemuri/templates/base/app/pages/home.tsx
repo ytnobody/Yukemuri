@@ -51,6 +51,38 @@ export default function Home() {
           </li>
         </ul>
       </div>
+
+      {/* Documentation Links */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">📖 Documentation</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <a 
+            href="/docs" 
+            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="text-lg font-semibold text-blue-600 mb-2">API Documentation</h3>
+            <p className="text-gray-600 text-sm">
+              Complete guide to all Yukemuri APIs including PWA, notifications, QR codes, and storage management.
+            </p>
+            <div className="mt-3 text-blue-500 text-sm font-medium">
+              Read Documentation →
+            </div>
+          </a>
+          
+          <a 
+            href="/examples" 
+            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200"
+          >
+            <h3 className="text-lg font-semibold text-green-600 mb-2">Code Examples</h3>
+            <p className="text-gray-600 text-sm">
+              Real-world component examples showing how to build complete features with Yukemuri framework.
+            </p>
+            <div className="mt-3 text-green-500 text-sm font-medium">
+              View Examples →
+            </div>
+          </a>
+        </div>
+      </div>
       
       <div className="text-center">
         <p className="text-gray-600">
