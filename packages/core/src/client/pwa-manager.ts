@@ -1,9 +1,4 @@
-// Yukemuri PWA Utils ♨️
-
-export interface PWAInstallPrompt {
-  prompt(): Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
+import type { PWAManager, PWAStatus, PWAInstallPrompt } from '../types.js'
 
 declare global {
   interface Window {
@@ -11,23 +6,19 @@ declare global {
   }
 }
 
-export class YukemuriPWA {
-  private static instance: YukemuriPWA
+export class PWAManagerImpl implements PWAManager {
   private swRegistration: ServiceWorkerRegistration | null = null
   private installPrompt: PWAInstallPrompt | null = null
+  private isInitialized = false
 
-  private constructor() {
+  constructor() {
     this.init()
   }
 
-  static getInstance(): YukemuriPWA {
-    if (!YukemuriPWA.instance) {
-      YukemuriPWA.instance = new YukemuriPWA()
-    }
-    return YukemuriPWA.instance
-  }
-
   private async init() {
+    if (this.isInitialized || typeof window === 'undefined') return
+    this.isInitialized = true
+
     console.log('♨️ Initializing Yukemuri PWA...')
     
     // Register Service Worker
@@ -53,6 +44,8 @@ export class YukemuriPWA {
   }
 
   private setupInstallPrompt() {
+    if (typeof window === 'undefined') return
+
     window.addEventListener('beforeinstallprompt', (e) => {
       console.log('📱 PWA install prompt ready')
       e.preventDefault()
@@ -71,32 +64,42 @@ export class YukemuriPWA {
     })
   }
 
-  // Check if PWA is installable
   isInstallable(): boolean {
+    if (typeof window === 'undefined') return false
     return !!this.installPrompt
   }
 
-  // Check if PWA is already installed
   isInstalled(): boolean {
+    if (typeof window === 'undefined') return false
+    
     return window.matchMedia('(display-mode: standalone)').matches ||
            window.matchMedia('(display-mode: fullscreen)').matches ||
            (window.navigator as any).standalone === true
   }
 
-  // Debug: Check PWA status
-  getPWAStatus() {
+  getStatus(): PWAStatus {
+    if (typeof window === 'undefined') {
+      return {
+        hasServiceWorker: false,
+        hasManifest: false,
+        isHTTPS: false,
+        installPromptAvailable: false,
+        isInstalled: false,
+        notificationPermission: 'default' as NotificationPermission
+      }
+    }
+
     return {
       hasServiceWorker: !!this.swRegistration,
       hasManifest: !!document.querySelector('link[rel="manifest"]'),
       isHTTPS: location.protocol === 'https:' || location.hostname === 'localhost',
       installPromptAvailable: !!this.installPrompt,
       isInstalled: this.isInstalled(),
-      notificationPermission: 'Notification' in window ? Notification.permission : 'not supported'
+      notificationPermission: 'Notification' in window ? Notification.permission : 'default' as NotificationPermission
     }
   }
 
-  // Show PWA install prompt
-  async showInstallPrompt(): Promise<boolean> {
+  async install(): Promise<boolean> {
     if (!this.installPrompt) {
       console.warn('⚠️ Install prompt not available')
       return false
@@ -118,74 +121,6 @@ export class YukemuriPWA {
     } catch (error) {
       console.error('❌ Install prompt failed:', error)
       return false
-    }
-  }
-
-  // Request push notification permission
-  async requestNotificationPermission(): Promise<NotificationPermission> {
-    if (!('Notification' in window)) {
-      console.warn('⚠️ This browser does not support notifications')
-      return 'denied'
-    }
-
-    if (Notification.permission === 'granted') {
-      return 'granted'
-    }
-
-    if (Notification.permission === 'denied') {
-      return 'denied'
-    }
-
-    // Request permission
-    const permission = await Notification.requestPermission()
-    console.log('🔔 Notification permission:', permission)
-    
-    return permission
-  }
-
-  // Subscribe to push notifications (VAPID-compatible)
-  async subscribeToPush(): Promise<PushSubscription | null> {
-    if (!this.swRegistration) {
-      console.error('❌ Service Worker not registered')
-      return null
-    }
-
-    try {
-      // Get VAPID public key from environment variables
-      const vapidPublicKey = (import.meta as any).env?.VITE_VAPID_PUBLIC_KEY
-
-      if (!vapidPublicKey) {
-        console.log('💡 VAPID public key not configured')
-        console.log('💡 To enable push notifications:')
-        console.log('1. Add VITE_VAPID_PUBLIC_KEY=your_public_key to .env file')
-        console.log('2. Generate VAPID key pair: npm run generate-vapid')
-        return null
-      }
-
-      const subscription = await this.swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey) as BufferSource
-      })
-
-      console.log('📬 Push subscription successful:', subscription)
-      return subscription
-    } catch (error) {
-      console.error('❌ Push subscription failed:', error)
-      return null
-    }
-  }
-
-  // Send test notification
-  async sendTestNotification(title: string = 'Yukemuri ♨️', body: string = 'PWA notification test') {
-    const permission = await this.requestNotificationPermission()
-    
-    if (permission === 'granted') {
-      new Notification(title, {
-        body,
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-72x72.png',
-        tag: 'yukemuri-test'
-      })
     }
   }
 
@@ -214,22 +149,4 @@ export class YukemuriPWA {
       installButton.style.display = 'none'
     }
   }
-
-  private urlBase64ToUint8Array(base64String: string): Uint8Array {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4)
-    const base64 = (base64String + padding)
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/')
-
-    const rawData = window.atob(base64)
-    const outputArray = new Uint8Array(rawData.length)
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i)
-    }
-    return outputArray
-  }
 }
-
-// Global instance
-export const pwa = YukemuriPWA.getInstance()

@@ -1,9 +1,9 @@
-name = "my-yukemari-app"
+name = "my-yukemuri-app"
 compatibility_date = "2024-09-24"
 pages_build_output_dir = "./dist"
 
 [env.production]
-name = "my-yukemari-app-production"
+name = "my-yukemuri-app-production"
 
 [env.preview]
-name = "my-yukemari-app-preview"
+name = "my-yukemuri-app-preview"

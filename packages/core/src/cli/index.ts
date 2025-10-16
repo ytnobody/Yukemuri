@@ -16,14 +16,14 @@ const packageJsonPath = path.join(__dirname, '../../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
 program
-  .name('yukemari')
-  .description('Yukemari CLI - Internet edge framework for PWAs')
+  .name('yukemuri')
+  .description('Yukemuri CLI - Internet edge framework for PWAs')
   .version(packageJson.version);
 
 // add コマンド - プラグインを追加
 program
   .command('add <plugin>')
-  .description('Add a plugin to your Yukemari project')
+  .description('Add a plugin to your Yukemuri project')
   .option('-c, --config <config>', 'Plugin configuration')
   .action(async (plugin: string, options: { config?: string }) => {
     await addPlugin(plugin, options);
@@ -66,13 +66,13 @@ async function addPlugin(pluginName: string, options: { config?: string }) {
     // package.jsonを読み込み
     const pkgPath = path.resolve('package.json');
     if (!fs.existsSync(pkgPath)) {
-      throw new Error('package.json not found. Are you in a Yukemari project?');
+      throw new Error('package.json not found. Are you in a Yukemuri project?');
     }
 
     const pkg = fs.readJsonSync(pkgPath);
 
     // プラグインの依存関係を追加
-    const pluginPackage = `@yukemari/plugin-${pluginName}`;
+    const pluginPackage = `@yukemuri/plugin-${pluginName}`;
     
     if (!pkg.dependencies) pkg.dependencies = {};
     pkg.dependencies[pluginPackage] = 'latest';
@@ -99,7 +99,7 @@ async function addPlugin(pluginName: string, options: { config?: string }) {
 async function startDev(options: { port?: string }) {
   const port = parseInt(options.port || '3000');
   
-  console.log(chalk.blue('Starting Yukemari development server...'));
+  console.log(chalk.blue('Starting Yukemuri development server...'));
   
   try {
     // src/index.ts を実行

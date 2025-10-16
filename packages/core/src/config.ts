@@ -1,9 +1,9 @@
-import type { YukemariConfig } from './types.js';
+import type { YukemuriConfig } from './types.js';
 
 /**
- * Yukemariの設定を定義する
+ * Yukemuriの設定を定義する
  */
-export function defineConfig(config: YukemariConfig): YukemariConfig {
+export function defineConfig(config: YukemuriConfig): YukemuriConfig {
   return {
     dev: process.env.NODE_ENV !== 'production',
     version: '1.0.0',
@@ -14,9 +14,9 @@ export function defineConfig(config: YukemariConfig): YukemariConfig {
 /**
  * デフォルト設定を取得する
  */
-export function getDefaultConfig(): YukemariConfig {
+export function getDefaultConfig(): YukemuriConfig {
   return {
-    name: 'yukemari-app',
+    name: 'yukemuri-app',
     version: '1.0.0',
     dev: process.env.NODE_ENV !== 'production',
     plugins: [],
@@ -28,7 +28,7 @@ export function getDefaultConfig(): YukemariConfig {
 /**
  * 設定をマージする
  */
-export function mergeConfig(base: YukemariConfig, override: Partial<YukemariConfig>): YukemariConfig {
+export function mergeConfig(base: YukemuriConfig, override: Partial<YukemuriConfig>): YukemuriConfig {
   return {
     ...base,
     ...override,

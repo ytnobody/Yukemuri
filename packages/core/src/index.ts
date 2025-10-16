@@ -1,19 +1,46 @@
 // フレームワークのメインエクスポート
-export { Yukemari, createDevApp, createProdApp } from './yukemuri.js';
+export { YukemuriFactory as createYukemuriApp, Yukemuri, createDevApp, createProdApp } from './yukemuri.js';
 export { createApp } from './app.js';
 export { defineConfig, getDefaultConfig, mergeConfig } from './config.js';
 export { createPlugin, validatePluginConfig } from './plugins/index.js';
 
 // 型定義のエクスポート
 export type { 
-  YukemariApp, 
-  YukemariConfig, 
-  YukemariPlugin,
+  YukemuriApp, 
+  YukemuriConfig, 
+  YukemuriPlugin,
+  YukemuriClient,
   RouteConfig,
   MiddlewareConfig,
   DatabaseConfig,
   CLICommand,
-  ProjectTemplate 
+  ProjectTemplate,
+  // Client API 型定義
+  PWAManager,
+  PWAStatus,
+  NotificationManager,
+  NotificationOptions,
+  QRCodeManager,
+  QRCodeOptions,
+  StorageManager,
+  StorageController,
+  PersistentController,
+  StorageOptions,
+  PersistentOptions,
+  NetworkManager,
+  NetworkStatus,
+  OfflineSyncManager,
+  QueuedRequest,
+  SyncResult,
+  DeviceManager,
+  DeviceInfo,
+  ViewportInfo,
+  RouterManager,
+  UtilsManager,
+  ClipboardManager,
+  ShareManager,
+  ShareData,
+  FullscreenManager
 } from './types.js';
 
 // ユーティリティのエクスポート

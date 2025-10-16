@@ -1,6 +1,6 @@
 import { h } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
-import QRCode from 'qrcode'
+import { Yukemuri } from '../lib/yukemuri'
 
 interface QRCodeComponentProps {
   value: string
@@ -8,47 +8,72 @@ interface QRCodeComponentProps {
   className?: string
 }
 
+const yu = new Yukemuri()
+
 export default function QRCodeComponent({ value, size = 200, className = '' }: QRCodeComponentProps) {
   const [qrDataURL, setQrDataURL] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const generateQR = async () => {
+      if (!value) return
+      
+      setIsLoading(true)
+      setError('')
+      
       try {
-        const dataURL = await QRCode.toDataURL(value, {
-          width: size,
+        console.log('♨️ Generating QR code with Yukemuri API:', value)
+        
+        const dataURL = await yu.qr.generate(value, {
+          size,
           margin: 2,
           color: {
             dark: '#000000',
             light: '#FFFFFF'
-          }
+          },
+          errorCorrectionLevel: 'M'
         })
+        
         setQrDataURL(dataURL)
-        setError('')
+        console.log('✅ QR code generated successfully')
       } catch (err) {
         setError('Failed to generate QR code')
-        console.error('QR code generation error:', err)
+        console.error('❌ QR code generation error:', err)
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    if (value) {
-      generateQR()
-    }
+    generateQR()
   }, [value, size])
+
+  const handleDownload = () => {
+    if (qrDataURL) {
+      console.log('♨️ Downloading QR code with Yukemuri API')
+      yu.qr.download(qrDataURL, `qr-${Date.now()}.png`)
+    }
+  }
 
   if (error) {
     return (
       <div className={`text-center text-red-500 ${className}`}>
         <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-2 text-sm text-blue-500 hover:text-blue-700"
+        >
+          Retry
+        </button>
       </div>
     )
   }
 
-  if (!qrDataURL) {
+  if (isLoading || !qrDataURL) {
     return (
       <div className={`text-center ${className}`}>
-        <div className="animate-pulse bg-gray-200 rounded" style={{ width: `${size}px`, height: `${size}px` }}>
-          <span className="text-gray-500">Loading...</span>
+        <div className="animate-pulse bg-gray-200 rounded flex items-center justify-center" style={{ width: `${size}px`, height: `${size}px`, margin: '0 auto' }}>
+          <span className="text-gray-500 text-sm">Loading QR...</span>
         </div>
       </div>
     )
@@ -56,12 +81,21 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
 
   return (
     <div className={`text-center ${className}`}>
-      <img 
-        src={qrDataURL} 
-        alt={`QR Code for ${value}`}
-        className="mx-auto rounded shadow-sm"
-        style={{ width: `${size}px`, height: `${size}px` }}
-      />
+      <div className="relative inline-block">
+        <img 
+          src={qrDataURL} 
+          alt={`QR Code for ${value}`}
+          className="mx-auto rounded shadow-sm"
+          style={{ width: `${size}px`, height: `${size}px` }}
+        />
+        <button
+          onClick={handleDownload}
+          className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded text-xs hover:bg-opacity-70 transition-opacity"
+          title="Download QR Code"
+        >
+          📥
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mt-2 break-all">{value}</p>
     </div>
   )

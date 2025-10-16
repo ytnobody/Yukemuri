@@ -6,6 +6,7 @@ import Home from '../pages/home'
 import About from '../pages/about'
 import Users from '../pages/users'
 import UserDetail from '../pages/user'
+import Storage from '../pages/storage'
 
 // Navigation component
 function Navigation() {
@@ -26,6 +27,9 @@ function Navigation() {
               </a>
               <a href="/users" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded">
                 Users
+              </a>
+              <a href="/storage" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded">
+                Storage
               </a>
             </div>
           </div>
@@ -60,6 +64,7 @@ export default function App() {
         <Route path="/about" component={About} />
         <Route path="/users" component={Users} />
         <Route path="/users/:id" component={UserDetail} />
+        <Route path="/storage" component={Storage} />
       </Router>
     </Layout>
   )

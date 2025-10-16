@@ -1,6 +1,9 @@
 import { h } from 'preact'
-import { useState } from 'preact/hooks'
+import { useState, useEffect } from 'preact/hooks'
 import CurrentURLQRCode from '../components/CurrentURLQRCode'
+import { Yukemuri } from '../lib/yukemuri'
+
+const yu = new Yukemuri()
 
 export default function Home() {
   return (
@@ -93,40 +96,109 @@ function Counter() {
 
 function PWAFeatures() {
   const [isInstallable, setIsInstallable] = useState(false)
+  const [isInstalled, setIsInstalled] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
+  const [pwaStatus, setPwaStatus] = useState<any>(null)
+
+  // 新しいYukemuri APIを使用したPWA機能
+  useEffect(() => {
+    const initPWAStatus = async () => {
+      console.log('♨️ Initializing PWA status with Yukemuri API')
+      
+      // yu.pwa API を使用
+      const status = yu.pwa.getStatus()
+      setPwaStatus(status)
+      
+      setIsInstallable(yu.pwa.isInstallable())
+      setIsInstalled(yu.pwa.isInstalled())
+      setNotificationPermission(yu.notifications.getPermissionStatus())
+      
+      console.log('✅ PWA status loaded:', status)
+    }
+
+    initPWAStatus()
+    
+    // 定期的に状態をチェック
+    const interval = setInterval(initPWAStatus, 2000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleInstall = async () => {
-    if ('serviceWorker' in navigator) {
-      // Service Worker install prompt logic
-      console.log('Install prompt triggered')
+    console.log('♨️ Attempting PWA install with Yukemuri API')
+    
+    try {
+      const success = await yu.pwa.install()
+      if (success) {
+        console.log('✅ PWA installed successfully')
+        setIsInstalled(true)
+        setIsInstallable(false)
+      } else {
+        console.log('❌ PWA install cancelled or failed')
+      }
+    } catch (error) {
+      console.error('❌ PWA install error:', error)
     }
   }
 
   const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission()
+    console.log('♨️ Requesting notification permission with Yukemuri API')
+    
+    try {
+      const permission = await yu.notifications.requestPermission()
       setNotificationPermission(permission)
       
       if (permission === 'granted') {
-        new Notification('Yukemuri ♨️', {
-          body: 'Notifications enabled successfully!',
-          icon: '/static/icons/icon-192x192.svg'
+        console.log('✅ Notification permission granted')
+        
+        // Send test notification using yu.notifications API
+        await yu.notifications.sendNotification('Yukemuri ♨️', {
+          body: 'Notifications enabled successfully with Yukemuri API!',
+          icon: '/icons/icon-192x192.png'
         })
+      } else {
+        console.log('❌ Notification permission denied')
       }
+    } catch (error) {
+      console.error('❌ Notification permission error:', error)
     }
   }
 
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-4">PWA Features</h2>
+      <h2 className="text-2xl font-semibold text-gray-900 mb-4">PWA Features (Yukemuri API)</h2>
+      
+      {/* PWA Status Debug Info */}
+      {pwaStatus && (
+        <div className="bg-gray-50 p-4 rounded-lg mb-4 text-sm">
+          <h3 className="font-semibold mb-2">🔍 PWA Status Debug</h3>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div>Service Worker: {pwaStatus.hasServiceWorker ? '✅' : '❌'}</div>
+            <div>Manifest: {pwaStatus.hasManifest ? '✅' : '❌'}</div>
+            <div>HTTPS: {pwaStatus.isHTTPS ? '✅' : '❌'}</div>
+            <div>Install Prompt: {pwaStatus.installPromptAvailable ? '✅' : '❌'}</div>
+            <div>Installed: {pwaStatus.isInstalled ? '✅' : '❌'}</div>
+            <div>Notifications: {pwaStatus.notificationPermission}</div>
+          </div>
+        </div>
+      )}
+      
       <div className="bg-white p-6 rounded-lg shadow space-y-4">
         <div>
           <h3 className="font-semibold mb-2">📱 App Installation</h3>
+          <p className="text-sm text-gray-600 mb-2">
+            Installable: {isInstallable ? '✅ Yes' : '❌ No'} | 
+            Installed: {isInstalled ? '✅ Yes' : '❌ No'}
+          </p>
           <button
             onClick={handleInstall}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+            className={`px-4 py-2 rounded text-white ${
+              isInstallable 
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
+            disabled={!isInstallable}
           >
-            Install App
+            {isInstalled ? 'Already Installed' : 'Install App'}
           </button>
         </div>
         

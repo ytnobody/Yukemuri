@@ -39,7 +39,7 @@ VAPID_SUBJECT=mailto:your-email@example.com
   console.log('1. Update VAPID_SUBJECT with your email address')
   console.log('2. Keep VAPID_PRIVATE_KEY secret (use in server-side only)')
   console.log('3. Restart your dev server to use the new keys')
-  console.log('\n♨️ Happy coding with Yukemari!')
+  console.log('\n♨️ Happy coding with Yukemuri!')
   
 } catch (error) {
   console.error('❌ Failed to generate VAPID keys:', error.message)

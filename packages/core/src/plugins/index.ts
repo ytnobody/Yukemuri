@@ -1,6 +1,6 @@
 import type { 
-  YukemariPlugin, 
-  YukemariApp, 
+  YukemuriPlugin, 
+  YukemuriApp, 
   RouteConfig, 
   MiddlewareConfig,
   ConfigProperty 
@@ -15,10 +15,10 @@ export function createPlugin(options: {
   description?: string;
   dependencies?: string[];
   configSchema?: Record<string, ConfigProperty>;
-  init: (app: YukemariApp, config?: any) => Promise<void> | void;
+  init: (app: YukemuriApp, config?: any) => Promise<void> | void;
   routes?: RouteConfig[];
   middleware?: MiddlewareConfig[];
-}): YukemariPlugin {
+}): YukemuriPlugin {
   return {
     name: options.name,
     version: options.version,

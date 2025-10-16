@@ -1,30 +1,30 @@
 import { Hono } from 'hono';
 import type { 
-  YukemariConfig, 
-  YukemariApp, 
-  YukemariPlugin, 
+  YukemuriConfig, 
+  YukemuriApp, 
+  YukemuriPlugin, 
   RouteConfig, 
   MiddlewareConfig 
 } from './types.js';
 import { getDefaultConfig, mergeConfig } from './config.js';
 
 /**
- * Yukemariアプリケーションを作成する
+ * Yukemuriアプリケーションを作成する
  */
-export function createApp(userConfig?: Partial<YukemariConfig>): YukemariApp {
+export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   const config = mergeConfig(getDefaultConfig(), userConfig || {});
   const hono = new Hono();
 
   // 内部状態
   const state = {
-    plugins: new Map<string, YukemariPlugin>(),
+    plugins: new Map<string, YukemuriPlugin>(),
     initialized: false,
   };
 
   /**
    * プラグインを追加する
    */
-  const use = async (plugin: YukemariPlugin, pluginConfig?: any): Promise<YukemariApp> => {
+  const use = async (plugin: YukemuriPlugin, pluginConfig?: any): Promise<YukemuriApp> => {
     if (state.plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
@@ -55,7 +55,7 @@ export function createApp(userConfig?: Partial<YukemariConfig>): YukemariApp {
   /**
    * ルートを追加する
    */
-  const route = (routeConfig: RouteConfig): YukemariApp => {
+  const route = (routeConfig: RouteConfig): YukemuriApp => {
     addRoute(routeConfig);
     return app;
   };
@@ -63,7 +63,7 @@ export function createApp(userConfig?: Partial<YukemariConfig>): YukemariApp {
   /**
    * ミドルウェアを追加する
    */
-  const middleware = (middlewareConfig: MiddlewareConfig): YukemariApp => {
+  const middleware = (middlewareConfig: MiddlewareConfig): YukemuriApp => {
     addMiddleware(middlewareConfig);
     return app;
   };
@@ -76,7 +76,7 @@ export function createApp(userConfig?: Partial<YukemariConfig>): YukemariApp {
       await initialize();
     }
 
-    console.log(`🚀 Yukemari server starting on http://localhost:${port}`);
+    console.log(`🚀 Yukemuri server starting on http://localhost:${port}`);
     
     // Node.js環境での起動（開発用）
     const { serve } = await import('@hono/node-server');
@@ -150,7 +150,7 @@ export function createApp(userConfig?: Partial<YukemariConfig>): YukemariApp {
   };
 
   // アプリケーションオブジェクトを構築
-  const app: YukemariApp = {
+  const app: YukemuriApp = {
     hono,
     config,
     use,

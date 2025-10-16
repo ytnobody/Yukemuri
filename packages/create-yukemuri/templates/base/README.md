@@ -1,6 +1,6 @@
-# Yukemari Application ♨️
+# Yukemuri Application ♨️
 
-This is a new PWA built with Yukemari framework powered by Hono + Preact.
+This is a new PWA built with Yukemuri framework powered by Hono + Preact.
 
 ## Getting Started
 
@@ -122,6 +122,6 @@ npm run deploy
 
 ## Learn More
 
-- [Yukemari Documentation](https://github.com/your-org/yukemari)
+- [Yukemuri Documentation](https://github.com/your-org/yukemuri)
 - [HonoX Documentation](https://hono.dev/getting-started/cloudflare-pages)
 - [Cloudflare Pages](https://pages.cloudflare.com)
