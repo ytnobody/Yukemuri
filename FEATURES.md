@@ -45,16 +45,16 @@ interface PWAStatus {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// アプリをインストール
+// Install the application
 if (yu.pwa.isInstallable()) {
   await yu.pwa.install()
 }
 
-// PWA診断情報を取得
+// Get PWA diagnostic information
 const status = yu.pwa.getStatus()
 console.log('PWA Status:', status)
 ```
@@ -62,14 +62,14 @@ console.log('PWA Status:', status)
 ---
 
 ### `yu.notifications`
-プッシュ通知機能を管理するAPI
+API for managing push notifications
 
-**機能概要:**
-- 通知許可の管理
-- プッシュ通知の送信
-- VAPID対応のプッシュ購読
+**Feature Overview:**
+- Notification permission management
+- Send push notifications
+- VAPID-enabled push subscriptions
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface NotificationManager {
   requestPermission: () => Promise<NotificationPermission>
@@ -87,21 +87,21 @@ interface NotificationOptions {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// 通知許可を要求
+// Request notification permission
 const permission = await yu.notifications.requestPermission()
 
 if (permission === 'granted') {
-  // テスト通知を送信
+  // Send test notification
   await yu.notifications.sendNotification('Yukemuri ♨️', {
-    body: '通知が有効になりました！',
+    body: 'Notifications enabled!',
     icon: '/icons/icon-192x192.png'
   })
   
-  // プッシュ通知に購読
+  // Subscribe to push notifications
   const subscription = await yu.notifications.subscribeToPush()
 }
 ```
@@ -111,15 +111,15 @@ if (permission === 'granted') {
 ## 📊 QR Code Functions
 
 ### `yu.qr`
-QRコード生成・管理機能
+QR code generation and management functionality
 
-**機能概要:**
-- 任意のテキストからQRコード生成
-- 現在のURLのQRコード生成
-- QRコードのダウンロード機能
-- カスタマイズ可能なスタイリング
+**Feature Overview:**
+- Generate QR code from any text
+- Generate QR code from current URL
+- Download QR codes
+- Customizable styling
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface QRCodeManager {
   generate: (value: string, options?: QRCodeOptions) => Promise<string>
@@ -141,20 +141,20 @@ interface QRCodeOptions {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// カスタムQRコード生成
+// Generate custom QR code
 const qrDataURL = await yu.qr.generate('https://example.com', {
   size: 300,
   color: { dark: '#1a365d', light: '#ffffff' }
 })
 
-// 現在のページのQRコード
+// Generate QR code for current page
 const currentQR = await yu.qr.getCurrentURL({ size: 200 })
 
-// QRコードをダウンロード
+// Download QR code
 yu.qr.download(qrDataURL, 'my-qr-code.png')
 ```
 
@@ -163,15 +163,15 @@ yu.qr.download(qrDataURL, 'my-qr-code.png')
 ## 🔄 State Management Functions
 
 ### `yu.storage`
-各種ストレージとの連携機能
+Storage synchronization functionality
 
-**機能概要:**
-- LocalStorageとの自動同期
-- SessionStorageとの自動同期
-- PWA対応のオフライン状態管理
-- 型安全な値の管理
+**Feature Overview:**
+- Automatic localStorage synchronization
+- Automatic sessionStorage synchronization
+- PWA-compatible offline state management
+- Type-safe value management
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface StorageManager {
   local: <T>(key: string, defaultValue: T, options?: StorageOptions) => StorageController<T>
@@ -193,20 +193,20 @@ interface PersistentController<T> extends StorageController<T> {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// LocalStorage
+// localStorage
 const username = yu.storage.local('username', '')
 username.set('user123')
 console.log(username.get()) // 'user123'
 
-// SessionStorage  
+// sessionStorage  
 const tempData = yu.storage.session('temp-data', { count: 0 })
 tempData.set(prev => ({ ...prev, count: prev.count + 1 }))
 
-// Persistent Storage (PWA対応)
+// Persistent Storage (PWA-compatible)
 const userData = yu.storage.persistent('user-data', { preferences: {} })
 await userData.sync()
 ```
@@ -216,15 +216,15 @@ await userData.sync()
 ## 🌐 Network Functions
 
 ### `yu.network`
-ネットワーク接続状態の監視とオフライン対応
+Network connection monitoring and offline support
 
-**機能概要:**
-- リアルタイム接続状態監視
-- 接続タイプの検出
-- オフライン時のリクエストキューイング
-- オンライン復帰時の自動同期
+**Feature Overview:**
+- Real-time connection status monitoring
+- Connection type detection
+- Request queueing for offline mode
+- Automatic synchronization when back online
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface NetworkManager {
   status: NetworkStatus
@@ -253,11 +253,11 @@ interface OfflineSyncManager {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// ネットワーク状態の監視
+// Monitor network status
 console.log('Online:', yu.network.status.isOnline)
 
 yu.network.onStatusChange((status) => {
@@ -266,7 +266,7 @@ yu.network.onStatusChange((status) => {
   }
 })
 
-// オフライン時のリクエストキューイング
+// Queue requests when offline
 if (yu.network.status.isOffline) {
   await yu.network.offlineSync.queueRequest({
     url: '/api/users',
@@ -275,7 +275,7 @@ if (yu.network.status.isOffline) {
     priority: 'high'
   })
 } else {
-  // オンライン時は即座に送信
+  // Send immediately when online
   await fetch('/api/users', { method: 'POST', body: JSON.stringify(userData) })
 }
 ```
@@ -285,15 +285,15 @@ if (yu.network.status.isOffline) {
 ## 📱 Device Information Functions
 
 ### `yu.device`
-デバイス情報の取得とレスポンシブ対応
+Device information retrieval and responsive support
 
-**機能概要:**
-- デバイスタイプの判定
-- 画面サイズとビューポート情報
-- メディアクエリの監視
-- タッチ対応状況
+**Feature Overview:**
+- Device type detection
+- Screen size and viewport information
+- Media query monitoring
+- Touch device detection
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface DeviceManager {
   info: DeviceInfo
@@ -323,27 +323,27 @@ interface ViewportInfo {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// デバイス情報の取得
+// Get device information
 const { isMobile, isTablet, viewport } = yu.device.info
 
-// レスポンシブレイアウトの調整
+// Adjust responsive layout
 const layoutClass = isMobile ? 'mobile-layout' : isTablet ? 'tablet-layout' : 'desktop-layout'
 
-// メディアクエリの監視
+// Monitor media queries
 const isMobileView = yu.device.mediaQuery('(max-width: 768px)')
 
-// 複数のブレークポイント監視
+// Monitor multiple breakpoints
 const breakpoints = yu.device.mediaQueries({
   sm: '(min-width: 640px)',
   md: '(min-width: 768px)',
   lg: '(min-width: 1024px)'
 })
 
-// ビューポート変更の監視
+// Monitor viewport changes
 yu.device.onViewportChange((viewport) => {
   console.log('Viewport changed:', viewport.width, 'x', viewport.height)
 })
@@ -354,15 +354,15 @@ yu.device.onViewportChange((viewport) => {
 ## 🛣️ Routing Functions
 
 ### `yu.router`
-ファイルベースルーティングの制御
+File-based routing control
 
-**機能概要:**
-- プログラマティックナビゲーション
-- ルートパラメーターの取得
-- 履歴管理
-- ナビゲーションガード
+**Feature Overview:**
+- Programmatic navigation
+- Route parameter extraction
+- History management
+- Navigation guards
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface RouterManager {
   push: (path: string, state?: any) => void
@@ -378,20 +378,20 @@ interface RouterManager {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// プログラマティックナビゲーション
+// Programmatic navigation
 const navigateToUser = (userId: string) => {
   yu.router.push(`/users/${userId}`)
 }
 
-// パラメーターの取得
+// Get route parameters
 const params = yu.router.getParams() // { id: "123" } for /users/123
 const query = yu.router.getQuery()   // URLSearchParams for ?tab=profile&sort=name
 
-// 条件付きナビゲーション
+// Conditional navigation
 const handleSave = async () => {
   try {
     await saveData()
@@ -401,7 +401,7 @@ const handleSave = async () => {
   }
 }
 
-// ナビゲーション監視
+// Monitor navigation
 yu.router.onNavigate((path) => {
   console.log('Navigated to:', path)
 })
@@ -412,15 +412,15 @@ yu.router.onNavigate((path) => {
 ## 🔧 Utility Functions
 
 ### `yu.utils`
-便利なユーティリティ機能群
+Utility function collection
 
-**機能概要:**
-- クリップボード操作
-- Web Share API統合
-- フルスクリーン制御
-- その他の便利機能
+**Feature Overview:**
+- Clipboard operations
+- Web Share API integration
+- Fullscreen control
+- Additional utility functions
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface UtilsManager {
   clipboard: ClipboardManager
@@ -451,22 +451,22 @@ interface FullscreenManager {
 }
 ```
 
-**使用例:**
+**Usage Example:**
 ```typescript
 const yu = new Yukemuri()
 
-// クリップボード操作
+// Clipboard operations
 if (yu.utils.clipboard.isSupported) {
   const success = await yu.utils.clipboard.copy(window.location.href)
   if (success) {
-    showToast('URLをコピーしました')
+    showToast('URL copied!')
   }
 }
 
-// 共有機能
+// Share functionality
 const shareData = {
   title: 'Yukemuri App',
-  text: '素晴らしいPWAフレームワーク',
+  text: 'Amazing PWA framework',
   url: window.location.href
 }
 
@@ -474,7 +474,7 @@ if (yu.utils.share.canShare(shareData)) {
   await yu.utils.share.share(shareData)
 }
 
-// フルスクリーン制御
+// Fullscreen control
 if (yu.utils.fullscreen.isSupported) {
   await yu.utils.fullscreen.toggle()
 }
@@ -484,39 +484,39 @@ if (yu.utils.fullscreen.isSupported) {
 
 ## 🏗️ Implementation Priority
 
-### High Priority (即座に実装)
-- `yu.pwa` - 既存コードのリファクタリング
-- `yu.notifications` - 既存コードのリファクタリング  
-- `yu.qr` - 既存コンポーネントの関数化
-- `yu.router` - ファイルベースルーティングとの統合
+### High Priority (Implement immediately)
+- `yu.pwa` - Refactor existing code
+- `yu.notifications` - Refactor existing code
+- `yu.qr` - Convert existing components to functions
+- `yu.router` - Integrate with file-based routing
 
-### Medium Priority (次フェーズ)
-- `yu.storage` - 基本的な状態管理機能
-- `yu.network` - PWAの基盤機能
-- `yu.device` - レスポンシブ対応機能
+### Medium Priority (Next phase)
+- `yu.storage` - Basic state management features
+- `yu.network` - PWA foundation features
+- `yu.device` - Responsive support features
 
-### Low Priority (将来実装)
-- `yu.storage.persistent()` - 高度な状態管理
-- `yu.network.offlineSync` - 複雑な同期機能
-- `yu.utils` - 便利機能群
+### Low Priority (Future implementation)
+- `yu.storage.persistent()` - Advanced state management
+- `yu.network.offlineSync` - Complex sync features
+- `yu.utils` - Utility function collection
 
 ---
 
 ## 📋 Implementation Notes
 
 ### Framework Design Principles
-- すべての機能はYukemuriクラスのインスタンスから提供
-- TypeScriptで型安全に実装
-- Preact環境での最適化
-- ServiceWorkerとの連携を考慮
-- エラーハンドリングとローディング状態を標準装備
-- ブラウザ互換性とフォールバック対応
-- PWA要件への準拠
-- パフォーマンスとメモリ効率の最適化
+- All features provided through Yukemuri class instance
+- Type-safe implementation with TypeScript
+- Optimized for Preact environment
+- Consider Service Worker integration
+- Standard error handling and loading states
+- Browser compatibility and fallback support
+- PWA requirement compliance
+- Performance and memory efficiency optimization
 
 ### API Design Guidelines
-- 一貫性のあるメソッド命名
-- プロミスベースの非同期処理
-- オプション引数による柔軟な設定
-- イベントリスナーによるリアクティブな更新
-- チェーンメソッドによる直感的なAPI
+- Consistent method naming conventions
+- Promise-based asynchronous operations
+- Flexible configuration through optional parameters
+- Reactive updates through event listeners
+- Intuitive API through method chaining
