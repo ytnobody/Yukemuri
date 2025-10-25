@@ -72,12 +72,32 @@ my-app/
   - VAPID key generation for Web Push
   - [Documentation](./packages/create-yukemuri/README.md)
 
-- **`packages/plugins/auth`** - Authentication plugin
+- **`packages/plugins/auth`** - Authentication plugin ✅
   - JWT token management
   - Password hashing with PBKDF2
   - User management system
   - React hooks and UI components
   - [Documentation](./packages/plugins/auth/README.md)
+
+- **`packages/plugins/database`** - Database plugin ✅
+  - SQLite/Turso database support
+  - Type-safe query operations
+  - Transaction support
+  - Migration management
+  - [Documentation](./packages/plugins/database/README.md)
+
+## Planned Plugins
+
+The following plugins are planned for future releases:
+
+| Plugin | Status | Features |
+|--------|--------|----------|
+| **Email** | 🔄 Planned | Email sending via SendGrid/Mailgun/SMTP, template support, delivery tracking |
+| **Rate Limiting** | 🔄 Planned | Token bucket & sliding window algorithms, per-user/IP rate limits, quota management |
+| **Logging** | 🔄 Planned | Structured logging, multi-sink support (file, stdout, external services), log levels |
+| **Cache** | 🔄 Planned | Redis/In-Memory caching, TTL management, cache invalidation, stampede prevention |
+| **Analytics** | 🔄 Planned | Event tracking, Google Analytics/Plausible integration, custom dashboards |
+| **Payments** | 🔄 Planned | Stripe/PayPal integration, payment flows, invoice management, webhook handling |
 
 ## Usage Examples
 
@@ -152,11 +172,16 @@ pnpm --filter @yukemuri/cli link --global
 - [x] Development server setup
 - [x] Core framework implementation with plugin system
 - [x] Authentication plugin with JWT and password hashing
+- [x] Database plugin with SQLite/Turso support
 - [x] Type-safe error handling and validation
-- [ ] Database integration (Turso/SQLite)
-- [ ] Additional plugins (email, file upload, etc.)
-- [ ] Deployment helpers for major platforms
+- [ ] Email plugin with multiple transport options
+- [ ] Rate limiting plugin with configurable strategies
+- [ ] Logging plugin with structured output
+- [ ] Cache plugin with Redis support
+- [ ] Analytics plugin with event tracking
+- [ ] Payments plugin with Stripe/PayPal integration
 - [ ] Admin dashboard template
+- [ ] Deployment helpers for major platforms
 
 ## Contributing
 
