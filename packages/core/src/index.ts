@@ -2,7 +2,7 @@
 export { YukemuriFactory as createYukemuriApp, Yukemuri, createDevApp, createProdApp } from './yukemuri.js';
 export { createApp } from './app.js';
 export { defineConfig, getDefaultConfig, mergeConfig } from './config.js';
-export { createPlugin, validatePluginConfig } from './plugins/index.js';
+export { createPlugin, createConfigSchema, validatePluginConfig } from './plugins/index.js';
 
 // 型定義のエクスポート
 export type { 

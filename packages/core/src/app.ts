@@ -4,7 +4,9 @@ import type {
   YukemuriApp, 
   YukemuriPlugin, 
   RouteConfig, 
-  MiddlewareConfig 
+  MiddlewareConfig,
+  Logger,
+  PluginUtils
 } from './types.js';
 import { getDefaultConfig, mergeConfig } from './config.js';
 
@@ -33,7 +35,23 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
     state.plugins.set(plugin.name, plugin);
 
     // プラグインの初期化
-    await plugin.init(app, pluginConfig);
+    if (plugin.init) {
+      const logger: Logger = {
+        info: (msg: string) => console.log(`[${plugin.name}] ${msg}`),
+        warn: (msg: string) => console.warn(`[${plugin.name}] ${msg}`),
+        error: (msg: string) => console.error(`[${plugin.name}] ${msg}`),
+        debug: (msg: string) => console.debug(`[${plugin.name}] ${msg}`),
+        child: (metadata: Record<string, any>) => logger,
+      };
+      const utils = {
+        env: (key: string, fallback?: string) => process.env[key] || fallback,
+        createLogger: (scope: string) => logger,
+        registerGlobal: (name: string, value: any) => { (globalThis as any)[name] = value; },
+        schedule: (fn: () => void | Promise<void>, delay: number) => { setInterval(fn, delay); },
+        getDatabase: (name?: string) => null,
+      };
+      await plugin.init({ app, config: pluginConfig, logger, utils, dependencies: {} });
+    }
 
     // プラグインのルートを追加
     if (plugin.routes) {

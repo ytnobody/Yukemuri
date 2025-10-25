@@ -1,0 +1,51 @@
+{
+  "name": "@yukemuri/plugin-auth",
+  "version": "1.0.0",
+  "description": "Authentication and authorization plugin for Yukemuri",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Yukemuri Team",
+  "license": "MIT",
+  "keywords": [
+    "yukemuri",
+    "plugin",
+    "auth",
+    "authentication",
+    "authorization"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@yukemuri/core": "workspace:*",
+    "hono": "^4.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/bcryptjs": "^2.4.0",
+    "preact": "^10.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0"
+  },
+  "peerDependencies": {
+    "@yukemuri/plugin-database": "^1.0.0",
+    "preact": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yukemuri": ">=1.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ]
+}

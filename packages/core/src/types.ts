@@ -66,7 +66,7 @@ export type MiddlewareFunction = MiddlewareHandler;
 // ===== プラグイン関連型 =====
 
 /**
- * Yukemuriプラグイン
+ * Yukemuri プラグイン
  */
 export interface YukemuriPlugin {
   /** プラグイン名 */
@@ -75,18 +75,53 @@ export interface YukemuriPlugin {
   version: string;
   /** 説明 */
   description?: string;
+  /** 作者 */
+  author?: string;
+  /** ライセンス */
+  license?: string;
+  /** ホームページ */
+  homepage?: string;
+  /** リポジトリ */
+  repository?: string;
   /** 依存関係 */
   dependencies?: string[];
+  /** ピア依存関係 */
+  peerDependencies?: string[];
+  /** エンジン要件 */
+  engines?: {
+    yukemuri?: string;
+    node?: string;
+  };
   /** 設定スキーマ */
-  configSchema?: Record<string, ConfigProperty>;
+  configSchema?: ConfigSchema;
+  /** デフォルト設定 */
+  defaultConfig?: any;
   /** プラグインの初期化関数 */
-  init: (app: YukemuriApp, config?: any) => Promise<void> | void;
+  init?: InitHook;
+  /** セットアップフック */
+  setup?: SetupHook;
+  /** 終了処理フック */
+  teardown?: TeardownHook;
   /** 追加ルート */
   routes?: RouteConfig[];
   /** 追加ミドルウェア */
   middleware?: MiddlewareConfig[];
   /** 静的ファイル */
   assets?: AssetConfig[];
+  /** CLIコマンド */
+  commands?: CommandConfig[];
+  /** クライアント拡張 */
+  clientExtensions?: ClientExtensions;
+}
+
+/**
+ * 設定スキーマ
+ */
+export interface ConfigSchema {
+  type: 'object';
+  properties?: Record<string, ConfigProperty>;
+  required?: string[];
+  additionalProperties?: boolean;
 }
 
 /**
@@ -94,10 +129,112 @@ export interface YukemuriPlugin {
  */
 export interface ConfigProperty {
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  description?: string;
+  default?: any;
+  enum?: any[];
+  minimum?: number;
+  maximum?: number;
+  pattern?: string;
+  items?: ConfigProperty;
+  properties?: Record<string, ConfigProperty>;
+  required?: boolean;
+  validation?: (value: any) => boolean | string;
+}
+
+/**
+ * プラグインコンテキスト
+ */
+export interface PluginContext {
+  app: YukemuriApp;
+  config: any;
+  logger: Logger;
+  utils: PluginUtils;
+  dependencies: Record<string, any>;
+}
+
+/**
+ * ライフサイクルフック
+ */
+export type InitHook = (context: PluginContext) => Promise<void> | void;
+export type SetupHook = (context: PluginContext) => Promise<void> | void;
+export type TeardownHook = (context: PluginContext) => Promise<void> | void;
+
+/**
+ * クライアント拡張
+ */
+export interface ClientExtensions {
+  components?: ComponentConfig[];
+  hooks?: HookConfig[];
+  utilities?: UtilityConfig[];
+}
+
+/**
+ * コンポーネント設定
+ */
+export interface ComponentConfig {
+  name: string;
+  component: () => Promise<any>;
+  props?: Record<string, any>;
+}
+
+/**
+ * フック設定
+ */
+export interface HookConfig {
+  name: string;
+  hook: () => Promise<any>;
+}
+
+/**
+ * ユーティリティ設定
+ */
+export interface UtilityConfig {
+  name: string;
+  utility: () => Promise<any>;
+}
+
+/**
+ * コマンド設定
+ */
+export interface CommandConfig {
+  name: string;
+  description?: string;
+  options?: CommandOption[];
+  handler: (args: any[], options: Record<string, any>) => Promise<void> | void;
+}
+
+/**
+ * コマンドオプション
+ */
+export interface CommandOption {
+  name: string;
+  alias?: string;
+  description?: string;
+  type?: 'string' | 'number' | 'boolean';
   required?: boolean;
   default?: any;
-  description?: string;
-  validation?: (value: any) => boolean | string;
+}
+
+/**
+ * プラグインユーティリティ
+ */
+export interface PluginUtils {
+  env(key: string, fallback?: string): string | undefined;
+  createLogger(scope: string): Logger;
+  registerGlobal(name: string, value: any): void;
+  schedule(fn: () => void | Promise<void>, delay: number): void;
+  getDatabase(name?: string): any;
+}
+
+/**
+ * ロガー
+ */
+export interface Logger {
+  info(message: string, ...args: any[]): void;
+  warn(message: string, ...args: any[]): void;
+  error(message: string, ...args: any[]): void;
+  debug(message: string, ...args: any[]): void;
+  child(metadata: Record<string, any>): Logger;
 }
 
 /**

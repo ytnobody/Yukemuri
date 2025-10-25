@@ -1,0 +1,45 @@
+{
+  "name": "@yukemuri/cli",
+  "version": "1.0.0",
+  "description": "CLI tool for Yukemuri Framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "yukemuri": "dist/cli.js"
+  },
+  "files": [
+    "dist/**/*",
+    "templates/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "yukemuri",
+    "cli",
+    "framework",
+    "web",
+    "pwa",
+    "preact",
+    "hono"
+  ],
+  "author": "Yukemuri Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "inquirer": "^9.2.0",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.0",
+    "fs-extra": "^11.0.0",
+    "execa": "^8.0.0",
+    "semver": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.0",
+    "@types/inquirer": "^9.0.0",
+    "@types/semver": "^7.5.0",
+    "typescript": "^5.0.0"
+  }
+}

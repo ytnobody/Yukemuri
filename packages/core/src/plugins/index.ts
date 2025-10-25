@@ -1,9 +1,15 @@
 import type { 
   YukemuriPlugin, 
-  YukemuriApp, 
+  ConfigSchema,
+  ConfigProperty,
+  InitHook,
+  SetupHook,
+  TeardownHook,
   RouteConfig, 
   MiddlewareConfig,
-  ConfigProperty 
+  AssetConfig,
+  CommandConfig,
+  ClientExtensions
 } from '../types.js';
 
 /**
@@ -13,22 +19,94 @@ export function createPlugin(options: {
   name: string;
   version: string;
   description?: string;
+  author?: string;
+  license?: string;
+  homepage?: string;
+  repository?: string;
   dependencies?: string[];
-  configSchema?: Record<string, ConfigProperty>;
-  init: (app: YukemuriApp, config?: any) => Promise<void> | void;
+  peerDependencies?: string[];
+  engines?: {
+    yukemuri?: string;
+    node?: string;
+  };
+  configSchema?: ConfigSchema;
+  defaultConfig?: any;
+  init?: InitHook;
+  setup?: SetupHook;
+  teardown?: TeardownHook;
   routes?: RouteConfig[];
   middleware?: MiddlewareConfig[];
+  assets?: AssetConfig[];
+  commands?: CommandConfig[];
+  clientExtensions?: ClientExtensions;
 }): YukemuriPlugin {
   return {
     name: options.name,
     version: options.version,
     description: options.description,
+    author: options.author,
+    license: options.license,
+    homepage: options.homepage,
+    repository: options.repository,
     dependencies: options.dependencies || [],
+    peerDependencies: options.peerDependencies || [],
+    engines: options.engines,
     configSchema: options.configSchema,
+    defaultConfig: options.defaultConfig,
     init: options.init,
+    setup: options.setup,
+    teardown: options.teardown,
     routes: options.routes || [],
     middleware: options.middleware || [],
+    assets: options.assets || [],
+    commands: options.commands || [],
+    clientExtensions: options.clientExtensions,
   };
+}
+
+/**
+ * プラグインの設定スキーマを作成する
+ */
+export function createConfigSchema(properties: Record<string, any>, required?: string[]): ConfigSchema {
+  return {
+    type: 'object',
+    properties,
+    required,
+    additionalProperties: false
+  };
+}
+
+/**
+ * プラグインバンドルを作成する（複数のプラグインを組み合わせ）
+ */
+export function createPluginBundle(options: {
+  name: string;
+  version: string;
+  description?: string;
+  plugins: YukemuriPlugin[];
+}): YukemuriPlugin {
+  const allRoutes = options.plugins.flatMap(p => p.routes || []);
+  const allMiddleware = options.plugins.flatMap(p => p.middleware || []);
+  const allAssets = options.plugins.flatMap(p => p.assets || []);
+  const allCommands = options.plugins.flatMap(p => p.commands || []);
+
+  return createPlugin({
+    name: options.name,
+    version: options.version,
+    description: options.description,
+    init: async (context) => {
+      // Initialize all bundled plugins
+      for (const plugin of options.plugins) {
+        if (plugin.init) {
+          await plugin.init(context);
+        }
+      }
+    },
+    routes: allRoutes,
+    middleware: allMiddleware,
+    assets: allAssets,
+    commands: allCommands
+  });
 }
 
 /**
