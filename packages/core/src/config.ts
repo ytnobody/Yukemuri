@@ -1,7 +1,7 @@
 import type { YukemuriConfig } from './types.js';
 
 /**
- * Yukemuriの設定を定義する
+ * Define Yukemuri configuration
  */
 export function defineConfig(config: YukemuriConfig): YukemuriConfig {
   return {
@@ -12,7 +12,7 @@ export function defineConfig(config: YukemuriConfig): YukemuriConfig {
 }
 
 /**
- * デフォルト設定を取得する
+ * Get default configuration
  */
 export function getDefaultConfig(): YukemuriConfig {
   return {
@@ -26,7 +26,7 @@ export function getDefaultConfig(): YukemuriConfig {
 }
 
 /**
- * 設定をマージする
+ * Merge configurations
  */
 export function mergeConfig(base: YukemuriConfig, override: Partial<YukemuriConfig>): YukemuriConfig {
   return {

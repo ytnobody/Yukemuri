@@ -42,12 +42,12 @@ export default defineConfig(({ mode }) => {
         name: 'dynamic-host-handler',
         configureServer(server) {
           server.middlewares.use((req, res, next) => {
-            // ngrokやトンネルサービスからのアクセスを許可
+            // Allow access from ngrok or tunnel services
             const host = req.headers.host
             const origin = req.headers.origin
             
             if (host && (host.includes('.ngrok-free.app') || host.includes('.ngrok.io') || host.includes('localhost'))) {
-              // Hostヘッダーを許可
+              // Allow Host header
               res.setHeader('Access-Control-Allow-Origin', origin || `https://${host}`)
               res.setHeader('Access-Control-Allow-Credentials', 'true')
               res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => {
       fs: {
         allow: ['..', '.', './app', './src']
       },
-      // 動的にngrokドメインを許可
+      // Dynamically allow ngrok domains
       allowedHosts: true
     },
     publicDir: 'public',

@@ -132,12 +132,12 @@ function PWAFeatures() {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [pwaStatus, setPwaStatus] = useState<any>(null)
 
-  // 新しいYukemuri APIを使用したPWA機能
+  // PWA features using the new Yukemuri API
   useEffect(() => {
     const initPWAStatus = async () => {
       console.log('♨️ Initializing PWA status with Yukemuri API')
       
-      // yu.pwa API を使用
+      // Use yu.pwa API
       const status = yu.pwa.getStatus()
       setPwaStatus(status)
       
@@ -150,7 +150,7 @@ function PWAFeatures() {
 
     initPWAStatus()
     
-    // 定期的に状態をチェック
+    // Check status periodically
     const interval = setInterval(initPWAStatus, 2000)
     return () => clearInterval(interval)
   }, [])

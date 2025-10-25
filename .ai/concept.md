@@ -1,188 +1,188 @@
 # Yukemuri ♨️ - Internet edge PWA framework
 
-## 基本コンセプト
+## Core Concept
 
-Yukemuriは「湯けむり」から名付けられた、温泉の湯けむりのように開発者に温かく心地よい体験を提供するPWAフレームワークです。小・中規模のサービスベンダーや個人開発者が、複雑な技術選定に悩まず、すぐに実用的なWebアプリケーションを構築できることを目指しています。
+Yukemuri (meaning "hot spring steam") is a PWA framework named to provide developers with a warm and comfortable development experience, just like the steam from hot springs. It aims to enable small to medium-sized service vendors and individual developers to build practical web applications immediately without worrying about complex technology selection.
 
-## 現在の技術スタック（2025年10月時点）
+## Current Technology Stack (October 2025)
 
-### コアアーキテクチャ
-- **Webフレームワーク**: Hono（軽量で型安全、エッジファースト設計）
-- **UIライブラリ**: Preact（React互換、組み込みTypeScript対応）
-- **ビルドツール**: Vite（高速開発サーバー、HMR対応）
-- **スタイリング**: UnoCSS（オンデマンドCSS生成、軽量）
-- **PWA機能**: Web App Manifest、Service Worker、Push通知対応
-- **デプロイ環境**: Cloudflare Workers（エッジコンピューティング）
+### Core Architecture
+- **Web Framework**: Hono (lightweight, type-safe, edge-first design)
+- **UI Library**: Preact (React-compatible, built-in TypeScript support)
+- **Build Tool**: Vite (fast dev server, HMR support)
+- **Styling**: UnoCSS (on-demand CSS generation, lightweight)
+- **PWA Features**: Web App Manifest, Service Worker, Push notifications
+- **Deployment Environment**: Cloudflare Workers (edge computing)
 
-### 開発ツール
-- **CLI**: create-yukemuri（`npx create-yukemuri my-app`で即座にプロジェクト作成）
-- **型安全**: TypeScript完全対応（@ts-ignoreなしでクリーンな実装）
-- **SSR + ハイドレーション**: サーバーサイドレンダリング + クライアントサイド動的機能
+### Development Tools
+- **CLI**: create-yukemuri (instant project creation with `npx create-yukemuri my-app`)
+- **Type Safety**: Full TypeScript support (clean implementation without @ts-ignore)
+- **SSR + Hydration**: Server-side rendering + client-side dynamic features
 
-## 設計思想
+## Design Philosophy
 
-### 1. 温かく心地よい開発体験（湯けむりコンセプト）
-- **学習コストの最小化**: 既存の知識（React/TypeScript）をそのまま活用
-- **即座の成果**: `npm run dev`で美しいUIが即座に表示
-- **エラーフリー**: TypeScriptエラーのない、クリーンなコード生成
+### 1. Warm and Comfortable Development Experience (Yukemuri Concept)
+- **Minimal Learning Cost**: Directly leverage existing knowledge (React/TypeScript)
+- **Immediate Results**: Beautiful UI displayed instantly with `npm run dev`
+- **Error-Free**: Clean code generation without TypeScript errors
 
-### 2. エッジファースト設計
-- **パフォーマンス**: Cloudflare Workersでの高速実行
-- **軽量**: UnoCSSによる最適化されたCSS出力
-- **スケーラビリティ**: エッジコンピューティングによる自動スケーリング
+### 2. Edge-First Design
+- **Performance**: High-speed execution on Cloudflare Workers
+- **Lightweight**: Optimized CSS output from UnoCSS
+- **Scalability**: Auto-scaling through edge computing
 
-### 3. PWAネイティブ体験
-- **インストール可能**: ネイティブアプリのような体験
-- **オフライン対応**: Service Workerによる安定した動作
-- **Push通知**: リアルタイムなユーザーエンゲージメント
-- **高速起動**: スプラッシュ画面とキャッシュ最適化
+### 3. PWA Native Experience
+- **Installable**: Native app-like experience
+- **Offline Support**: Stable operation with Service Workers
+- **Push Notifications**: Real-time user engagement
+- **Fast Startup**: Splash screen and cache optimization
 
-### 4. プラグインエコシステム（将来展開）
+### 4. Plugin Ecosystem (Future Expansion)
 ```sql
--- 計画中のプラグインシステム
+-- Planned Plugin System
 plugins/
-├── auth/           # 認証プラグイン（Auth0, Clerk, Supabase）
-├── payments/       # 決済プラグイン（Stripe, PayPal）
-├── database/       # データベースプラグイン（Turso + Drizzle）
-├── analytics/      # 分析プラグイン（Google Analytics, Plausible）
-└── cms/           # CMSプラグイン（Headless CMS統合）
+├── auth/           # Authentication Plugin (Auth0, Clerk, Supabase)
+├── payments/       # Payment Plugin (Stripe, PayPal)
+├── database/       # Database Plugin (Turso + Drizzle)
+├── analytics/      # Analytics Plugin (Google Analytics, Plausible)
+└── cms/           # CMS Plugin (Headless CMS Integration)
 ```
 
-## 現在の実装状況
+## Current Implementation Status
 
-### ✅ 完成済み機能
-- **create-yukemuri CLI**: 完全動作、プロジェクト生成
-- **Hono + Preact統合**: SSR + ハイドレーション完成
-- **UnoCSS統合**: 美しいUIコンポーネント生成
-- **TypeScript完全対応**: エラーフリーなテンプレート
-- **開発環境**: `npm run dev`で即座に起動
-- **ビルドシステム**: クライアント/サーバー両対応
+### ✅ Completed Features
+- **create-yukemuri CLI**: Fully operational, project generation
+- **Hono + Preact Integration**: SSR + Hydration completed
+- **UnoCSS Integration**: Beautiful UI component generation
+- **Full TypeScript Support**: Error-free templates
+- **Development Environment**: Instant startup with `npm run dev`
+- **Build System**: Client/server-side support
 
-### 🚧 開発中・計画中
-- **PWAコア機能**: Web App Manifest、Service Worker、オフライン対応
-- **PWA通知機能**: Push通知、バックグラウンド同期
-- **PWAインストール機能**: インストールプロンプト、スプラッシュ画面
-- **プラグインシステム**: アーキテクチャ設計
-- **データベース統合**: Turso + Drizzle ORM
-- **認証システム**: 複数プロバイダー対応
-- **決済システム**: Stripe統合
+### 🚧 In Development / Planned
+- **PWA Core Features**: Web App Manifest, Service Worker, offline support
+- **PWA Notification Features**: Push notifications, background sync
+- **PWA Installation Features**: Installation prompt, splash screen
+- **Plugin System**: Architecture design
+- **Database Integration**: Turso + Drizzle ORM
+- **Authentication System**: Multiple provider support
+- **Payment System**: Stripe integration
 
-## ブランディング
+## Branding
 
-### シンボル
-- **ロゴマーク**: ♨️（温泉マーク、大きく表示）
-- **メッセージ**: "Happy coding! ♨️"
-- **カラーパレット**: プライマリブルー（#3b82f6）、温かみのあるグレー
+### Symbol
+- **Logo**: ♨️ (hot spring mark, displayed prominently)
+- **Message**: "Happy coding! ♨️"
+- **Color Palette**: Primary blue (#3b82f6), warm gray
 
-### コミュニケーション
-- **温かく親しみやすい**: 湯けむりのような癒しの開発体験
-- **実用性重視**: 美しさと機能性の両立
-- **コミュニティ指向**: 開発者同士の知識共有
+### Communication
+- **Warm and Friendly**: Soothing development experience like hot spring steam
+- **Practical Focus**: Balance between beauty and functionality
+- **Community-Oriented**: Knowledge sharing among developers
 
-## ターゲットユーザー
+## Target Users
 
-### プライマリターゲット
-- **個人開発者**: 副業やポートフォリオ作成
-- **スタートアップ**: MVP（Minimum Viable Product）の迅速な構築
-- **小規模チーム**: 2-5人でのアジャイル開発
+### Primary Targets
+- **Individual Developers**: Side projects and portfolio creation
+- **Startups**: Rapid MVP (Minimum Viable Product) development
+- **Small Teams**: Agile development with 2-5 people
 
-### ユースケース例
-- **SaaS MVP**: 認証 + 決済 + 基本機能
-- **ランディングページ**: 高速でSEO対応
-- **企業向けツール**: 社内システムの迅速な構築
-- **ECサイト**: 商品販売システム
+### Use Case Examples
+- **SaaS MVP**: Authentication + payment + core features
+- **Landing Page**: Fast and SEO-optimized
+- **Enterprise Tools**: Rapid internal system development
+- **E-commerce Site**: Product sales system
 
-## 競合との差別化
+## Competitive Differentiation
 
 ### vs Next.js
-- **学習コスト**: より簡単、設定レス
-- **パフォーマンス**: エッジファースト設計
-- **規模**: 小中規模に特化した最適化
+- **Learning Cost**: Simpler, configuration-less
+- **Performance**: Edge-first design
+- **Scale**: Optimized for small to medium projects
 
 ### vs Nuxt.js
-- **型安全性**: TypeScriptファースト
-- **軽量**: より小さなバンドルサイズ
-- **デプロイ**: Cloudflare Workers標準対応
+- **Type Safety**: TypeScript-first
+- **Lightweight**: Smaller bundle size
+- **Deployment**: Native Cloudflare Workers support
 
 ### vs SvelteKit
-- **エコシステム**: React/Preactの豊富なライブラリ活用
-- **移行コスト**: 既存React知識の活用
-- **企業採用**: より安定した技術選択
+- **Ecosystem**: Abundant React/Preact library ecosystem
+- **Migration Cost**: Leverage existing React knowledge
+- **Enterprise Adoption**: More stable technology choice
 
-## 今後のロードマップ
+## Future Roadmap
 
-### Phase 1（完了済み）- 基盤構築
-- ✅ CLI + テンプレートシステム
-- ✅ Hono + Preact + UnoCSS統合
-- ✅ TypeScript完全対応
+### Phase 1 (Completed) - Foundation Building
+- ✅ CLI + template system
+- ✅ Hono + Preact + UnoCSS integration
+- ✅ Full TypeScript support
 
-### Phase 2（次期開発優先度高）- PWAコア機能
-- 🚧 Web App Manifest（アプリメタデータ、アイコン、テーマ）
-- 🚧 Service Worker（キャッシュ戦略、オフライン対応）
-- 🚧 インストール機能（PWAインストールプロンプト、スプラッシュ画面）
-- 🚧 Push通知（通知許可、メッセージ配信、バックグラウンド処理）
-- 🚧 PWA検出API（インストール状態の確認、ネイティブ機能アクセス）
+### Phase 2 (High Priority for Next Development) - PWA Core Features
+- 🚧 Web App Manifest (app metadata, icons, theme)
+- 🚧 Service Worker (cache strategy, offline support)
+- 🚧 Installation Features (PWA install prompt, splash screen)
+- 🚧 Push Notifications (permission, message delivery, background processing)
+- 🚧 PWA Detection API (installation state check, native capability access)
 
-### Phase 3（中期開発）- プラグインエコシステム
-- 🚧 認証プラグイン（Auth0, Clerk, Supabase）
-- 🚧 決済プラグイン（Stripe）
-- 🚧 データベースプラグイン（Turso + Drizzle）
+### Phase 3 (Mid-term Development) - Plugin Ecosystem
+- 🚧 Authentication Plugin (Auth0, Clerk, Supabase)
+- 🚧 Payment Plugin (Stripe)
+- 🚧 Database Plugin (Turso + Drizzle)
 
-### Phase 4（将来展開）- エコシステム拡張
-- 📋 CMS統合
-- 📋 分析ツール統合
-- 📋 テスト・デプロイ自動化
-- 📋 コミュニティプラグイン
+### Phase 4 (Future Expansion) - Ecosystem Extension
+- 📋 CMS Integration
+- 📋 Analytics Tool Integration
+- 📋 Test & Deployment Automation
+- 📋 Community Plugins
 
-## PWA機能詳細（Phase 2開発計画）
+## PWA Features Details (Phase 2 Development Plan)
 
 ### Web App Manifest
-- **アプリ情報**: 名前、説明、アイコン（複数サイズ）
-- **表示設定**: standalone、fullscreen、minimal-ui対応
-- **テーマカラー**: ブランドカラーの統一
-- **スプラッシュ画面**: カスタマイズ可能な起動画面
+- **App Information**: Name, description, icons (multiple sizes)
+- **Display Settings**: standalone, fullscreen, minimal-ui support
+- **Theme Color**: Unified brand color
+- **Splash Screen**: Customizable startup screen
 
 ### Service Worker
-- **キャッシュ戦略**: 
-  - Cache First（静的リソース）
-  - Network First（API）
-  - Stale While Revalidate（画像）
-- **オフライン対応**: フォールバックページ、データ同期
-- **バックグラウンド同期**: ネットワーク復旧時の自動送信
+- **Cache Strategy**:
+  - Cache First (static resources)
+  - Network First (API)
+  - Stale While Revalidate (images)
+- **Offline Support**: Fallback page, data sync
+- **Background Sync**: Auto-sending on network recovery
 
-### インストール機能
-- **インストール検出**: PWAがインストール可能かの判定
-- **カスタムプロンプト**: ブランドに合わせたインストール誘導
-- **インストール状態**: アプリがインストール済みかの確認
-- **アップデート通知**: 新バージョンの自動検知
+### Installation Features
+- **Installation Detection**: Determine if PWA is installable
+- **Custom Prompt**: Brand-aligned installation guidance
+- **Installation State**: Check if app is already installed
+- **Update Notification**: Auto-detect new versions
 
-### Push通知
-- **通知許可**: ユーザーフレンドリーな許可リクエスト
-- **メッセージ配信**: サーバーからのリアルタイム通知
-- **通知アクション**: ボタン付き通知、深いリンク対応
-- **バックグラウンド処理**: アプリ未起動時の通知処理
+### Push Notifications
+- **Permission Request**: User-friendly permission request
+- **Message Delivery**: Real-time server notifications
+- **Notification Actions**: Button-enabled notifications, deep linking support
+- **Background Processing**: Notification handling when app is not running
 
-## 技術的優位性
+## Technical Superiority
 
-### パフォーマンス
-- **エッジコンピューティング**: 世界中で高速レスポンス
-- **オンデマンドCSS**: 使用したスタイルのみ生成
-- **軽量ランタイム**: Preactによる小さなバンドルサイズ
-- **PWAキャッシュ**: Service Workerによる効率的なリソース管理
+### Performance
+- **Edge Computing**: High-speed response worldwide
+- **On-Demand CSS**: Generate only used styles
+- **Lightweight Runtime**: Small bundle size with Preact
+- **PWA Caching**: Efficient resource management with Service Workers
 
-### 開発体験
-- **ゼロコンフィグ**: 設定なしで即座に開始
-- **型安全**: 実行前にエラーを検出
-- **HMR**: 高速な開発サイクル
-- **PWAツール**: マニフェスト生成、Service Worker自動生成
+### Developer Experience
+- **Zero Config**: Start immediately without configuration
+- **Type Safety**: Detect errors before runtime
+- **HMR**: Fast development cycle
+- **PWA Tools**: Auto-generate manifests, Service Workers
 
-### ユーザー体験
-- **ネイティブライク**: アプリストア不要のインストール
-- **オフライン対応**: ネットワーク状況に依存しない動作
-- **Push通知**: ユーザーエンゲージメント向上
-- **高速起動**: キャッシュ戦略による瞬時の表示
+### User Experience
+- **Native-like**: Installation without app store
+- **Offline Support**: Works independently of network conditions
+- **Push Notifications**: Enhanced user engagement
+- **Fast Startup**: Instant display with cache strategy
 
-### 運用面
-- **コスト効率**: サーバーレスによる従量課金
-- **スケーラビリティ**: 自動スケーリング
-- **セキュリティ**: Cloudflareの基盤活用
+### Operations
+- **Cost Efficient**: Pay-per-use serverless model
+- **Scalability**: Auto-scaling
+- **Security**: Leverage Cloudflare infrastructure

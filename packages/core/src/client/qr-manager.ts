@@ -5,9 +5,9 @@ export class QRCodeManagerImpl implements QRCodeManager {
   async generate(value: string, options?: QRCodeOptions): Promise<string> {
     if (typeof window === 'undefined') return ''
 
-    // QRコード生成ライブラリの動的インポート
+    // Dynamically import QR code generation library
     try {
-      // まず外部のqrcodeライブラリを試行
+      // Try external qrcode library first
       const QRCode = await this.loadQRCodeLibrary()
       
       const dataURL = await QRCode.toDataURL(value, {
@@ -26,7 +26,7 @@ export class QRCodeManagerImpl implements QRCodeManager {
     } catch (error) {
       console.error('❌ QR code generation failed:', error)
       
-      // フォールバック: シンプルなQRコード風のプレースホルダーを生成
+      // Fallback: Generate a simple QR code-like placeholder
       return this.generateFallbackQR(value, options)
     }
   }
@@ -83,16 +83,16 @@ export class QRCodeManagerImpl implements QRCodeManager {
 
   private async loadQRCodeLibrary(): Promise<any> {
     try {
-      // 動的インポートでqrcodeライブラリを読み込み
+      // Load qrcode library via dynamic import
       return await import('qrcode' as any)
     } catch (error) {
-      // qrcodeライブラリが利用できない場合はエラーをスロー
+      // Throw error if qrcode library is not available
       throw new Error('QRCode library not available. Please install: npm install qrcode @types/qrcode')
     }
   }
 
   private generateFallbackQR(value: string, options?: QRCodeOptions): string {
-    // Canvas を使用したシンプルなQRコード風プレースホルダー
+    // Simple QR code-like placeholder using Canvas
     const canvas = document.createElement('canvas')
     const size = options?.size || 200
     canvas.width = size
@@ -101,22 +101,22 @@ export class QRCodeManagerImpl implements QRCodeManager {
     const ctx = canvas.getContext('2d')
     if (!ctx) return ''
 
-    // 背景色
+    // Background color
     ctx.fillStyle = options?.color?.light || '#FFFFFF'
     ctx.fillRect(0, 0, size, size)
 
-    // 境界線
+    // Border
     ctx.strokeStyle = options?.color?.dark || '#000000'
     ctx.lineWidth = 2
     ctx.strokeRect(1, 1, size - 2, size - 2)
 
-    // 中央にテキストを表示
+    // Display text in center
     ctx.fillStyle = options?.color?.dark || '#000000'
     ctx.font = '12px monospace'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     
-    // テキストを複数行に分割
+    // Split text into multiple lines
     const words = value.split(/[\s\/\?&=]/)
     const lines = []
     let currentLine = ''

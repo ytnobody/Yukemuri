@@ -1,22 +1,22 @@
 # AI Instructions Directory
 
-このディレクトリには、AIアシスタントがYukemuriフレームワークを理解し、開発を支援するための指示ファイルが含まれています。
+This directory contains instruction files for AI assistants to understand the Yukemuri framework and assist with development.
 
-## ファイル構成
+## File Structure
 
-- `concept.md` - Yukemuriフレームワークの基本コンセプトと設計思想
-- `development-guidelines.md` - 開発ガイドラインとベストプラクティス（予定）
-- `architecture.md` - システムアーキテクチャの詳細（予定）
+- `concept.md` - Core concepts and design philosophy of the Yukemuri framework
+- `development-guidelines.md` - Development guidelines and best practices (planned)
+- `architecture.md` - Detailed system architecture (planned)
 
-## 使用目的
+## Usage Purpose
 
-これらのファイルは以下の目的で使用されます：
+These files are used for the following purposes:
 
-1. **コンテキスト提供**: AIがプロジェクトの背景と目標を理解する
-2. **一貫性の確保**: 開発方針とコーディング標準の統一
-3. **知識の継承**: プロジェクトの設計決定と理由の記録
+1. **Context Provision**: AI understands the project background and goals
+2. **Consistency Assurance**: Unified development policies and coding standards
+3. **Knowledge Transfer**: Record of design decisions and their rationale
 
-## 注意事項
+## Notes
 
-- このディレクトリのファイルは本番環境には含まれません
-- AI指示用のファイルなので、実際のユーザー向けドキュメントは`README.md`や`docs/`ディレクトリを使用してください
+- Files in this directory are not included in production environments
+- As these are AI instruction files, user-facing documentation should use `README.md` and `docs/` directory instead

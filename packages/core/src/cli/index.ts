@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// パッケージ情報を読み込み
+// Load package information
 const packageJsonPath = path.join(__dirname, '../../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
@@ -20,7 +20,7 @@ program
   .description('Yukemuri CLI - Internet edge framework for PWAs')
   .version(packageJson.version);
 
-// add コマンド - プラグインを追加
+// add command - Add a plugin
 program
   .command('add <plugin>')
   .description('Add a plugin to your Yukemuri project')
@@ -29,7 +29,7 @@ program
     await addPlugin(plugin, options);
   });
 
-// dev コマンド - 開発サーバー起動
+// dev command - Start development server
 program
   .command('dev')
   .description('Start development server')
@@ -38,7 +38,7 @@ program
     await startDev(options);
   });
 
-// build コマンド - プロジェクトビルド
+// build command - Build the project
 program
   .command('build')
   .description('Build the project')
@@ -47,7 +47,7 @@ program
     await buildProject(options);
   });
 
-// deploy コマンド - デプロイ
+// deploy command - Deploy to Cloudflare Workers
 program
   .command('deploy')
   .description('Deploy to Cloudflare Workers')
@@ -57,13 +57,13 @@ program
   });
 
 /**
- * プラグインを追加する
+ * Add a plugin
  */
 async function addPlugin(pluginName: string, options: { config?: string }) {
   const spinner = ora(chalk.blue(`Adding plugin ${pluginName}...`)).start();
 
   try {
-    // package.jsonを読み込み
+    // Load package.json
     const pkgPath = path.resolve('package.json');
     if (!fs.existsSync(pkgPath)) {
       throw new Error('package.json not found. Are you in a Yukemuri project?');
@@ -71,13 +71,13 @@ async function addPlugin(pluginName: string, options: { config?: string }) {
 
     const pkg = fs.readJsonSync(pkgPath);
 
-    // プラグインの依存関係を追加
+    // Add plugin dependencies
     const pluginPackage = `@yukemuri/plugin-${pluginName}`;
     
     if (!pkg.dependencies) pkg.dependencies = {};
     pkg.dependencies[pluginPackage] = 'latest';
 
-    // package.jsonを更新
+    // Update package.json
     fs.writeJsonSync(pkgPath, pkg, { spaces: 2 });
 
     spinner.succeed(chalk.green(`Plugin ${pluginName} added successfully!`));
@@ -94,7 +94,7 @@ async function addPlugin(pluginName: string, options: { config?: string }) {
 }
 
 /**
- * 開発サーバーを起動する
+ * Start development server
  */
 async function startDev(options: { port?: string }) {
   const port = parseInt(options.port || '3000');
@@ -102,7 +102,7 @@ async function startDev(options: { port?: string }) {
   console.log(chalk.blue('Starting Yukemuri development server...'));
   
   try {
-    // src/index.ts を実行
+    // Run src/index.ts
     const { spawn } = await import('child_process');
     
     const child = spawn('tsx', ['watch', 'src/index.ts'], {

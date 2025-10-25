@@ -1,13 +1,13 @@
 # Yukemuri Framework Features Specification ♨️
 
-Yukemuriフレームワークが提供するコア機能とAPIの仕様定義
+Core features and API specifications provided by the Yukemuri framework
 
 ## 🏗️ Core Framework API
 
 ### `Yukemuri` Class
-フレームワークのメインクラス。すべての機能にアクセスするためのエントリーポイント
+Main class of the framework. Entry point for accessing all features
 
-**基本使用法:**
+**Basic Usage:**
 ```typescript
 import { Yukemuri } from 'yukemuri'
 
@@ -19,14 +19,14 @@ const yu = new Yukemuri()
 ## 📱 PWA (Progressive Web App) Functions
 
 ### `yu.pwa`
-PWAの基本機能を管理するためのAPI群
+API group for managing basic PWA features
 
-**機能概要:**
-- アプリのインストール機能
-- インストール状態の確認
-- PWA対応状況の診断
+**Feature Overview:**
+- Application installation capability
+- Check installation status
+- PWA compatibility diagnostics
 
-**API仕様:**
+**API Specification:**
 ```typescript
 interface PWAManager {
   install: () => Promise<boolean>

@@ -7,8 +7,8 @@ import type {
 } from '../types.js'
 
 /**
- * StorageManager実装
- * localStorage、sessionStorage、および永続化ストレージを管理
+ * StorageManager implementation
+ * Manages localStorage, sessionStorage, and persistent storage
  */
 export class StorageManagerImpl implements StorageManager {
   private controllers = new Map<string, StorageController<any>>()
@@ -65,7 +65,7 @@ class LocalStorageController<T> implements StorageController<T> {
   ) {
     this.currentValue = this.loadValue()
     
-    // タブ間同期が有効な場合
+    // Enable cross-tab sync if specified
     if (options?.syncAcrossTabs) {
       this.setupStorageListener()
     }
@@ -236,7 +236,7 @@ class SessionStorageController<T> implements StorageController<T> {
 }
 
 /**
- * 永続化ストレージ コントローラー (IndexedDB使用)
+ * Persistent storage controller (using IndexedDB)
  */
 class PersistentStorageController<T> implements PersistentController<T> {
   private listeners: Set<(value: T) => void> = new Set()
@@ -267,7 +267,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
     this.currentValue = newValue
     this.notifyListeners(newValue)
 
-    // 同期戦略に応じて保存
+    // Save according to sync strategy
     const strategy = this.options?.syncStrategy || 'immediate'
     if (strategy === 'immediate') {
       this.sync()

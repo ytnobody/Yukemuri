@@ -13,7 +13,7 @@ import type {
 } from '../types.js';
 
 /**
- * プラグインを作成する
+ * Create a plugin
  */
 export function createPlugin(options: {
   name: string;
@@ -65,7 +65,7 @@ export function createPlugin(options: {
 }
 
 /**
- * プラグインの設定スキーマを作成する
+ * Create a plugin configuration schema
  */
 export function createConfigSchema(properties: Record<string, any>, required?: string[]): ConfigSchema {
   return {
@@ -77,7 +77,7 @@ export function createConfigSchema(properties: Record<string, any>, required?: s
 }
 
 /**
- * プラグインバンドルを作成する（複数のプラグインを組み合わせ）
+ * Create a plugin bundle (combine multiple plugins)
  */
 export function createPluginBundle(options: {
   name: string;
@@ -110,7 +110,7 @@ export function createPluginBundle(options: {
 }
 
 /**
- * プラグインの設定を検証する
+ * Validate plugin configuration
  */
 export function validatePluginConfig(
   config: any,
@@ -121,18 +121,18 @@ export function validatePluginConfig(
   for (const [key, property] of Object.entries(schema)) {
     const value = config[key];
 
-    // 必須チェック
+    // Check if required property is present
     if (property.required && (value === undefined || value === null)) {
       errors.push(`Required property "${key}" is missing`);
       continue;
     }
 
-    // 型チェック
+    // Type checking
     if (value !== undefined && !checkType(value, property.type)) {
       errors.push(`Property "${key}" must be of type ${property.type}`);
     }
 
-    // カスタムバリデーション
+    // Custom validation
     if (value !== undefined && property.validation) {
       const result = property.validation(value);
       if (typeof result === 'string') {
@@ -150,7 +150,7 @@ export function validatePluginConfig(
 }
 
 /**
- * 型チェック用のヘルパー関数
+ * Helper function for type checking
  */
 function checkType(value: any, expectedType: string): boolean {
   switch (expectedType) {
@@ -170,14 +170,14 @@ function checkType(value: any, expectedType: string): boolean {
 }
 
 /**
- * プラグインのルートをマージする
+ * Merge plugin routes
  */
 export function mergeRoutes(...routeArrays: RouteConfig[][]): RouteConfig[] {
   return routeArrays.flat();
 }
 
 /**
- * プラグインのミドルウェアをマージする
+ * Merge plugin middleware
  */
 export function mergeMiddleware(...middlewareArrays: MiddlewareConfig[][]): MiddlewareConfig[] {
   return middlewareArrays.flat();

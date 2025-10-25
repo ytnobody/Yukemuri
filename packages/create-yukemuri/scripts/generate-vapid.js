@@ -15,7 +15,7 @@ try {
   console.log(`Private Key: ${result.keys.privateKey}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
   
-  // .envファイルに追加
+  // Add to .env file
   const envPath = path.join(process.cwd(), '.env')
   const envExists = fs.existsSync(envPath)
   

@@ -11,30 +11,30 @@ import type {
 import { getDefaultConfig, mergeConfig } from './config.js';
 
 /**
- * Yukemuriアプリケーションを作成する
+ * Create a Yukemuri application
  */
 export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   const config = mergeConfig(getDefaultConfig(), userConfig || {});
   const hono = new Hono();
 
-  // 内部状態
+  // Internal state
   const state = {
     plugins: new Map<string, YukemuriPlugin>(),
     initialized: false,
   };
 
   /**
-   * プラグインを追加する
+   * Register a plugin
    */
   const use = async (plugin: YukemuriPlugin, pluginConfig?: any): Promise<YukemuriApp> => {
     if (state.plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
 
-    // プラグインを登録
+    // Register plugin
     state.plugins.set(plugin.name, plugin);
 
-    // プラグインの初期化
+    // Initialize plugin
     if (plugin.init) {
       const logger: Logger = {
         info: (msg: string) => console.log(`[${plugin.name}] ${msg}`),
@@ -53,14 +53,14 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
       await plugin.init({ app, config: pluginConfig, logger, utils, dependencies: {} });
     }
 
-    // プラグインのルートを追加
+    // Register plugin routes
     if (plugin.routes) {
       plugin.routes.forEach(route => {
         addRoute(route);
       });
     }
 
-    // プラグインのミドルウェアを追加
+    // Register plugin middleware
     if (plugin.middleware) {
       plugin.middleware.forEach(middleware => {
         addMiddleware(middleware);
@@ -71,7 +71,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * ルートを追加する
+   * Register a route
    */
   const route = (routeConfig: RouteConfig): YukemuriApp => {
     addRoute(routeConfig);
@@ -79,7 +79,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * ミドルウェアを追加する
+   * Register middleware
    */
   const middleware = (middlewareConfig: MiddlewareConfig): YukemuriApp => {
     addMiddleware(middlewareConfig);
@@ -87,7 +87,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * アプリケーションを開始する（開発用）
+   * Start the application (development mode)
    */
   const start = async (port = 3000): Promise<void> => {
     if (!state.initialized) {
@@ -96,7 +96,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
 
     console.log(`🚀 Yukemuri server starting on http://localhost:${port}`);
     
-    // Node.js環境での起動（開発用）
+    // Startup on Node.js environment (for development)
     const { serve } = await import('@hono/node-server');
     serve({
       fetch: hono.fetch,
@@ -105,7 +105,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * Fetchハンドラーを取得する（Cloudflare Workers用）
+   * Get fetch handler (for Cloudflare Workers)
    */
   const fetch = async (request: Request): Promise<Response> => {
     if (!state.initialized) {
@@ -115,22 +115,22 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * 初期化処理
+   * Initialization processing
    */
   const initialize = async (): Promise<void> => {
     if (state.initialized) return;
 
-    // 設定からルートを追加
+    // Add routes from configuration
     config.routes?.forEach(routeConfig => {
       addRoute(routeConfig);
     });
 
-    // 設定からミドルウェアを追加
+    // Add middleware from configuration
     config.middleware?.forEach(middlewareConfig => {
       addMiddleware(middlewareConfig);
     });
 
-    // 設定からプラグインを追加
+    // Add plugins from configuration
     if (config.plugins) {
       for (const plugin of config.plugins) {
         await use(plugin);
@@ -141,23 +141,23 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
   };
 
   /**
-   * 内部関数: ルート追加
+   * Internal function: Add route
    */
   const addRoute = (routeConfig: RouteConfig): void => {
     const { method, path, handler, middleware: routeMiddleware } = routeConfig;
     
     if (routeMiddleware && routeMiddleware.length > 0) {
-      // ミドルウェア付きルート - 各ミドルウェアを先に登録
+      // Route with middleware - register each middleware first
       routeMiddleware.forEach(mw => hono.use(path, mw));
       hono.on(method.toLowerCase() as any, path, handler);
     } else {
-      // シンプルルート
+      // Simple route
       hono.on(method.toLowerCase() as any, path, handler);
     }
   };
 
   /**
-   * 内部関数: ミドルウェア追加
+   * Internal function: Add middleware
    */
   const addMiddleware = (middlewareConfig: MiddlewareConfig): void => {
     if (middlewareConfig.path) {
@@ -167,7 +167,7 @@ export function createApp(userConfig?: Partial<YukemuriConfig>): YukemuriApp {
     }
   };
 
-  // アプリケーションオブジェクトを構築
+  // Build application object
   const app: YukemuriApp = {
     hono,
     config,

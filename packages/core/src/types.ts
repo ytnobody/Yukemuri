@@ -1,121 +1,121 @@
 import type { Hono, Context, MiddlewareHandler } from 'hono';
 
-// ===== 基本型定義 =====
+// ===== Basic Type Definitions =====
 
 /**
- * Yukemuriアプリケーションの設定
+ * Yukemuri application configuration
  */
 export interface YukemuriConfig {
-  /** アプリケーション名 */
+  /** Application name */
   name: string;
-  /** バージョン */
+  /** Version */
   version?: string;
-  /** 開発モードかどうか */
+  /** Whether in development mode */
   dev?: boolean;
-  /** データベース設定 */
+  /** Database configuration */
   database?: DatabaseConfig;
-  /** プラグイン設定 */
+  /** Plugin configuration */
   plugins?: YukemuriPlugin[];
-  /** カスタムルート */
+  /** Custom routes */
   routes?: RouteConfig[];
-  /** ミドルウェア設定 */
+  /** Middleware configuration */
   middleware?: MiddlewareConfig[];
 }
 
 /**
- * データベース設定
+ * Database configuration
  */
 export interface DatabaseConfig {
-  /** データベースURL */
+  /** Database URL */
   url: string;
-  /** 認証トークン */
+  /** Authentication token */
   authToken?: string;
-  /** マイグレーションの実行 */
+  /** Execute migrations */
   migrate?: boolean;
 }
 
 /**
- * ルート設定
+ * Route configuration
  */
 export interface RouteConfig {
-  /** HTTPメソッド */
+  /** HTTP method */
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-  /** パス */
+  /** Path */
   path: string;
-  /** ハンドラー */
+  /** Route handler */
   handler: (c: Context) => Response | Promise<Response>;
-  /** ミドルウェア */
+  /** Middleware */
   middleware?: MiddlewareFunction[];
 }
 
 /**
- * ミドルウェア設定
+ * Middleware configuration
  */
 export interface MiddlewareConfig {
-  /** パスパターン */
+  /** Path pattern */
   path?: string;
-  /** ミドルウェア関数 */
+  /** Middleware function */
   middleware: MiddlewareFunction;
 }
 
 /**
- * ミドルウェア関数の型
+ * Middleware function type
  */
 export type MiddlewareFunction = MiddlewareHandler;
 
-// ===== プラグイン関連型 =====
+// ===== Plugin-Related Types =====
 
 /**
- * Yukemuri プラグイン
+ * Yukemuri plugin
  */
 export interface YukemuriPlugin {
-  /** プラグイン名 */
+  /** Plugin name */
   name: string;
-  /** バージョン */
+  /** Version */
   version: string;
-  /** 説明 */
+  /** Description */
   description?: string;
-  /** 作者 */
+  /** Author */
   author?: string;
-  /** ライセンス */
+  /** License */
   license?: string;
-  /** ホームページ */
+  /** Homepage */
   homepage?: string;
-  /** リポジトリ */
+  /** Repository */
   repository?: string;
-  /** 依存関係 */
+  /** Dependencies */
   dependencies?: string[];
-  /** ピア依存関係 */
+  /** Peer dependencies */
   peerDependencies?: string[];
-  /** エンジン要件 */
+  /** Engine requirements */
   engines?: {
     yukemuri?: string;
     node?: string;
   };
-  /** 設定スキーマ */
+  /** Configuration schema */
   configSchema?: ConfigSchema;
-  /** デフォルト設定 */
+  /** Default configuration */
   defaultConfig?: any;
-  /** プラグインの初期化関数 */
+  /** Plugin initialization function */
   init?: InitHook;
-  /** セットアップフック */
+  /** Setup hook */
   setup?: SetupHook;
-  /** 終了処理フック */
+  /** Teardown hook */
   teardown?: TeardownHook;
-  /** 追加ルート */
+  /** Additional routes */
   routes?: RouteConfig[];
-  /** 追加ミドルウェア */
+  /** Additional middleware */
   middleware?: MiddlewareConfig[];
-  /** 静的ファイル */
+  /** Static files */
   assets?: AssetConfig[];
-  /** CLIコマンド */
+  /** CLI commands */
   commands?: CommandConfig[];
-  /** クライアント拡張 */
+  /** Client extensions */
   clientExtensions?: ClientExtensions;
 }
 
 /**
- * 設定スキーマ
+ * Configuration schema
  */
 export interface ConfigSchema {
   type: 'object';
@@ -125,7 +125,7 @@ export interface ConfigSchema {
 }
 
 /**
- * 設定プロパティ
+ * Configuration property
  */
 export interface ConfigProperty {
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
@@ -142,7 +142,7 @@ export interface ConfigProperty {
 }
 
 /**
- * プラグインコンテキスト
+ * Plugin context
  */
 export interface PluginContext {
   app: YukemuriApp;
@@ -153,14 +153,14 @@ export interface PluginContext {
 }
 
 /**
- * ライフサイクルフック
+ * Lifecycle hooks
  */
 export type InitHook = (context: PluginContext) => Promise<void> | void;
 export type SetupHook = (context: PluginContext) => Promise<void> | void;
 export type TeardownHook = (context: PluginContext) => Promise<void> | void;
 
 /**
- * クライアント拡張
+ * Client extensions
  */
 export interface ClientExtensions {
   components?: ComponentConfig[];
@@ -169,7 +169,7 @@ export interface ClientExtensions {
 }
 
 /**
- * コンポーネント設定
+ * Component configuration
  */
 export interface ComponentConfig {
   name: string;
@@ -178,7 +178,7 @@ export interface ComponentConfig {
 }
 
 /**
- * フック設定
+ * Hook configuration
  */
 export interface HookConfig {
   name: string;
@@ -186,7 +186,7 @@ export interface HookConfig {
 }
 
 /**
- * ユーティリティ設定
+ * Utility configuration
  */
 export interface UtilityConfig {
   name: string;
@@ -194,7 +194,7 @@ export interface UtilityConfig {
 }
 
 /**
- * コマンド設定
+ * Command configuration
  */
 export interface CommandConfig {
   name: string;
@@ -204,7 +204,7 @@ export interface CommandConfig {
 }
 
 /**
- * コマンドオプション
+ * Command option
  */
 export interface CommandOption {
   name: string;
@@ -216,7 +216,7 @@ export interface CommandOption {
 }
 
 /**
- * プラグインユーティリティ
+ * Plugin utilities
  */
 export interface PluginUtils {
   env(key: string, fallback?: string): string | undefined;
@@ -227,7 +227,7 @@ export interface PluginUtils {
 }
 
 /**
- * ロガー
+ * Logger
  */
 export interface Logger {
   info(message: string, ...args: any[]): void;
@@ -238,41 +238,41 @@ export interface Logger {
 }
 
 /**
- * 静的ファイル設定
+ * Static file configuration
  */
 export interface AssetConfig {
-  /** ローカルパス */
+  /** Local path */
   from: string;
-  /** 公開パス */
+  /** Public path */
   to: string;
 }
 
-// ===== アプリケーション型 =====
+// ===== Application Types =====
 
 /**
- * Yukemuriアプリケーション
+ * Yukemuri application
  */
 export interface YukemuriApp {
-  /** 内部のHonoインスタンス */
+  /** Internal Hono instance */
   hono: Hono;
-  /** 設定 */
+  /** Configuration */
   config: YukemuriConfig;
-  /** プラグインを追加 */
+  /** Add a plugin */
   use(plugin: YukemuriPlugin, config?: any): Promise<YukemuriApp>;
-  /** ルートを追加 */
+  /** Add a route */
   route(config: RouteConfig): YukemuriApp;
-  /** ミドルウェアを追加 */
+  /** Add middleware */
   middleware(config: MiddlewareConfig): YukemuriApp;
-  /** アプリケーションを開始 */
+  /** Start the application */
   start(port?: number): Promise<void>;
-  /** リクエストハンドラーを取得（Cloudflare Workers用） */
+  /** Get request handler (for Cloudflare Workers) */
   fetch: (request: Request) => Promise<Response>;
 }
 
-// ===== CLI関連型 =====
+// ===== CLI-Related Types =====
 
 /**
- * CLIコマンドの型
+ * CLI command type
  */
 export interface CLICommand {
   name: string;
@@ -282,7 +282,7 @@ export interface CLICommand {
 }
 
 /**
- * CLIオプションの型
+ * CLI option type
  */
 export interface CLIOption {
   flags: string;
@@ -290,10 +290,10 @@ export interface CLIOption {
   default?: any;
 }
 
-// ===== テンプレート関連型 =====
+// ===== Template-Related Types =====
 
 /**
- * プロジェクトテンプレート
+ * Project template
  */
 export interface ProjectTemplate {
   name: string;
@@ -305,18 +305,18 @@ export interface ProjectTemplate {
 }
 
 /**
- * テンプレートファイル
+ * Template file
  */
 export interface TemplateFile {
   path: string;
   content: string;
-  template?: boolean; // Mustacheテンプレートかどうか
+  template?: boolean; // Whether this is a Mustache template
 }
 
-// ===== Yukemuri Client API関連型 =====
+// ===== Yukemuri Client API Types =====
 
 /**
- * PWAインストールプロンプト
+ * PWA install prompt
  */
 export interface PWAInstallPrompt {
   prompt(): Promise<void>
@@ -324,7 +324,7 @@ export interface PWAInstallPrompt {
 }
 
 /**
- * PWA管理機能
+ * PWA management
  */
 export interface PWAManager {
   install: () => Promise<boolean>
@@ -334,7 +334,7 @@ export interface PWAManager {
 }
 
 /**
- * PWA状態情報
+ * PWA status information
  */
 export interface PWAStatus {
   hasServiceWorker: boolean
@@ -346,7 +346,7 @@ export interface PWAStatus {
 }
 
 /**
- * 通知管理機能
+ * Notification management
  */
 export interface NotificationManager {
   requestPermission: () => Promise<NotificationPermission>
@@ -356,7 +356,7 @@ export interface NotificationManager {
 }
 
 /**
- * 通知オプション
+ * Notification options
  */
 export interface NotificationOptions {
   body?: string
@@ -367,7 +367,7 @@ export interface NotificationOptions {
 }
 
 /**
- * QRコード管理機能
+ * QR code management
  */
 export interface QRCodeManager {
   generate: (value: string, options?: QRCodeOptions) => Promise<string>
@@ -377,7 +377,7 @@ export interface QRCodeManager {
 }
 
 /**
- * QRコードオプション
+ * QR code options
  */
 export interface QRCodeOptions {
   size?: number
@@ -392,7 +392,7 @@ export interface QRCodeOptions {
 }
 
 /**
- * ストレージ管理機能
+ * Storage management
  */
 export interface StorageManager {
   local: <T>(key: string, defaultValue: T, options?: StorageOptions<T>) => StorageController<T>
@@ -401,7 +401,7 @@ export interface StorageManager {
 }
 
 /**
- * ストレージコントローラー
+ * Storage controller
  */
 export interface StorageController<T> {
   get: () => T
@@ -411,7 +411,7 @@ export interface StorageController<T> {
 }
 
 /**
- * 永続化ストレージコントローラー
+ * Persistent storage controller
  */
 export interface PersistentController<T> extends StorageController<T> {
   sync: () => Promise<void>
@@ -420,7 +420,7 @@ export interface PersistentController<T> extends StorageController<T> {
 }
 
 /**
- * ストレージオプション
+ * Storage options
  */
 export interface StorageOptions<T = any> {
   serializer?: {
@@ -431,7 +431,7 @@ export interface StorageOptions<T = any> {
 }
 
 /**
- * 永続化オプション
+ * Persistent storage options
  */
 export interface PersistentOptions<T = any> extends StorageOptions<T> {
   syncStrategy?: 'immediate' | 'batched' | 'manual'
@@ -440,7 +440,7 @@ export interface PersistentOptions<T = any> extends StorageOptions<T> {
 }
 
 /**
- * ネットワーク管理機能
+ * Network management
  */
 export interface NetworkManager {
   status: NetworkStatus
@@ -449,7 +449,7 @@ export interface NetworkManager {
 }
 
 /**
- * ネットワーク状態
+ * Network status
  */
 export interface NetworkStatus {
   isOnline: boolean
@@ -462,17 +462,17 @@ export interface NetworkStatus {
 }
 
 /**
- * 接続タイプ
+ * Connection type
  */
 export type ConnectionType = 'bluetooth' | 'cellular' | 'ethernet' | 'none' | 'wifi' | 'wimax' | 'other' | 'unknown'
 
 /**
- * 実効接続タイプ
+ * Effective connection type
  */
 export type EffectiveConnectionType = 'slow-2g' | '2g' | '3g' | '4g'
 
 /**
- * オフライン同期管理
+ * Offline sync management
  */
 export interface OfflineSyncManager {
   queueRequest: (request: QueuedRequest) => Promise<string>
@@ -485,7 +485,7 @@ export interface OfflineSyncManager {
 }
 
 /**
- * キューイングリクエスト
+ * Queued request
  */
 export interface QueuedRequest {
   id?: string
@@ -498,7 +498,7 @@ export interface QueuedRequest {
 }
 
 /**
- * 同期結果
+ * Sync result
  */
 export interface SyncResult {
   id: string
@@ -508,7 +508,7 @@ export interface SyncResult {
 }
 
 /**
- * デバイス管理機能
+ * Device management
  */
 export interface DeviceManager {
   info: DeviceInfo
@@ -519,7 +519,7 @@ export interface DeviceManager {
 }
 
 /**
- * デバイス情報
+ * Device information
  */
 export interface DeviceInfo {
   isMobile: boolean
@@ -534,7 +534,7 @@ export interface DeviceInfo {
 }
 
 /**
- * ビューポート情報
+ * Viewport information
  */
 export interface ViewportInfo {
   width: number
@@ -544,7 +544,7 @@ export interface ViewportInfo {
 }
 
 /**
- * ルーター管理機能
+ * Router management
  */
 export interface RouterManager {
   push: (path: string, state?: any) => void
@@ -560,7 +560,7 @@ export interface RouterManager {
 }
 
 /**
- * ユーティリティ管理機能
+ * Utilities management
  */
 export interface UtilsManager {
   clipboard: ClipboardManager
@@ -569,7 +569,7 @@ export interface UtilsManager {
 }
 
 /**
- * クリップボード管理
+ * Clipboard management
  */
 export interface ClipboardManager {
   copy: (text: string) => Promise<boolean>
@@ -579,7 +579,7 @@ export interface ClipboardManager {
 }
 
 /**
- * 共有管理
+ * Share management
  */
 export interface ShareManager {
   share: (data: ShareData) => Promise<boolean>
@@ -588,7 +588,7 @@ export interface ShareManager {
 }
 
 /**
- * 共有データ
+ * Share data
  */
 export interface ShareData {
   title?: string
@@ -598,7 +598,7 @@ export interface ShareData {
 }
 
 /**
- * フルスクリーン管理
+ * Fullscreen management
  */
 export interface FullscreenManager {
   enter: (element?: HTMLElement) => Promise<void>
@@ -610,7 +610,7 @@ export interface FullscreenManager {
 }
 
 /**
- * Yukemuri クライアントAPI
+ * Yukemuri Client API
  */
 export interface YukemuriClient {
   pwa: PWAManager
