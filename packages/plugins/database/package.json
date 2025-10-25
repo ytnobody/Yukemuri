@@ -1,0 +1,37 @@
+{
+  "name": "@yukemuri/plugin-database",
+  "version": "1.0.0",
+  "description": "Database plugin for Yukemuri with SQLite and Turso support",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.4.0",
+    "@yukemuri/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  },
+  "keywords": [
+    "yukemuri",
+    "plugin",
+    "database",
+    "sqlite",
+    "turso"
+  ],
+  "author": "Yukemuri Team",
+  "license": "MIT"
+}
