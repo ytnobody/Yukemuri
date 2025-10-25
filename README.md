@@ -54,9 +54,69 @@ my-app/
 
 ## Package Structure
 
-- `packages/core` - Core framework (under development)
-- `packages/create-yukemuri` - Project scaffolding tool
-- `packages/plugins` - Official plugins (planned)
+- **`packages/core`** - Core framework with plugin system
+  - Application factory and lifecycle
+  - Plugin manager and utilities
+  - Type definitions and configuration
+  - [Documentation](./packages/core/README.md)
+
+- **`packages/cli`** - Command-line interface
+  - Project scaffolding commands
+  - Development server management
+  - Plugin installation and management
+  - [Documentation](./packages/cli/README.md)
+
+- **`packages/create-yukemuri`** - Project template scaffolding
+  - Base template with PWA setup
+  - Vite + Preact configuration
+  - VAPID key generation for Web Push
+  - [Documentation](./packages/create-yukemuri/README.md)
+
+- **`packages/plugins/auth`** - Authentication plugin
+  - JWT token management
+  - Password hashing with PBKDF2
+  - User management system
+  - React hooks and UI components
+  - [Documentation](./packages/plugins/auth/README.md)
+
+## Usage Examples
+
+### Creating an App with Authentication
+
+```bash
+# Create project
+npx create-yukemuri my-secure-app
+cd my-secure-app
+
+# Install auth plugin
+npm install @yukemuri/plugin-auth
+```
+
+Then in your server setup:
+
+```typescript
+import { createApp } from '@yukemuri/core';
+import authPlugin from '@yukemuri/plugin-auth';
+
+const app = createApp();
+
+await app.use(authPlugin, {
+  jwtSecret: process.env.JWT_SECRET,
+  jwtExpiry: '7d',
+  protectedRoutes: ['/api/protected/*']
+});
+```
+
+And in your client:
+
+```typescript
+import { useAuth, LoginForm } from '@yukemuri/plugin-auth';
+
+function LoginPage() {
+  const { login, isLoading, error } = useAuth();
+  return <LoginForm onSubmit={login} isLoading={isLoading} error={error} />;
+}
+```
 
 ## Development
 
@@ -69,8 +129,11 @@ pnpm install
 # Build all packages
 pnpm build
 
-# Link create-yukemuri globally for testing
-pnpm --filter create-yukemuri link --global
+# Run development servers
+pnpm dev
+
+# Link CLI globally for testing
+pnpm --filter @yukemuri/cli link --global
 ```
 
 ## Technology Stack
@@ -87,11 +150,13 @@ pnpm --filter create-yukemuri link --global
 - [x] Project scaffolding with `create-yukemuri`
 - [x] Basic PWA template with Service Worker
 - [x] Development server setup
-- [ ] Core framework implementation
-- [ ] Plugin system architecture
+- [x] Core framework implementation with plugin system
+- [x] Authentication plugin with JWT and password hashing
+- [x] Type-safe error handling and validation
 - [ ] Database integration (Turso/SQLite)
-- [ ] Authentication plugins
-- [ ] Deployment helpers
+- [ ] Additional plugins (email, file upload, etc.)
+- [ ] Deployment helpers for major platforms
+- [ ] Admin dashboard template
 
 ## Contributing
 

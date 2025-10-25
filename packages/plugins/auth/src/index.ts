@@ -1,5 +1,5 @@
 import { createPlugin, createConfigSchema } from '@yukemuri/core';
-import type { Context } from 'hono';
+import { JWTUtils, PasswordUtils, UserUtils } from './utils/auth';
 
 // Configuration schema
 const configSchema = createConfigSchema({
@@ -52,8 +52,8 @@ const configSchema = createConfigSchema({
   }
 }, ['jwtSecret']);
 
-// Auth middleware
-async function authMiddleware(c: Context, next: any) {
+// Auth middleware - validates JWT token and sets user context
+async function authMiddleware(c: any, next: any) {
   const config = c.get('pluginConfig');
   const path = c.req.path;
   
@@ -73,30 +73,107 @@ async function authMiddleware(c: Context, next: any) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
   
-  c.set('user', { id: '1', email: 'user@example.com' });
+  const payload = JWTUtils.verify(token, config.jwtSecret);
+  if (!payload) {
+    return c.json({ error: 'Invalid or expired token' }, 401);
+  }
+  
+  const user = UserUtils.findById(payload.userId);
+  if (!user) {
+    return c.json({ error: 'User not found' }, 401);
+  }
+  
+  c.set('user', user);
   return next();
 }
+// Register route handler
+async function registerHandler(c: any) {
+  try {
+    const config = c.get('pluginConfig');
+    const body = c.get('body') || {};
+    const { email, password, name } = body;
 
-// Route handlers
-async function registerHandler(c: Context) {
-  return c.json({ message: 'Register endpoint' });
+    if (!email || !password) {
+      return c.json({ error: 'Email and password are required' }, 400);
+    }
+
+    const user = UserUtils.createUser(email, password, { name });
+    const token = JWTUtils.sign({ userId: user.id, email: user.email }, config.jwtSecret, config.jwtExpiry);
+
+    return c.json({ token, user }, 201);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Registration failed';
+    return c.json({ error: message }, 400);
+  }
 }
 
-async function loginHandler(c: Context) {
-  return c.json({ token: 'stub_token' });
+// Login route handler
+async function loginHandler(c: any) {
+  try {
+    const config = c.get('pluginConfig');
+    const body = c.get('body') || {};
+    const { email, password } = body;
+
+    if (!email || !password) {
+      return c.json({ error: 'Email and password are required' }, 400);
+    }
+
+    const user = UserUtils.authenticate(email, password);
+    if (!user) {
+      return c.json({ error: 'Invalid credentials' }, 401);
+    }
+
+    const token = JWTUtils.sign({ userId: user.id, email: user.email }, config.jwtSecret, config.jwtExpiry);
+    return c.json({ token, user });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Login failed';
+    return c.json({ error: message }, 400);
+  }
 }
 
-async function logoutHandler(c: Context) {
-  return c.json({ message: 'Logged out' });
+// Logout route handler
+async function logoutHandler(c: any) {
+  // In a production app, you might maintain a token blacklist
+  // For now, the client just removes the token from localStorage
+  return c.json({ message: 'Logged out successfully' });
 }
 
-async function meHandler(c: Context) {
+// Get current user route handler
+async function meHandler(c: any) {
   const user = c.get('user');
-  return c.json({ user });
+  if (!user) {
+    return c.json({ error: 'Not authenticated' }, 401);
+  }
+  return c.json(user);
 }
 
-async function refreshHandler(c: Context) {
-  return c.json({ token: 'new_token' });
+// Refresh token route handler
+async function refreshHandler(c: any) {
+  try {
+    const config = c.get('pluginConfig');
+    const authHeader = c.req.header('Authorization');
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return c.json({ error: 'No token provided' }, 401);
+    }
+
+    const payload = JWTUtils.verify(token, config.jwtSecret);
+    if (!payload) {
+      return c.json({ error: 'Invalid or expired token' }, 401);
+    }
+
+    const user = UserUtils.findById(payload.userId);
+    if (!user) {
+      return c.json({ error: 'User not found' }, 401);
+    }
+
+    const newToken = JWTUtils.sign({ userId: user.id, email: user.email }, config.jwtSecret, config.jwtExpiry);
+    return c.json({ token: newToken });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Token refresh failed';
+    return c.json({ error: message }, 400);
+  }
 }
 
 export default createPlugin({
@@ -116,7 +193,7 @@ export default createPlugin({
   },
   init: async (context: any) => {
     const { logger } = context;
-    logger.info('Auth plugin initialized');
+    logger.info('Auth plugin initialized with JWT and password hashing');
   },
   middleware: [
     {
