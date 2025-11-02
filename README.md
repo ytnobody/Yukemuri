@@ -86,13 +86,20 @@ my-app/
   - Migration management
   - [Documentation](./packages/plugins/database/README.md)
 
+- **`packages/plugins/email`** - Email plugin ✅
+  - Email sending via SMTP, SendGrid, or Mailgun
+  - Email template engine with variable substitution
+  - Rate limiting and queue management
+  - Email validation and formatting utilities
+  - [Documentation](./packages/plugins/email/README.md)
+
 ## Planned Plugins
 
 The following plugins are planned for future releases:
 
 | Plugin | Status | Features |
 |--------|--------|----------|
-| **Email** | 🔄 Planned | Email sending via SendGrid/Mailgun/SMTP, template support, delivery tracking |
+| **Email** | ✅ Implemented | Email sending via SendGrid/Mailgun/SMTP, template support, rate limiting, queue management |
 | **Rate Limiting** | 🔄 Planned | Token bucket & sliding window algorithms, per-user/IP rate limits, quota management |
 | **Logging** | 🔄 Planned | Structured logging, multi-sink support (file, stdout, external services), log levels |
 | **Cache** | 🔄 Planned | Redis/In-Memory caching, TTL management, cache invalidation, stampede prevention |
@@ -173,8 +180,8 @@ pnpm --filter @yukemuri/cli link --global
 - [x] Core framework implementation with plugin system
 - [x] Authentication plugin with JWT and password hashing
 - [x] Database plugin with SQLite/Turso support
+- [x] Email plugin with multiple transport options (SMTP, SendGrid, Mailgun)
 - [x] Type-safe error handling and validation
-- [ ] Email plugin with multiple transport options
 - [ ] Rate limiting plugin with configurable strategies
 - [ ] Logging plugin with structured output
 - [ ] Cache plugin with Redis support

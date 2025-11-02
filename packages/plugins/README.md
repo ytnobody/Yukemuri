@@ -71,24 +71,43 @@ app.use(databasePlugin, {
 
 ---
 
-### Planned Plugins
+#### 3. Email Plugin (@yukemuri/plugin-email) ✅
 
-The following plugins are planned for implementation in future releases.
+Email sending with multiple transport options and template support.
 
-#### 1. Email Plugin (@yukemuri/plugin-email) 📋
+**Features:**
+- Support for SMTP, SendGrid, and Mailgun providers
+- Email template engine with variable substitution
+- Template registry (welcome, password_reset, email_verification)
+- Rate limiting per user with quota management
+- Email queue for batch operations
+- Email validation (format, domain, list validation)
+- Email formatting (recipient formatting, HTML-to-text, HTML escaping)
+- Attachment support (file, buffer, base64)
+- Connection health checks
+- Type-safe error handling
+- Comprehensive test suite (58 tests)
 
-Email sending with multiple transport options.
+**Quick Start:**
+```bash
+npm install @yukemuri/plugin-email
+```
 
-**Planned Features:**
-- Support for SendGrid, Mailgun, and SMTP
-- Email template system with variables
-- Delivery tracking and open/click analytics
-- Rate limiting for email sends
-- Batch email operations
-- HTML and plain text support
-- Attachment support
-- Email validation and sanitization
-- Bounce and complaint handling
+```typescript
+import emailPlugin from '@yukemuri/plugin-email';
+
+app.use(emailPlugin, {
+  provider: 'smtp',
+  config: {
+    host: process.env.SMTP_HOST,
+    port: 587,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  }
+});
+```
 
 **Use Cases:**
 - User notifications
@@ -97,9 +116,15 @@ Email sending with multiple transport options.
 - Password reset emails
 - Account verification
 
+**Documentation:** See [packages/plugins/email/README.md](./email/README.md)
+
 ---
 
-#### 2. Rate Limiting Plugin (@yukemuri/plugin-rate-limit) 📋
+### Planned Plugins
+
+The following plugins are planned for implementation in future releases.
+
+#### 1. Rate Limiting Plugin (@yukemuri/plugin-rate-limit) 📋
 
 API rate limiting and quota management.
 
@@ -124,7 +149,7 @@ API rate limiting and quota management.
 
 ---
 
-#### 3. Logging Plugin (@yukemuri/plugin-logging) 📋
+#### 2. Logging Plugin (@yukemuri/plugin-logging) 📋
 
 Structured logging with multiple outputs.
 
@@ -149,7 +174,7 @@ Structured logging with multiple outputs.
 
 ---
 
-#### 4. Cache Plugin (@yukemuri/plugin-cache) 📋
+#### 3. Cache Plugin (@yukemuri/plugin-cache) 📋
 
 In-memory and Redis-based caching.
 
@@ -174,7 +199,7 @@ In-memory and Redis-based caching.
 
 ---
 
-#### 5. Analytics Plugin (@yukemuri/plugin-analytics) 📋
+#### 4. Analytics Plugin (@yukemuri/plugin-analytics) 📋
 
 Event tracking and analytics integration.
 
@@ -199,7 +224,7 @@ Event tracking and analytics integration.
 
 ---
 
-#### 6. Payments Plugin (@yukemuri/plugin-payments) 📋
+#### 5. Payments Plugin (@yukemuri/plugin-payments) 📋
 
 Payment processing with multiple providers.
 

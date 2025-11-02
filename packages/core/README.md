@@ -99,6 +99,76 @@ function Login() {
 
 See [@yukemuri/plugin-auth README](../auth/README.md) for detailed documentation.
 
+#### Database Plugin (@yukemuri/plugin-database)
+
+SQLite and Turso database integration with type-safe queries.
+
+**Key Features:**
+- SQLite/Turso database support
+- Type-safe query operations
+- Transaction support
+- Migration management
+- CRUD operations with automatic casting
+
+**Setup:**
+```typescript
+import { databasePlugin } from '@yukemuri/plugin-database';
+
+await app.use(databasePlugin, {
+  url: 'file:./app.db',
+  authToken: process.env.DATABASE_TOKEN
+});
+```
+
+See [@yukemuri/plugin-database README](../database/README.md) for detailed documentation.
+
+#### Email Plugin (@yukemuri/plugin-email)
+
+Email sending with multiple transport options and template support.
+
+**Key Features:**
+- Multi-provider support (SMTP, SendGrid, Mailgun)
+- Email template engine with variables
+- Rate limiting and queue management
+- Email validation and formatting
+- Built-in templates (welcome, password_reset, email_verification)
+
+**Setup:**
+```typescript
+import emailPlugin from '@yukemuri/plugin-email';
+
+await app.use(emailPlugin, {
+  provider: 'smtp',
+  config: {
+    host: process.env.SMTP_HOST,
+    port: 587,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  }
+});
+```
+
+**Usage:**
+```typescript
+// Send email
+const result = await app.email.send({
+  to: { email: 'user@example.com' },
+  subject: 'Welcome to Yukemuri',
+  html: '<h1>Welcome!</h1>'
+});
+
+// Send with template
+const result = await app.email.sendWithTemplate({
+  to: { email: 'user@example.com' },
+  template: 'welcome',
+  variables: { name: 'John' }
+});
+```
+
+See [@yukemuri/plugin-email README](../email/README.md) for detailed documentation.
+
 ### Creating Custom Plugins
 
 ```typescript
