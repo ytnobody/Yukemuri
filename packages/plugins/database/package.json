@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "test": "echo 'No tests in database plugin yet'",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

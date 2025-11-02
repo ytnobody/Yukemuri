@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "echo 'No plugins to build yet'",
-    "dev": "echo 'No plugins to develop yet'",
-    "test": "echo 'No plugins to test yet'",
-    "lint": "echo 'No plugins to lint yet'",
-    "type-check": "echo 'No plugins to type-check yet'",
-    "clean": "echo 'No plugins to clean yet'"
+    "build": "echo 'Plugins are built individually by their own package.json'",
+    "dev": "echo 'Plugins are developed individually by their own package.json'",
+    "test": "echo 'Plugins are tested individually by their own package.json'",
+    "lint": "echo 'Plugins are linted individually by their own package.json'",
+    "type-check": "echo 'Plugins are type-checked individually by their own package.json'",
+    "clean": "echo 'Plugins are cleaned individually by their own package.json'"
   }
 }

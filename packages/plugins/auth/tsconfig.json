@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -17,11 +16,7 @@
     "removeComments": false,
     "noEmitOnError": true,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@yukemuri/*": ["../../../packages/*/dist/index.d.ts", "../../../packages/*/src/index.ts"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]

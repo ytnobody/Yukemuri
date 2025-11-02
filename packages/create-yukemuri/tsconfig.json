@@ -1,13 +1,8 @@
 {
   "extends": "../core/tsconfig.json",
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@yukemuri/*": ["../../packages/*/dist/index.d.ts", "../../packages/*/src/index.ts"]
-    }
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
