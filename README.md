@@ -245,6 +245,41 @@ results.forEach(result => {
 await yu.network.offlineSync.retryFailedRequests();
 ```
 
+### Client-Side Routing
+
+Handle navigation and URL parameters in your SPA:
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Register route patterns
+yu.router.registerRoute('/users/:id');
+yu.router.registerRoute('/blog/*slug');
+
+// Navigate programmatically
+yu.router.push('/users/123');
+
+// Extract URL parameters
+const { id } = yu.router.getParams();  // { id: '123' }
+
+// Parse query parameters
+const query = yu.router.getQuery();
+const tab = query.get('tab');
+
+// Check active route
+if (yu.router.isActive('/users', false)) {
+  console.log('On users page');
+}
+
+// Listen for navigation
+yu.router.onNavigate((path) => {
+  console.log('Navigated to:', path);
+  updateUI(path);
+});
+```
+
 ### Creating an App with Authentication
 
 ```bash

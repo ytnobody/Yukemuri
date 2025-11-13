@@ -763,6 +763,251 @@ async function fetchImages() {
 
 ---
 
+### Routing with RouterManager
+
+RouterManager provides client-side routing and URL parameter management for SPAs.
+
+#### Overview
+
+RouterManager offers:
+1. **Programmatic Navigation** - Push/replace routes, history management
+2. **Parameter Extraction** - Extract dynamic parameters from URLs
+3. **Query String Parsing** - Parse and access query parameters
+4. **Route Matching** - Match URLs against route patterns
+5. **Navigation Monitoring** - Listen for route changes
+
+#### Basic Navigation
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Navigate to a new page
+yu.router.push('/users/123');
+
+// Replace current history entry
+yu.router.replace('/home');
+
+// Navigate back/forward
+yu.router.back();
+yu.router.forward();
+yu.router.go(-2);  // Go back 2 pages
+
+// Get current path
+console.log(yu.router.getCurrentPath());  // '/users/123'
+```
+
+#### URL Parameters
+
+RouterManager supports dynamic route patterns compatible with file-based routing:
+
+```typescript
+const yu = new Yukemuri();
+
+// Register route patterns
+yu.router.registerRoute('/users/:id');
+yu.router.registerRoute('/blog/*slug');
+yu.router.registerRoute('/docs/**path');
+
+// Navigate and extract parameters
+yu.router.push('/users/123');
+const params = yu.router.getParams();  // { id: '123' }
+
+// Manual parameter extraction
+const params2 = yu.router.extractParams('/users/:id', '/users/456');
+// { id: '456' }
+```
+
+#### Route Pattern Syntax
+
+Supports multiple pattern types:
+
+| Pattern | Example | Extracts |
+|---------|---------|----------|
+| **Static** | `/about` | No parameters |
+| **Dynamic** | `/users/:id` | `{ id: '123' }` |
+| **Catch-all** | `/blog/*slug` | `{ slug: 'category/post-name' }` |
+| **Optional** | `/docs/**path` | `{ path: 'guide' }` or `{}` |
+| **Multiple** | `/users/:id/posts/:postId` | `{ id: '123', postId: '456' }` |
+
+#### Query Parameters
+
+Parse query strings from URLs:
+
+```typescript
+const yu = new Yukemuri();
+
+yu.router.push('/search?q=javascript&sort=date&limit=10');
+
+const query = yu.router.getQuery();
+console.log(query.get('q'));     // 'javascript'
+console.log(query.get('sort'));  // 'date'
+console.log(query.get('limit')); // '10'
+
+// Iterate all params
+for (const [key, value] of query.entries()) {
+  console.log(`${key}=${value}`);
+}
+```
+
+#### Active Route Detection
+
+Check if a route is currently active:
+
+```typescript
+const yu = new Yukemuri();
+
+yu.router.push('/users/123');
+
+// Exact match (default)
+yu.router.isActive('/users/123');        // true
+yu.router.isActive('/users');            // false
+
+// Partial match
+yu.router.isActive('/users', false);     // true
+yu.router.isActive('/user', false);      // false
+```
+
+#### Navigation Monitoring
+
+Listen for navigation events:
+
+```typescript
+const yu = new Yukemuri();
+
+const unsubscribe = yu.router.onNavigate((path) => {
+  console.log('Navigated to:', path);
+  
+  // Update UI based on route
+  updateBreadcrumbs(path);
+  trackPageView(path);
+});
+
+// Stop listening
+unsubscribe();
+```
+
+#### Real-World Examples
+
+**User Profile Page**
+```typescript
+const yu = new Yukemuri();
+
+yu.router.registerRoute('/users/:userId');
+yu.router.push('/users/john-doe');
+
+const { userId } = yu.router.getParams();
+console.log(`Loading profile for: ${userId}`);
+```
+
+**Blog Post with Tags**
+```typescript
+const yu = new Yukemuri();
+
+yu.router.registerRoute('/blog/:year/:month/:slug');
+yu.router.push('/blog/2024/november/intro-to-pwa');
+
+const params = yu.router.getParams();
+console.log(params);  // { year: '2024', month: 'november', slug: 'intro-to-pwa' }
+```
+
+**File Browser**
+```typescript
+const yu = new Yukemuri();
+
+yu.router.registerRoute('/files/*path');
+yu.router.push('/files/documents/2024/reports/Q4.pdf');
+
+const { path } = yu.router.getParams();
+console.log(`Loading file: ${path}`);
+```
+
+**Conditional Navigation with State**
+```typescript
+const yu = new Yukemuri();
+
+async function handleSave() {
+  try {
+    await saveData();
+    // Navigate with success message
+    yu.router.push('/success', { message: 'Data saved!' });
+  } catch (error) {
+    // Navigate to error page
+    yu.router.push('/error', { error: error.message });
+  }
+}
+```
+
+**Active Menu Item**
+```typescript
+const yu = new Yukemuri();
+
+const menuItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Users', href: '/users' },
+  { label: 'Settings', href: '/settings' }
+];
+
+yu.router.onNavigate((path) => {
+  menuItems.forEach(item => {
+    const isActive = yu.router.isActive(item.href, false);
+    updateMenuItem(item, isActive);
+  });
+});
+```
+
+#### Best Practices
+
+1. **Register Routes Early**
+   ```typescript
+   // Register all route patterns at app startup
+   yu.router.registerRoute('/users/:id');
+   yu.router.registerRoute('/users/:id/posts/:postId');
+   yu.router.registerRoute('/blog/*slug');
+   ```
+
+2. **Use Descriptive Parameter Names**
+   ```typescript
+   // Good
+   yu.router.registerRoute('/users/:userId/posts/:postId');
+   
+   // Less clear
+   yu.router.registerRoute('/u/:a/p/:b');
+   ```
+
+3. **Handle Missing Parameters Safely**
+   ```typescript
+   const params = yu.router.getParams();
+   const userId = params.userId || 'guest';
+   ```
+
+4. **Clean Up Listeners**
+   ```typescript
+   const unsubscribe = yu.router.onNavigate(handler);
+   
+   // On component cleanup
+   onDestroy(() => unsubscribe());
+   ```
+
+5. **Combine with Query Parameters**
+   ```typescript
+   yu.router.push('/search?q=react&page=2');
+   
+   const query = yu.router.getQuery();
+   const searchTerm = query.get('q');
+   const page = parseInt(query.get('page') || '1');
+   ```
+
+#### Limitations
+
+- **Client-Side Only**: Routing works after page load
+- **No Server Integration**: Requires server to serve SPA at all routes
+- **Pattern Matching**: Simple pattern matching (not regex)
+- **No Built-in Guards**: Use listeners for auth checks
+
+---
+
 ### createApp(config?: YukemuriConfig)
 
 Creates a Yukemuri application instance.
