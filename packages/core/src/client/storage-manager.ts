@@ -245,6 +245,8 @@ class PersistentStorageController<T> implements PersistentController<T> {
   private lastSyncTime: Date | null = null
   private dbName = 'yukemuri-persistent'
   private storeName = 'storage'
+  private batchedChanges: T | null = null
+  private batchTimeout: ReturnType<typeof setTimeout> | null = null
 
   constructor(
     private key: string,
@@ -271,6 +273,8 @@ class PersistentStorageController<T> implements PersistentController<T> {
     const strategy = this.options?.syncStrategy || 'immediate'
     if (strategy === 'immediate') {
       this.sync()
+    } else if (strategy === 'batched') {
+      this.enqueueBatchedSync(newValue)
     }
   }
 
@@ -278,6 +282,13 @@ class PersistentStorageController<T> implements PersistentController<T> {
     this.currentValue = this.defaultValue
     this.notifyListeners(this.defaultValue)
     this.deleteFromDB()
+    
+    // Clear any pending batched sync
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout)
+      this.batchTimeout = null
+      this.batchedChanges = null
+    }
   }
 
   subscribe(callback: (value: T) => void): () => void {
@@ -292,6 +303,11 @@ class PersistentStorageController<T> implements PersistentController<T> {
     try {
       await this.saveToDB(this.currentValue)
       this.lastSyncTime = new Date()
+      this.batchedChanges = null
+      if (this.batchTimeout) {
+        clearTimeout(this.batchTimeout)
+        this.batchTimeout = null
+      }
     } catch (error) {
       console.warn('Failed to sync to IndexedDB:', error)
     } finally {
@@ -307,8 +323,26 @@ class PersistentStorageController<T> implements PersistentController<T> {
     return this.lastSyncTime
   }
 
+  private enqueueBatchedSync(value: T): void {
+    this.batchedChanges = value
+    
+    // Clear existing timeout
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout)
+    }
+    
+    // Set new timeout for batched sync (300ms debounce)
+    this.batchTimeout = setTimeout(() => {
+      this.sync()
+      this.batchTimeout = null
+    }, 300)
+  }
+
   private async init(): Promise<void> {
     try {
+      if (!this.isIndexedDBAvailable()) {
+        return
+      }
       const value = await this.loadFromDB()
       if (value !== null) {
         this.currentValue = value
@@ -319,7 +353,17 @@ class PersistentStorageController<T> implements PersistentController<T> {
     }
   }
 
+  private isIndexedDBAvailable(): boolean {
+    if (typeof window === 'undefined') return false
+    return typeof indexedDB !== 'undefined' && indexedDB !== null
+  }
+
+
   private async getDB(): Promise<IDBDatabase> {
+    if (!this.isIndexedDBAvailable()) {
+      throw new Error('IndexedDB is not available in this environment')
+    }
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1)
       
@@ -337,6 +381,10 @@ class PersistentStorageController<T> implements PersistentController<T> {
 
   private async loadFromDB(): Promise<T | null> {
     try {
+      if (!this.isIndexedDBAvailable()) {
+        return null
+      }
+
       const db = await this.getDB()
       const transaction = db.transaction([this.storeName], 'readonly')
       const store = transaction.objectStore(this.storeName)
@@ -363,6 +411,11 @@ class PersistentStorageController<T> implements PersistentController<T> {
   }
 
   private async saveToDB(value: T): Promise<void> {
+    if (!this.isIndexedDBAvailable()) {
+      console.warn('IndexedDB is not available, skipping persistent storage sync')
+      return
+    }
+
     const db = await this.getDB()
     const transaction = db.transaction([this.storeName], 'readwrite')
     const store = transaction.objectStore(this.storeName)
@@ -380,6 +433,10 @@ class PersistentStorageController<T> implements PersistentController<T> {
 
   private async deleteFromDB(): Promise<void> {
     try {
+      if (!this.isIndexedDBAvailable()) {
+        return
+      }
+
       const db = await this.getDB()
       const transaction = db.transaction([this.storeName], 'readwrite')
       const store = transaction.objectStore(this.storeName)

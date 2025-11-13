@@ -289,6 +289,234 @@ const app = createApp({
 
 ## Core APIs
 
+### Storage Management with StorageManager
+
+StorageManager provides a unified API for managing state across three storage levels.
+
+#### Overview
+
+StorageManager offers three storage options optimized for different use cases:
+
+| Storage | Scope | Persistence | Capacity | Speed | Use Case |
+|---------|-------|-------------|----------|-------|----------|
+| **local** | Browser wide | Session | 5-10MB | ⚡⚡⚡ | User preferences, theme, UI state |
+| **session** | Current tab | Tab lifetime | 5-10MB | ⚡⚡ | Temporary form data, filters, pagination |
+| **persistent** | Browser wide | User deletion | 50MB+ | ⚡ | User data, cache, important settings |
+
+#### Quick Start
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Local storage - survives browser restarts
+const username = yu.storage.local('username', 'Guest');
+username.set('John Doe');
+console.log(username.get()); // 'John Doe'
+
+// Session storage - cleared when tab closes
+const tempData = yu.storage.session('temp', { page: 1 });
+tempData.set(prev => ({ page: prev.page + 1 }));
+
+// Persistent storage (IndexedDB) - survives indefinitely
+const userData = yu.storage.persistent('user', { id: '', name: '' });
+userData.set({ id: '123', name: 'John' });
+```
+
+#### Common API (All Storage Types)
+
+```typescript
+// Get current value
+const value = storage.get();
+
+// Set value directly or with function
+storage.set(newValue);
+storage.set(prev => ({ ...prev, field: newValue }));
+
+// Reset to default
+storage.clear();
+
+// Subscribe to changes
+const unsubscribe = storage.subscribe((newValue) => {
+  console.log('Changed:', newValue);
+});
+
+// Cleanup listener
+unsubscribe();
+```
+
+#### Persistent Storage API
+
+Persistent storage adds additional methods for IndexedDB synchronization:
+
+```typescript
+// Manual sync to IndexedDB
+await userData.sync();
+
+// Check sync status
+if (userData.isSyncing()) {
+  console.log('Syncing...');
+}
+
+// Get last sync time
+const lastSync = userData.lastSynced(); // Date | null
+```
+
+#### Sync Strategies (Persistent Only)
+
+**Immediate (Default)** - Syncs to IndexedDB immediately after each change.
+```typescript
+const data = yu.storage.persistent('config', {}, {
+  syncStrategy: 'immediate'
+});
+data.set({ theme: 'dark' }); // Syncs immediately
+```
+
+**Batched** - Debounces syncs for 300ms, useful for frequent updates.
+```typescript
+const logs = yu.storage.persistent('logs', [], {
+  syncStrategy: 'batched'
+});
+logs.set(prev => [...prev, 'event1']);
+logs.set(prev => [...prev, 'event2']); // Both sync once after 300ms
+```
+
+**Manual** - Requires explicit `sync()` calls.
+```typescript
+const form = yu.storage.persistent('form', {}, {
+  syncStrategy: 'manual'
+});
+form.set({ field: 'value' });
+await form.sync(); // Explicit sync when needed
+```
+
+#### Real-World Examples
+
+**User Theme Preference**
+```typescript
+const theme = yu.storage.local('theme', 'light');
+
+function setTheme(newTheme: 'light' | 'dark') {
+  theme.set(newTheme);
+  document.documentElement.setAttribute('data-theme', newTheme);
+}
+
+// Listen to changes from other tabs
+theme.subscribe((newTheme) => {
+  document.documentElement.setAttribute('data-theme', newTheme);
+});
+```
+
+**Shopping Cart with Batched Sync**
+```typescript
+interface CartItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+const cart = yu.storage.persistent('cart', [] as CartItem[], {
+  syncStrategy: 'batched'
+});
+
+function addToCart(item: CartItem) {
+  cart.set(prev => {
+    const existing = prev.find(i => i.id === item.id);
+    if (existing) {
+      return prev.map(i =>
+        i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+      );
+    }
+    return [...prev, item];
+  });
+}
+
+function getTotal() {
+  return cart.get().reduce((sum, item) => sum + item.price * item.quantity, 0);
+}
+```
+
+**Form State with Manual Sync**
+```typescript
+interface FormState {
+  title: string;
+  content: string;
+  lastSaved: Date | null;
+}
+
+const form = yu.storage.persistent('form', 
+  { title: '', content: '', lastSaved: null },
+  { syncStrategy: 'manual' }
+);
+
+async function saveForm() {
+  await form.sync();
+  form.set(prev => ({ ...prev, lastSaved: new Date() }));
+}
+```
+
+#### Best Practices
+
+1. **Choose Appropriate Storage Level**
+   - `local` - UI state, user preferences
+   - `session` - temporary form data, filters
+   - `persistent` - user data, important settings
+
+2. **Select Right Sync Strategy**
+   - `immediate` - important data, infrequent updates
+   - `batched` - form inputs, rapid updates
+   - `manual` - critical operations, user control
+
+3. **Type Safety**
+   ```typescript
+   interface UserData {
+     id: string;
+     email: string;
+     role: 'user' | 'admin';
+   }
+   
+   const user = yu.storage.persistent<UserData>('user', {
+     id: '',
+     email: '',
+     role: 'user'
+   });
+   ```
+
+4. **Memory Management**
+   ```typescript
+   const unsubscribe = data.subscribe(listener);
+   
+   // Clean up when component unmounts
+   onDestroy(() => unsubscribe());
+   ```
+
+5. **Error Handling**
+   ```typescript
+   try {
+     data.set(newValue);
+     await data.sync();
+   } catch (error) {
+     console.error('Storage error:', error);
+   }
+   ```
+
+#### Browser Support
+
+All storage options are supported in modern browsers:
+- localStorage/sessionStorage: Chrome, Firefox, Safari, Edge ✅
+- IndexedDB: Chrome, Firefox, Safari, Edge ✅
+
+#### Limitations
+
+- Local/Session Storage: Limited to ~5-10MB per domain
+- IndexedDB: May require user permission for large storage
+- Cross-Origin: Storage is isolated per origin
+- Private Browsing: May have limited or no storage
+
+---
+
 ### createApp(config?: YukemuriConfig)
 
 Creates a Yukemuri application instance.

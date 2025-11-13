@@ -58,6 +58,7 @@ my-app/
   - Application factory and lifecycle
   - Plugin manager and utilities
   - Type definitions and configuration
+  - StorageManager for state management (local, session, persistent)
   - [Documentation](./packages/core/README.md)
 
 - **`packages/cli`** - Command-line interface
@@ -107,6 +108,99 @@ The following plugins are planned for future releases:
 | **Payments** | 🔄 Planned | Stripe/PayPal integration, payment flows, invoice management, webhook handling |
 
 ## Usage Examples
+
+### State Management with StorageManager
+
+Yukemuri provides a powerful storage system with three levels: `local`, `session`, and `persistent`.
+
+#### Local Storage (Browser Session)
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Basic usage
+const username = yu.storage.local('username', 'Guest');
+username.set('John Doe');
+console.log(username.get()); // 'John Doe'
+
+// Functional updates
+const counter = yu.storage.local('counter', 0);
+counter.set(prev => prev + 1);
+
+// Subscribe to changes
+const unsubscribe = username.subscribe((newValue) => {
+  console.log('Username changed to:', newValue);
+});
+
+// Clean up listener
+unsubscribe();
+```
+
+#### Session Storage (Browser Tab)
+
+```typescript
+const yu = new Yukemuri();
+
+// Store temporary data per tab
+const tempData = yu.storage.session('temp', { page: 1, filter: '' });
+
+tempData.set(prev => ({ 
+  ...prev, 
+  page: prev.page + 1 
+}));
+```
+
+#### Persistent Storage (IndexedDB)
+
+```typescript
+const yu = new Yukemuri();
+
+// Immediate sync (default)
+const userData = yu.storage.persistent('user', 
+  { id: '', name: '', theme: 'light' },
+  { syncStrategy: 'immediate' }
+);
+
+userData.set({ id: '123', name: 'John', theme: 'dark' });
+console.log(userData.isSyncing()); // false (after sync completes)
+console.log(userData.lastSynced()); // Date object
+
+// Batched sync (debounced by 300ms)
+const logs = yu.storage.persistent('logs', 
+  [] as string[],
+  { syncStrategy: 'batched' }
+);
+
+logs.set(prev => [...prev, 'Event 1']);
+logs.set(prev => [...prev, 'Event 2']); // Will sync once after 300ms
+
+// Manual sync
+const config = yu.storage.persistent('config',
+  { notifications: true },
+  { syncStrategy: 'manual' }
+);
+
+config.set({ notifications: false });
+await config.sync(); // Explicitly sync when needed
+```
+
+#### Custom Serializers
+
+```typescript
+const yu = new Yukemuri();
+
+const customSerializer = {
+  stringify: (value: any) => JSON.stringify(value),
+  parse: (str: string) => JSON.parse(str),
+};
+
+const data = yu.storage.persistent('custom', 
+  { value: 0 },
+  { serializer: customSerializer }
+);
+```
 
 ### Creating an App with Authentication
 
@@ -182,6 +276,7 @@ pnpm --filter @yukemuri/cli link --global
 - [x] Database plugin with SQLite/Turso support
 - [x] Email plugin with multiple transport options (SMTP, SendGrid, Mailgun)
 - [x] Type-safe error handling and validation
+- [x] StorageManager with local, session, and persistent storage
 - [ ] Rate limiting plugin with configurable strategies
 - [ ] Logging plugin with structured output
 - [ ] Cache plugin with Redis support
