@@ -202,6 +202,49 @@ const data = yu.storage.persistent('custom',
 );
 ```
 
+### Network Management with Offline Support
+
+Manage network status and automatically queue requests when offline:
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Monitor network status
+yu.network.onStatusChange((status) => {
+  if (status.isOffline) {
+    console.log('📡 You are offline');
+  } else {
+    console.log('✅ Back online');
+  }
+});
+
+// Queue requests while offline
+const requestId = await yu.network.offlineSync.queueRequest({
+  url: '/api/users',
+  method: 'POST',
+  body: { name: 'John' },
+  priority: 'high'
+});
+
+// Check pending requests
+console.log(`Pending: ${yu.network.offlineSync.pendingCount}`);
+
+// Sync automatically when back online, or manually trigger:
+const results = await yu.network.offlineSync.syncWhenOnline();
+results.forEach(result => {
+  if (result.success) {
+    console.log(`✅ Request succeeded`);
+  } else {
+    console.log(`❌ Request failed: ${result.error.message}`);
+  }
+});
+
+// Retry failed requests
+await yu.network.offlineSync.retryFailedRequests();
+```
+
 ### Creating an App with Authentication
 
 ```bash

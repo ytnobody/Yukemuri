@@ -517,6 +517,252 @@ All storage options are supported in modern browsers:
 
 ---
 
+### Network Management with NetworkManager
+
+NetworkManager provides network status monitoring and offline request queue management for PWA applications.
+
+#### Overview
+
+NetworkManager offers two key features:
+1. **Network Status Monitoring** - Real-time connection and network information
+2. **Offline Sync** - Automatic request queueing and syncing when back online
+
+#### Network Status API
+
+```typescript
+import { Yukemuri } from '@yukemuri/core';
+
+const yu = new Yukemuri();
+
+// Get current network status
+const status = yu.network.status;
+console.log(status.isOnline);      // boolean
+console.log(status.isOffline);     // boolean
+console.log(status.connectionType); // 'wifi' | 'cellular' | 'ethernet' | etc
+console.log(status.effectiveType);  // '4g' | '3g' | '2g' | 'slow-2g'
+console.log(status.downlink);       // Mbps
+console.log(status.rtt);            // Round trip time in ms
+console.log(status.saveData);       // User's data saver preference
+
+// Listen to network status changes
+const unsubscribe = yu.network.onStatusChange((status) => {
+  if (status.isOffline) {
+    console.log('⚠️ Connection lost, requests will be queued');
+  } else {
+    console.log('✅ Back online, syncing queued requests...');
+  }
+});
+
+// Stop listening
+unsubscribe();
+```
+
+#### Offline Sync API
+
+Queue requests automatically when offline and sync when back online:
+
+```typescript
+const yu = new Yukemuri();
+
+// Queue a request while offline
+const requestId = await yu.network.offlineSync.queueRequest({
+  url: '/api/users',
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: { name: 'John', email: 'john@example.com' },
+  priority: 'high',
+  maxRetries: 3
+});
+
+// Get pending requests
+const pending = yu.network.offlineSync.getPendingRequests();
+console.log(`Pending requests: ${pending.length}`);
+console.log(`Sync in progress: ${yu.network.offlineSync.issyncing}`);
+console.log(`Total pending: ${yu.network.offlineSync.pendingCount}`);
+
+// Manually trigger sync
+const results = await yu.network.offlineSync.syncWhenOnline();
+results.forEach(result => {
+  if (result.success) {
+    console.log(`✅ Request ${result.id} succeeded`);
+  } else {
+    console.error(`❌ Request ${result.id} failed:`, result.error);
+  }
+});
+
+// Retry failed requests
+const retryResults = await yu.network.offlineSync.retryFailedRequests();
+console.log(`Retried ${retryResults.length} requests`);
+
+// Clear all queued requests
+await yu.network.offlineSync.clearQueue();
+```
+
+#### Request Priority
+
+Requests are synced in priority order: `high` → `normal` → `low`
+
+```typescript
+// High priority - synced first
+await yu.network.offlineSync.queueRequest({
+  url: '/api/critical-data',
+  method: 'POST',
+  priority: 'high'
+});
+
+// Normal priority - synced second (default)
+await yu.network.offlineSync.queueRequest({
+  url: '/api/user-data',
+  method: 'POST'
+  // priority defaults to 'normal'
+});
+
+// Low priority - synced last
+await yu.network.offlineSync.queueRequest({
+  url: '/api/analytics',
+  method: 'POST',
+  priority: 'low'
+});
+```
+
+#### Retry Management
+
+Failed requests are automatically retried up to `maxRetries` times:
+
+```typescript
+const requestId = await yu.network.offlineSync.queueRequest({
+  url: '/api/data',
+  method: 'POST',
+  maxRetries: 5  // Default is 3
+});
+
+// Manually retry failed requests
+const retryResults = await yu.network.offlineSync.retryFailedRequests();
+```
+
+#### Real-World Examples
+
+**Auto-save Form with Offline Support**
+```typescript
+const yu = new Yukemuri();
+
+async function saveForm(formData: any) {
+  if (yu.network.status.isOffline) {
+    // Queue for later
+    await yu.network.offlineSync.queueRequest({
+      url: '/api/form-data',
+      method: 'POST',
+      body: formData,
+      priority: 'high'
+    });
+    console.log('Form queued, will sync when online');
+  } else {
+    // Send immediately
+    const response = await fetch('/api/form-data', {
+      method: 'POST',
+      body: JSON.stringify(formData)
+    });
+    if (!response.ok) throw new Error('Save failed');
+  }
+}
+
+// Listen for connectivity
+yu.network.onStatusChange((status) => {
+  if (status.isOnline && yu.network.offlineSync.pendingCount > 0) {
+    console.log('🔄 Syncing queued requests...');
+    yu.network.offlineSync.syncWhenOnline();
+  }
+});
+```
+
+**Adaptive API Calls Based on Connection**
+```typescript
+const yu = new Yukemuri();
+
+async function fetchData(url: string) {
+  const status = yu.network.status;
+
+  // High quality on fast connections
+  if (status.effectiveType === '4g') {
+    return fetch(`${url}?quality=high`);
+  }
+
+  // Medium quality on 3G
+  if (status.effectiveType === '3g') {
+    return fetch(`${url}?quality=medium`);
+  }
+
+  // Low quality on slow connections
+  return fetch(`${url}?quality=low`);
+}
+```
+
+**Data Saver Mode Support**
+```typescript
+const yu = new Yukemuri();
+
+async function fetchImages() {
+  const status = yu.network.status;
+
+  if (status.saveData) {
+    // Skip image loading when user has data saver enabled
+    console.log('Data saver enabled, skipping image requests');
+    return null;
+  }
+
+  return fetch('/api/images');
+}
+```
+
+#### Best Practices
+
+1. **Queue Requests Strategically**
+   - Queue high-priority operations when offline
+   - For UI feedback, show request is queued
+   - Log important operations
+
+2. **Handle Sync Errors**
+   ```typescript
+   const results = await yu.network.offlineSync.syncWhenOnline();
+   results.forEach(result => {
+     if (!result.success) {
+       // Handle failed request
+       console.error(`Request failed: ${result.error.message}`);
+     }
+   });
+   ```
+
+3. **Respect User's Data Saver Preference**
+   ```typescript
+   if (!yu.network.status.saveData) {
+     // Load additional resources
+   }
+   ```
+
+4. **Provide User Feedback**
+   ```typescript
+   const unsubscribe = yu.network.onStatusChange((status) => {
+     const message = status.isOnline ? '✅ Online' : '⚠️ Offline';
+     updateConnectionIndicator(message);
+   });
+   ```
+
+5. **Clean Up Listeners**
+   ```typescript
+   const unsubscribe = yu.network.onStatusChange(handler);
+   // Later...
+   unsubscribe(); // Stop listening
+   ```
+
+#### Limitations
+
+- **Offline Queue**: Persists in memory only (not stored to disk)
+- **Max Request Size**: Limited by fetch API and server
+- **Connection Detection**: Browser-dependent, may have slight delays
+- **Service Worker**: Requires Service Worker for truly offline operation
+
+---
+
 ### createApp(config?: YukemuriConfig)
 
 Creates a Yukemuri application instance.
