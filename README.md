@@ -94,6 +94,14 @@ my-app/
   - Email validation and formatting utilities
   - [Documentation](./packages/plugins/email/README.md)
 
+- **`packages/plugins/rate-limiting`** - Rate Limiting plugin ✅
+  - Token bucket algorithm for smooth traffic distribution
+  - Sliding window algorithm for precise rate limiting
+  - Per-user/IP rate limiting with custom key generation
+  - Configurable storage backends
+  - Standard HTTP rate limit headers
+  - [Documentation](./packages/plugins/rate-limiting/README.md)
+
 ## Planned Plugins
 
 The following plugins are planned for future releases:
@@ -101,7 +109,7 @@ The following plugins are planned for future releases:
 | Plugin | Status | Features |
 |--------|--------|----------|
 | **Email** | ✅ Implemented | Email sending via SendGrid/Mailgun/SMTP, template support, rate limiting, queue management |
-| **Rate Limiting** | 🔄 Planned | Token bucket & sliding window algorithms, per-user/IP rate limits, quota management |
+| **Rate Limiting** | ✅ Implemented | Token bucket & sliding window algorithms, per-user/IP rate limits, quota management |
 | **Logging** | 🔄 Planned | Structured logging, multi-sink support (file, stdout, external services), log levels |
 | **Cache** | 🔄 Planned | Redis/In-Memory caching, TTL management, cache invalidation, stampede prevention |
 | **Analytics** | 🔄 Planned | Event tracking, Google Analytics/Plausible integration, custom dashboards |
