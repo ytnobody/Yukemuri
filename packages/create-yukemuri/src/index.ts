@@ -149,14 +149,79 @@ async function createProject(projectName: string) {
     packageJson.name = projectName
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2))
 
+    // Generate biome.json configuration
+    const biomeConfig = {
+      $schema: "https://biomejs.dev/schemas/2.3.6/schema.json",
+      files: {
+        includes: [
+          "*.{ts,tsx,js,jsx,json,md}",
+          "src/**/*.{ts,tsx,js,jsx,json,md}",
+          "app/**/*.{ts,tsx,js,jsx,json,md}",
+        ],
+        ignoreUnknown: true,
+      },
+      vcs: {
+        enabled: true,
+        clientKind: "git",
+        useIgnoreFile: true,
+      },
+      linter: {
+        enabled: true,
+        rules: {
+          recommended: true,
+          complexity: {
+            noStaticOnlyClass: "warn",
+          },
+        },
+      },
+      formatter: {
+        enabled: true,
+        indentStyle: "space",
+        indentWidth: 2,
+        lineWidth: 100,
+      },
+      javascript: {
+        formatter: {
+          semicolons: "asNeeded",
+          trailingCommas: "es5",
+          arrowParentheses: "asNeeded",
+          bracketSpacing: true,
+          jsxQuoteStyle: "double",
+        },
+      },
+      json: {
+        formatter: {
+          trailingCommas: "none",
+        },
+      },
+    }
+
+    const biomeJsonPath = path.join(projectPath, "biome.json")
+    await fs.writeFile(biomeJsonPath, JSON.stringify(biomeConfig, null, 2))
+    console.log("✔ Generated biome.json")
+
     // Generate icon files
     await generateIconFiles(projectPath)
+
+    // Setup Git hooks
+    const { exec } = await import("child_process")
+    const { promisify } = await import("util")
+    const execAsync = promisify(exec)
+
+    try {
+      process.chdir(projectPath)
+      await execAsync("git config core.hooksPath .githooks")
+      console.log("✔ Git hooks configured")
+    } catch {
+      // Git not initialized yet, that's okay
+    }
 
     console.log(`✔ Project ${projectName} created successfully!`)
     console.log("")
     console.log("Next steps:")
     console.log(`  cd ${projectName}`)
     console.log("  npm install")
+    console.log("  git config core.hooksPath .githooks  (if not auto-configured)")
     console.log("  npm run dev")
     console.log("")
     console.log("Happy coding! ♨️")

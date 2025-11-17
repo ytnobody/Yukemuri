@@ -11,6 +11,27 @@ npm install
 npm run dev
 ```
 
+### Setup Git Hooks
+
+Enable Git hooks for automatic code quality checks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This project uses **Biome** for automated code linting and formatting with Git hooks:
+
+- **Pre-commit hook**: Automatically formats and lints staged files
+- **Commit-msg hook**: Validates commit message format
+
+Manual code quality commands:
+
+```bash
+npm run format   # Format all files
+npm run lint     # Lint and fix issues
+```
+
+
 Open [http://localhost:5173](http://localhost:5173) to view your application.
 
 ### External Access (LAN, ngrok, etc.)
