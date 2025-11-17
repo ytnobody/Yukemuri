@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check for empty commit message
+if [ -z "$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" ]; then
+  echo "❌ Commit message cannot be empty"
+  exit 1
+fi
+
+# Check minimum length
+if [ ${#COMMIT_MSG} -lt 5 ]; then
+  echo "❌ Commit message must be at least 5 characters long"
+  exit 1
+fi
+
+# Warn if message is very long (over 72 chars for title)
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+if [ ${#FIRST_LINE} -gt 72 ]; then
+  echo "⚠️  Warning: First line of commit message is over 72 characters"
+  echo "   Current: ${#FIRST_LINE} characters"
+fi
+
+exit 0

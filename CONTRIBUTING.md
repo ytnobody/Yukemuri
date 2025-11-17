@@ -8,6 +8,7 @@ We welcome contributions to Yukemuri! This document provides guidelines and inst
 
 - Node.js >= 18.0.0
 - pnpm >= 8.0.0
+- Git >= 2.9 (for local git hooks support)
 
 ### Installation
 
@@ -18,7 +19,26 @@ cd yukemuri
 
 # Install dependencies
 pnpm install
+
+# Enable git hooks (automatic on first clone due to core.hooksPath config)
+# If not automatically enabled, run:
+git config core.hooksPath .githooks
 ```
+
+### Git Hooks Setup
+
+This project uses **Git hooks** stored in `.githooks/` directory for automatic code quality checks. Git hooks are configured in `.git/config` with `core.hooksPath = .githooks`.
+
+#### Pre-commit Hook
+- Automatically formats staged files with Biome
+- Automatically lints staged files with Biome
+- Re-stages fixed files automatically
+- Runs before each commit
+
+#### Commit-msg Hook
+- Validates commit message format
+- Ensures minimum message length (5 characters)
+- Warns if first line exceeds 72 characters
 
 ## Code Quality
 
@@ -46,10 +66,10 @@ To check if code passes all quality checks without making changes:
 
 ```bash
 # Check formatting
-pnpm exec biome format .
+./node_modules/.pnpm/@biomejs+cli-linux-x64@2.3.6/node_modules/@biomejs/cli-linux-x64/biome format .
 
 # Check linting
-pnpm exec biome check .
+./node_modules/.pnpm/@biomejs+cli-linux-x64@2.3.6/node_modules/@biomejs/cli-linux-x64/biome check .
 ```
 
 ## Biome Configuration
@@ -64,23 +84,28 @@ For more details, see the [Biome documentation](https://biomejs.dev/).
 
 ## Commit Guidelines
 
-1. Before committing, ensure your code passes all checks:
-   ```bash
-   pnpm run format
-   pnpm run lint
-   ```
-
-2. Write descriptive commit messages
-3. Reference any related issues in your commit message
+1. Make changes to your feature branch
+2. Stage changes: `git add .`
+3. Commit: `git commit -m "Your descriptive message"`
+   - Pre-commit hook automatically formats and lints your changes
+   - Commit-msg hook validates your message format
 4. Ensure your changes don't break existing tests: `pnpm run test`
+
+### Commit Message Format
+
+- **Minimum length**: 5 characters
+- **Recommended**: Under 72 characters for the first line
+- **Format**: Use present tense ("Add feature" not "Added feature")
+- **Example**: `fix: handle runtime errors in network module`
 
 ## Pull Requests
 
 1. Create a feature branch: `git checkout -b feature/my-feature`
 2. Make your changes and ensure code quality
-3. Push to your fork and create a Pull Request
-4. Provide a clear description of what your PR does
-5. Link any related issues
+3. Commit your changes with descriptive messages
+4. Push to your fork and create a Pull Request
+5. Provide a clear description of what your PR does
+6. Link any related issues
 
 ## Project Structure
 
@@ -88,6 +113,7 @@ For more details, see the [Biome documentation](https://biomejs.dev/).
 - `packages/cli` - Command-line interface
 - `packages/create-yukemuri` - Project scaffolding
 - `packages/plugins/*` - Framework plugins (auth, database, email, etc.)
+- `.githooks/` - Git hooks for automatic code quality checks
 
 ## Building and Testing
 
@@ -111,5 +137,6 @@ pnpm clean
 ## License
 
 By contributing to Yukemuri, you agree that your contributions will be licensed under the MIT License.
+
 
 

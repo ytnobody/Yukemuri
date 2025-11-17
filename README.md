@@ -335,6 +335,20 @@ pnpm dev
 pnpm --filter @yukemuri/cli link --global
 ```
 
+### Code Quality
+
+This project uses **Biome** for automated code linting and formatting with Git hooks integration:
+
+```bash
+# Format all files
+pnpm run format
+
+# Lint and fix issues
+pnpm run lint
+```
+
+**Git Hooks**: Pre-commit hooks automatically format and lint staged files before each commit. See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed setup instructions.
+
 ## Technology Stack
 
 - **Runtime**: Cloudflare Workers / Node.js
