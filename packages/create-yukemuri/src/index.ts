@@ -147,7 +147,34 @@ async function createProject(projectName: string) {
     const packageJsonPath = path.join(projectPath, "package.json")
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf-8"))
     packageJson.name = projectName
+    packageJson.description = `A Yukemuri application - ${projectName}`
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2))
+
+    // Update README.md with project name
+    const readmePath = path.join(projectPath, "README.md")
+    let readmeContent = await fs.readFile(readmePath, "utf-8")
+    readmeContent = readmeContent.replace(/# Yukemuri Application ♨️/, `# ${projectName} ♨️`)
+    readmeContent = readmeContent.replace(
+      /This is a new PWA built with Yukemuri framework/,
+      `${projectName} is a PWA built with Yukemuri framework`
+    )
+    await fs.writeFile(readmePath, readmeContent)
+
+    // Update manifest.json if it exists
+    const manifestPath = path.join(projectPath, "public/manifest.json")
+    try {
+      const manifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"))
+      const displayName = projectName
+        .split("-")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+      manifest.name = displayName
+      manifest.short_name = displayName.substring(0, 12)
+      manifest.description = `${displayName} - A Yukemuri Application`
+      await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2))
+    } catch {
+      // manifest.json might not exist yet, that's okay
+    }
 
     // Generate biome.json configuration
     const biomeConfig = {
