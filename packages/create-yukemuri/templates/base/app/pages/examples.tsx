@@ -1,30 +1,30 @@
-import { h } from 'preact'
-import { useState } from 'preact/hooks'
+import { h } from "preact"
+import { useState } from "preact/hooks"
 
 export default function ExamplesPage() {
-  const [activeExample, setActiveExample] = useState('install')
+  const [activeExample, setActiveExample] = useState("install")
 
   const examples = [
     {
-      id: 'install',
-      title: '📱 PWA Installation',
-      description: 'Complete PWA installation component with status checking'
+      id: "install",
+      title: "📱 PWA Installation",
+      description: "Complete PWA installation component with status checking",
     },
     {
-      id: 'notifications',
-      title: '🔔 Notification Manager',
-      description: 'Full notification system with permissions and push subscriptions'
+      id: "notifications",
+      title: "🔔 Notification Manager",
+      description: "Full notification system with permissions and push subscriptions",
     },
     {
-      id: 'qr-share',
-      title: '📱 QR Code Sharing',
-      description: 'Generate and share QR codes with download functionality'
+      id: "qr-share",
+      title: "📱 QR Code Sharing",
+      description: "Generate and share QR codes with download functionality",
     },
     {
-      id: 'settings',
-      title: '⚙️ Settings Manager',
-      description: 'Type-safe settings with local and cloud storage sync'
-    }
+      id: "settings",
+      title: "⚙️ Settings Manager",
+      description: "Type-safe settings with local and cloud storage sync",
+    },
   ]
 
   const codeExamples = {
@@ -187,7 +187,7 @@ export default function NotificationManager() {
   )
 }`,
 
-    'qr-share': `import { h } from 'preact'
+    "qr-share": `import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { yu } from '../lib/yukemuri'
 
@@ -455,7 +455,7 @@ export default function SettingsManager() {
       </div>
     </div>
   )
-}`
+}`,
   }
 
   return (
@@ -479,8 +479,8 @@ export default function SettingsManager() {
                   onClick={() => setActiveExample(example.id)}
                   className={`w-full text-left p-3 rounded-lg transition-colors ${
                     activeExample === example.id
-                      ? 'bg-blue-100 text-blue-800 border-2 border-blue-200'
-                      : 'hover:bg-gray-100 border-2 border-transparent'
+                      ? "bg-blue-100 text-blue-800 border-2 border-blue-200"
+                      : "hover:bg-gray-100 border-2 border-transparent"
                   }`}
                 >
                   <div className="font-medium text-sm">{example.title}</div>
@@ -490,10 +490,7 @@ export default function SettingsManager() {
             </nav>
 
             <div className="mt-6 pt-4 border-t border-gray-200">
-              <a 
-                href="/docs" 
-                className="text-sm text-blue-600 hover:underline"
-              >
+              <a href="/docs" className="text-sm text-blue-600 hover:underline">
                 📖 API Documentation
               </a>
             </div>
@@ -519,22 +516,24 @@ export default function SettingsManager() {
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold">Complete Component Code</h3>
                   <button
-                    onClick={() => navigator.clipboard.writeText(codeExamples[activeExample as keyof typeof codeExamples])}
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        codeExamples[activeExample as keyof typeof codeExamples]
+                      )
+                    }
                     className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded transition-colors"
                   >
                     📋 Copy Code
                   </button>
                 </div>
-                
+
                 <div className="bg-gray-900 text-gray-100 rounded-lg overflow-hidden">
                   <div className="px-4 py-2 bg-gray-800 text-sm font-medium">
                     {activeExample}.tsx
                   </div>
                   <div className="p-4 overflow-x-auto">
                     <pre className="text-sm">
-                      <code>
-                        {codeExamples[activeExample as keyof typeof codeExamples]}
-                      </code>
+                      <code>{codeExamples[activeExample as keyof typeof codeExamples]}</code>
                     </pre>
                   </div>
                 </div>
@@ -544,28 +543,28 @@ export default function SettingsManager() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-800 mb-2">💡 Usage Notes</h4>
                 <div className="text-blue-700 text-sm space-y-2">
-                  {activeExample === 'install' && (
+                  {activeExample === "install" && (
                     <div>
                       <p>• This component automatically detects if PWA installation is available</p>
                       <p>• Handles loading states and error cases gracefully</p>
                       <p>• Updates UI when installation status changes</p>
                     </div>
                   )}
-                  {activeExample === 'notifications' && (
+                  {activeExample === "notifications" && (
                     <div>
                       <p>• Manages notification permissions with clear user feedback</p>
                       <p>• Includes push notification subscription for server-sent messages</p>
                       <p>• Provides fallback instructions for denied permissions</p>
                     </div>
                   )}
-                  {activeExample === 'qr-share' && (
+                  {activeExample === "qr-share" && (
                     <div>
                       <p>• Generates QR codes on-demand to avoid unnecessary processing</p>
                       <p>• Supports both custom URLs and current page sharing</p>
                       <p>• Includes native Web Share API integration when available</p>
                     </div>
                   )}
-                  {activeExample === 'settings' && (
+                  {activeExample === "settings" && (
                     <div>
                       <p>• Demonstrates type-safe storage with complex data structures</p>
                       <p>• Combines local storage for speed with persistent storage for sync</p>
@@ -582,9 +581,15 @@ export default function SettingsManager() {
       {/* Footer */}
       <footer className="mt-12 pt-8 border-t text-center text-gray-500">
         <div className="space-x-4 text-sm">
-          <a href="/" className="text-blue-600 hover:underline">← Back to Home</a>
-          <a href="/docs" className="text-blue-600 hover:underline">API Documentation</a>
-          <a href="/about" className="text-blue-600 hover:underline">About</a>
+          <a href="/" className="text-blue-600 hover:underline">
+            ← Back to Home
+          </a>
+          <a href="/docs" className="text-blue-600 hover:underline">
+            API Documentation
+          </a>
+          <a href="/about" className="text-blue-600 hover:underline">
+            About
+          </a>
         </div>
       </footer>
     </div>

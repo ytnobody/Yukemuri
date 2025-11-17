@@ -1,35 +1,41 @@
-import type { NetworkManager, NetworkStatus, OfflineSyncManager, QueuedRequest, SyncResult } from '../types.js'
+import type {
+  NetworkManager,
+  NetworkStatus,
+  OfflineSyncManager,
+  QueuedRequest,
+  SyncResult,
+} from "../types.js"
 
 export class NetworkManagerImpl implements NetworkManager {
   private offlineSyncManager: OfflineSyncManagerImpl
-  
+
   constructor() {
     this.offlineSyncManager = new OfflineSyncManagerImpl()
   }
-  
+
   get status(): NetworkStatus {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return {
         isOnline: true,
         isOffline: false,
-        connectionType: 'unknown',
-        effectiveType: '4g',
+        connectionType: "unknown",
+        effectiveType: "4g",
         downlink: 0,
         rtt: 0,
-        saveData: false
+        saveData: false,
       }
     }
 
     const connection = (navigator as any).connection || (navigator as any).mozConnection
-    
+
     return {
       isOnline: navigator.onLine,
       isOffline: !navigator.onLine,
-      connectionType: connection?.type || 'unknown',
-      effectiveType: connection?.effectiveType || '4g',
+      connectionType: connection?.type || "unknown",
+      effectiveType: connection?.effectiveType || "4g",
       downlink: connection?.downlink ?? 0,
       rtt: connection?.rtt ?? 0,
-      saveData: connection?.saveData ?? false
+      saveData: connection?.saveData ?? false,
     }
   }
 
@@ -38,19 +44,19 @@ export class NetworkManagerImpl implements NetworkManager {
   }
 
   onStatusChange(callback: (status: NetworkStatus) => void): () => void {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return () => {}
     }
 
     const handleOnline = () => callback(this.status)
     const handleOffline = () => callback(this.status)
 
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    window.addEventListener("online", handleOnline)
+    window.addEventListener("offline", handleOffline)
 
     return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener("online", handleOnline)
+      window.removeEventListener("offline", handleOffline)
     }
   }
 }
@@ -61,7 +67,8 @@ export class NetworkManagerImpl implements NetworkManager {
  */
 class OfflineSyncManagerImpl implements OfflineSyncManager {
   private queue: Map<string, QueuedRequest> = new Map()
-  private failedRequests: Map<string, { request: QueuedRequest; error: Error; retries: number }> = new Map()
+  private failedRequests: Map<string, { request: QueuedRequest; error: Error; retries: number }> =
+    new Map()
   private isCurrentlySyncing = false
   private syncOnlineListener: (() => void) | null = null
 
@@ -74,8 +81,8 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
     const queuedRequest: QueuedRequest = {
       ...request,
       id,
-      priority: request.priority || 'normal',
-      maxRetries: request.maxRetries ?? 3
+      priority: request.priority || "normal",
+      maxRetries: request.maxRetries ?? 3,
     }
 
     this.queue.set(id, queuedRequest)
@@ -86,12 +93,12 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
 
   async syncWhenOnline(): Promise<SyncResult[]> {
     if (this.isCurrentlySyncing) {
-      console.warn('⚠️ Sync already in progress')
+      console.warn("⚠️ Sync already in progress")
       return []
     }
 
-    if (typeof window !== 'undefined' && !navigator.onLine) {
-      console.log('📡 Still offline, cannot sync')
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      console.log("📡 Still offline, cannot sync")
       return []
     }
 
@@ -102,7 +109,10 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
       // Sort by priority: high -> normal -> low
       const sortedRequests = Array.from(this.queue.values()).sort((a, b) => {
         const priorityOrder = { high: 3, normal: 2, low: 1 }
-        return (priorityOrder[b.priority || 'normal'] ?? 2) - (priorityOrder[a.priority || 'normal'] ?? 2)
+        return (
+          (priorityOrder[b.priority || "normal"] ?? 2) -
+          (priorityOrder[a.priority || "normal"] ?? 2)
+        )
       })
 
       console.log(`🔄 Starting sync of ${sortedRequests.length} requests`)
@@ -120,8 +130,8 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
             // Keep failed request in queue
             this.failedRequests.set(request.id!, {
               request,
-              error: result.error || new Error('Unknown error'),
-              retries: 0
+              error: result.error || new Error("Unknown error"),
+              retries: 0,
             })
             console.warn(`❌ Sync failed: ${request.id}`)
           }
@@ -130,17 +140,19 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
           results.push({
             id: request.id!,
             success: false,
-            error: syncError
+            error: syncError,
           })
           this.failedRequests.set(request.id!, {
             request,
             error: syncError,
-            retries: 0
+            retries: 0,
           })
         }
       }
 
-      console.log(`📊 Sync complete: ${results.filter(r => r.success).length}/${results.length} succeeded`)
+      console.log(
+        `📊 Sync complete: ${results.filter(r => r.success).length}/${results.length} succeeded`
+      )
     } finally {
       this.isCurrentlySyncing = false
     }
@@ -155,7 +167,7 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
   async clearQueue(): Promise<void> {
     this.queue.clear()
     this.failedRequests.clear()
-    console.log('🗑️ Queue cleared')
+    console.log("🗑️ Queue cleared")
   }
 
   async retryFailedRequests(): Promise<SyncResult[]> {
@@ -171,7 +183,9 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
       }
 
       try {
-        console.log(`🔁 Retrying request: ${id} (attempt ${retries + 1}/${request.maxRetries ?? 3})`)
+        console.log(
+          `🔁 Retrying request: ${id} (attempt ${retries + 1}/${request.maxRetries ?? 3})`
+        )
         const result = await this.executeRequest(request)
         results.push(result)
 
@@ -189,7 +203,7 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
         results.push({
           id,
           success: false,
-          error
+          error,
         })
         failedItem.retries++
       }
@@ -211,7 +225,7 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
       const response = await fetch(request.url, {
         method: request.method,
         headers: request.headers,
-        body: request.body ? JSON.stringify(request.body) : undefined
+        body: request.body ? JSON.stringify(request.body) : undefined,
       })
 
       if (!response.ok) {
@@ -221,30 +235,30 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
       return {
         id: request.id!,
         success: true,
-        response
+        response,
       }
     } catch (error) {
       return {
         id: request.id!,
         success: false,
-        error: error instanceof Error ? error : new Error(String(error))
+        error: error instanceof Error ? error : new Error(String(error)),
       }
     }
   }
 
   private setupOnlineListener(): void {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return
     }
 
     this.syncOnlineListener = async () => {
-      console.log('📡 Back online, syncing queued requests...')
+      console.log("📡 Back online, syncing queued requests...")
       // Small delay to ensure connection is stable
       await new Promise(resolve => setTimeout(resolve, 100))
       await this.syncWhenOnline()
     }
 
-    window.addEventListener('online', this.syncOnlineListener)
+    window.addEventListener("online", this.syncOnlineListener)
   }
 
   private generateId(): string {
@@ -252,8 +266,8 @@ class OfflineSyncManagerImpl implements OfflineSyncManager {
   }
 
   destroy(): void {
-    if (typeof window !== 'undefined' && this.syncOnlineListener) {
-      window.removeEventListener('online', this.syncOnlineListener)
+    if (typeof window !== "undefined" && this.syncOnlineListener) {
+      window.removeEventListener("online", this.syncOnlineListener)
     }
   }
 }

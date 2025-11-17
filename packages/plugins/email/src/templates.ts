@@ -2,21 +2,21 @@
  * Email template definition
  */
 export interface Template {
-  name: string;
-  subject: string;
-  html: string;
-  text?: string;
-  variables: string[];
+  name: string
+  subject: string
+  html: string
+  text?: string
+  variables: string[]
 }
 
 /**
  * Template engine for email rendering
  */
 export class TemplateEngine {
-  private templates: Map<string, Template> = new Map();
+  private templates: Map<string, Template> = new Map()
 
   constructor() {
-    this.registerDefaultTemplates();
+    this.registerDefaultTemplates()
   }
 
   /**
@@ -25,8 +25,8 @@ export class TemplateEngine {
   private registerDefaultTemplates(): void {
     // Welcome email
     this.register({
-      name: 'welcome',
-      subject: 'Welcome to {{appName}}',
+      name: "welcome",
+      subject: "Welcome to {{appName}}",
       html: `
         <html>
           <body style="font-family: Arial, sans-serif;">
@@ -54,13 +54,13 @@ export class TemplateEngine {
         Best regards,
         The {{appName}} Team
       `,
-      variables: ['firstName', 'appName', 'dashboardUrl']
-    });
+      variables: ["firstName", "appName", "dashboardUrl"],
+    })
 
     // Password reset email
     this.register({
-      name: 'resetPassword',
-      subject: 'Reset your {{appName}} password',
+      name: "resetPassword",
+      subject: "Reset your {{appName}} password",
       html: `
         <html>
           <body style="font-family: Arial, sans-serif;">
@@ -94,13 +94,13 @@ export class TemplateEngine {
         Best regards,
         The {{appName}} Team
       `,
-      variables: ['firstName', 'resetLink', 'expiryTime', 'appName']
-    });
+      variables: ["firstName", "resetLink", "expiryTime", "appName"],
+    })
 
     // Email verification
     this.register({
-      name: 'verifyEmail',
-      subject: 'Verify your {{appName}} email',
+      name: "verifyEmail",
+      subject: "Verify your {{appName}} email",
       html: `
         <html>
           <body style="font-family: Arial, sans-serif;">
@@ -131,71 +131,74 @@ export class TemplateEngine {
         Best regards,
         The {{appName}} Team
       `,
-      variables: ['firstName', 'verifyLink', 'expiryTime', 'appName']
-    });
+      variables: ["firstName", "verifyLink", "expiryTime", "appName"],
+    })
   }
 
   /**
    * Register a new template
    */
   register(template: Template): void {
-    this.templates.set(template.name, template);
+    this.templates.set(template.name, template)
   }
 
   /**
    * Get a template by name
    */
   get(name: string): Template | undefined {
-    return this.templates.get(name);
+    return this.templates.get(name)
   }
 
   /**
    * Render a template with variables
    */
-  render(templateName: string, variables: Record<string, any>): { subject: string; html: string; text?: string } {
-    const template = this.templates.get(templateName);
+  render(
+    templateName: string,
+    variables: Record<string, any>
+  ): { subject: string; html: string; text?: string } {
+    const template = this.templates.get(templateName)
     if (!template) {
-      throw new Error(`Template not found: ${templateName}`);
+      throw new Error(`Template not found: ${templateName}`)
     }
 
     // Validate variables
-    const missingVars = template.variables.filter((v) => !(v in variables));
+    const missingVars = template.variables.filter(v => !(v in variables))
     if (missingVars.length > 0) {
-      throw new Error(`Missing template variables: ${missingVars.join(', ')}`);
+      throw new Error(`Missing template variables: ${missingVars.join(", ")}`)
     }
 
-    const subject = this.replaceVariables(template.subject, variables);
-    const html = this.replaceVariables(template.html, variables);
-    const text = template.text ? this.replaceVariables(template.text, variables) : undefined;
+    const subject = this.replaceVariables(template.subject, variables)
+    const html = this.replaceVariables(template.html, variables)
+    const text = template.text ? this.replaceVariables(template.text, variables) : undefined
 
-    return { subject, html, text };
+    return { subject, html, text }
   }
 
   /**
    * Replace variables in text
    */
   private replaceVariables(text: string, variables: Record<string, any>): string {
-    let result = text;
+    let result = text
 
     for (const [key, value] of Object.entries(variables)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      result = result.replace(regex, String(value));
+      const regex = new RegExp(`{{${key}}}`, "g")
+      result = result.replace(regex, String(value))
     }
 
-    return result;
+    return result
   }
 
   /**
    * List all registered templates
    */
   list(): string[] {
-    return Array.from(this.templates.keys());
+    return Array.from(this.templates.keys())
   }
 
   /**
    * Check if template exists
    */
   exists(name: string): boolean {
-    return this.templates.has(name);
+    return this.templates.has(name)
   }
 }

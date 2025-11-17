@@ -1,10 +1,10 @@
 /// <reference types="preact" />
 
 // UnoCSS virtual modules
-declare module 'virtual:uno.css'
+declare module "virtual:uno.css"
 
 // Hono modules (type definitions are provided in actual projects)
-declare module 'hono' {
+declare module "hono" {
   export class Hono {
     constructor()
     get(path: string, handler: any): void
@@ -24,39 +24,39 @@ declare module 'hono' {
 }
 
 // Vite plugins (type definitions are provided in actual projects)
-declare module '@preact/preset-vite' {
+declare module "@preact/preset-vite" {
   const plugin: any
   export default plugin
 }
 
-declare module '@hono/vite-dev-server' {
+declare module "@hono/vite-dev-server" {
   const plugin: any
   export default plugin
 }
 
 // UnoCSS modules (type definitions are provided in actual projects)
-declare module 'unocss' {
+declare module "unocss" {
   export function defineConfig(config: any): any
   export function presetUno(): any
   export function presetTypography(): any
 }
 
-declare module 'unocss/vite' {
+declare module "unocss/vite" {
   const plugin: any
   export default plugin
 }
 
-declare module '@unocss/preset-uno' {
+declare module "@unocss/preset-uno" {
   export default function presetUno(): any
 }
 
-declare module '@unocss/preset-typography' {
+declare module "@unocss/preset-typography" {
   export default function presetTypography(): any
 }
 
-declare module 'uno.css' {}
+declare module "uno.css" {}
 
-declare module 'preact-render-to-string' {
+declare module "preact-render-to-string" {
   export function render(vnode: any): string
 }
 

@@ -3,45 +3,45 @@
  * User registration form component
  */
 export interface RegisterFormProps {
-  onSubmit: (email: string, password: string, name?: string) => Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
-  onSuccess?: () => void;
+  onSubmit: (email: string, password: string, name?: string) => Promise<void>
+  isLoading?: boolean
+  error?: string | null
+  onSuccess?: () => void
 }
 
 export function RegisterForm(props: RegisterFormProps) {
-  let email = '';
-  let password = '';
-  let name = '';
+  let email = ""
+  let password = ""
+  let name = ""
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     if (!email || !password) {
-      return;
+      return
     }
 
     try {
-      await props.onSubmit(email, password, name || undefined);
+      await props.onSubmit(email, password, name || undefined)
       if (props.onSuccess) {
-        props.onSuccess();
+        props.onSuccess()
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error)
     }
-  };
+  }
 
   const handleEmailChange = (e: any) => {
-    email = e.target.value;
-  };
+    email = e.target.value
+  }
 
   const handlePasswordChange = (e: any) => {
-    password = e.target.value;
-  };
+    password = e.target.value
+  }
 
   const handleNameChange = (e: any) => {
-    name = e.target.value;
-  };
+    name = e.target.value
+  }
 
   return `
     <form onsubmit="${handleSubmit}">
@@ -83,11 +83,11 @@ export function RegisterForm(props: RegisterFormProps) {
         </label>
       </div>
 
-      ${props.error ? `<div class="error">${props.error}</div>` : ''}
+      ${props.error ? `<div class="error">${props.error}</div>` : ""}
 
       <button type="submit" disabled="${props.isLoading}">
-        ${props.isLoading ? 'Registering...' : 'Register'}
+        ${props.isLoading ? "Registering..." : "Register"}
       </button>
     </form>
-  `;
+  `
 }

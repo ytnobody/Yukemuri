@@ -1,21 +1,21 @@
-import { Hono } from 'hono'
-import type { Context } from 'hono'
-import { readFileSync } from 'fs'
-import { join, dirname } from 'path'
-import { existsSync } from 'fs'
-import { fileURLToPath } from 'url'
-import { renderPage } from './document'
-import { generateServiceWorker } from './core/service-worker'
-import { createFileRouter } from './core/router'
-import api from './api'
-import 'virtual:uno.css'
+import { Hono } from "hono"
+import type { Context } from "hono"
+import { readFileSync } from "fs"
+import { join, dirname } from "path"
+import { existsSync } from "fs"
+import { fileURLToPath } from "url"
+import { renderPage } from "./document"
+import { generateServiceWorker } from "./core/service-worker"
+import { createFileRouter } from "./core/router"
+import api from "./api"
+import "virtual:uno.css"
 
 // ES modules equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 // Initialize file-based router
-const fileRouter = createFileRouter(join(__dirname, 'routes'))
+const fileRouter = createFileRouter(join(__dirname, "routes"))
 
 const app = new Hono()
 
@@ -24,7 +24,7 @@ const app = new Hono()
 // ============================================
 
 // Web App Manifest
-app.get('/manifest.json', (c: Context) => {
+app.get("/manifest.json", (c: Context) => {
   return c.json({
     name: "Yukemuri Application",
     short_name: "Yukemuri",
@@ -41,68 +41,68 @@ app.get('/manifest.json', (c: Context) => {
         src: "/static/icons/icon-72x72.svg",
         sizes: "72x72",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-96x96.svg",
         sizes: "96x96",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-128x128.svg",
         sizes: "128x128",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-144x144.svg",
         sizes: "144x144",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-152x152.svg",
         sizes: "152x152",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-192x192.svg",
         sizes: "192x192",
         type: "image/svg+xml",
-        purpose: "any maskable"
+        purpose: "any maskable",
       },
       {
         src: "/static/icons/icon-384x384.svg",
         sizes: "384x384",
         type: "image/svg+xml",
-        purpose: "any"
+        purpose: "any",
       },
       {
         src: "/static/icons/icon-512x512.svg",
         sizes: "512x512",
         type: "image/svg+xml",
-        purpose: "any maskable"
-      }
+        purpose: "any maskable",
+      },
     ],
     categories: ["productivity", "utilities"],
     lang: "ja",
     dir: "ltr",
     display_override: ["window-controls-overlay", "standalone"],
     edge_side_panel: {},
-    handle_links: "preferred"
+    handle_links: "preferred",
   })
 })
 
 // Service Worker
-app.get('/sw.js', (c: Context) => {
+app.get("/sw.js", (c: Context) => {
   return new Response(generateServiceWorker(), {
     headers: {
-      'Content-Type': 'application/javascript; charset=utf-8',
-      'Service-Worker-Allowed': '/',
-      'Cache-Control': 'no-cache'
-    }
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Service-Worker-Allowed": "/",
+      "Cache-Control": "no-cache",
+    },
   })
 })
 
@@ -111,50 +111,50 @@ app.get('/sw.js', (c: Context) => {
 // ============================================
 
 // Static files from app/static
-app.get('/static/*', (c: Context) => {
-  const filePath = c.req.path.replace('/static', '')
-  const fullPath = join(__dirname, 'static', filePath)
-  
+app.get("/static/*", (c: Context) => {
+  const filePath = c.req.path.replace("/static", "")
+  const fullPath = join(__dirname, "static", filePath)
+
   try {
     if (existsSync(fullPath)) {
-      const content = readFileSync(fullPath, 'utf-8')
-      
+      const content = readFileSync(fullPath, "utf-8")
+
       // Determine content type based on file extension
-      let contentType = 'text/plain'
-      if (filePath.endsWith('.svg')) {
-        contentType = 'image/svg+xml; charset=utf-8'
-      } else if (filePath.endsWith('.png')) {
-        contentType = 'image/png'
-      } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
-        contentType = 'image/jpeg'
-      } else if (filePath.endsWith('.css')) {
-        contentType = 'text/css; charset=utf-8'
-      } else if (filePath.endsWith('.js')) {
-        contentType = 'application/javascript; charset=utf-8'
+      let contentType = "text/plain"
+      if (filePath.endsWith(".svg")) {
+        contentType = "image/svg+xml; charset=utf-8"
+      } else if (filePath.endsWith(".png")) {
+        contentType = "image/png"
+      } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+        contentType = "image/jpeg"
+      } else if (filePath.endsWith(".css")) {
+        contentType = "text/css; charset=utf-8"
+      } else if (filePath.endsWith(".js")) {
+        contentType = "application/javascript; charset=utf-8"
       }
-      
+
       return new Response(content, {
         headers: {
-          'Content-Type': contentType,
-          'Cache-Control': 'public, max-age=31536000'
-        }
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=31536000",
+        },
       })
     }
   } catch (error) {
-    console.error('Error serving static file:', error)
+    console.error("Error serving static file:", error)
   }
-  
-  return new Response('Not Found', { status: 404 })
+
+  return new Response("Not Found", { status: 404 })
 })
 
 // Legacy icon route redirect (backward compatibility)
-app.get('/icons/*', (c: Context) => {
-  const iconPath = c.req.path.replace('/icons', '/static/icons')
+app.get("/icons/*", (c: Context) => {
+  const iconPath = c.req.path.replace("/icons", "/static/icons")
   return new Response(null, {
     status: 301,
     headers: {
-      'Location': iconPath
-    }
+      Location: iconPath,
+    },
   })
 })
 
@@ -163,25 +163,31 @@ app.get('/icons/*', (c: Context) => {
 // ============================================
 
 // Mount API routes using Hono's route method for grouping
-app.route('/api', api)
+app.route("/api", api)
 
 // ============================================
 // Application Routes
 // ============================================
 
 // SPA routing - serve the same page for all non-API routes
-app.get('*', (c: Context) => {
+app.get("*", (c: Context) => {
   // Skip API routes and static files
   const path = c.req.path
-  if (path.startsWith('/api/') || path.startsWith('/static/') || path.startsWith('/icons/') || path === '/manifest.json' || path === '/sw.js') {
+  if (
+    path.startsWith("/api/") ||
+    path.startsWith("/static/") ||
+    path.startsWith("/icons/") ||
+    path === "/manifest.json" ||
+    path === "/sw.js"
+  ) {
     // Let other handlers deal with these
     return
   }
-  
+
   // Serve SPA for all other routes
   return c.html(renderPage())
 })
 
-console.log('♨️ Yukemuri app initialized')
+console.log("♨️ Yukemuri app initialized")
 
 export default app

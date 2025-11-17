@@ -1,6 +1,6 @@
-import { readdirSync, statSync } from 'fs'
-import { join, relative, basename, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { readdirSync, statSync } from "fs"
+import { join, relative, basename, dirname } from "path"
+import { fileURLToPath } from "url"
 
 export interface RouteInfo {
   path: string
@@ -19,14 +19,14 @@ export interface RouteSegment {
 
 /**
  * Next.js App Router style file-based routing
- * 
+ *
  * File patterns:
  * - page.tsx → renders the route
  * - layout.tsx → shared layout
  * - loading.tsx → loading UI
  * - error.tsx → error boundary
  * - not-found.tsx → 404 page
- * 
+ *
  * Dynamic routes:
  * - [id]/page.tsx → /users/:id
  * - [...slug]/page.tsx → /blog/*
@@ -45,36 +45,36 @@ export class FileRouter {
    */
   scanRoutes(): RouteInfo[] {
     const routes: RouteInfo[] = []
-    
-    this.walkDirectory(this.routesDir, '', routes)
-    
+
+    this.walkDirectory(this.routesDir, "", routes)
+
     // Sort routes by specificity (static routes first, then dynamic)
     routes.sort((a, b) => {
       if (!a.isDynamic && b.isDynamic) return -1
       if (a.isDynamic && !b.isDynamic) return 1
       return a.path.localeCompare(b.path)
     })
-    
+
     routes.forEach(route => {
       this.routes.set(route.path, route)
     })
-    
+
     return routes
   }
 
   private walkDirectory(dir: string, currentPath: string, routes: RouteInfo[]) {
     try {
       const items = readdirSync(dir)
-      
+
       for (const item of items) {
         const fullPath = join(dir, item)
         const stat = statSync(fullPath)
-        
+
         if (stat.isDirectory()) {
           // Handle directory (route segment)
-          const segmentPath = currentPath + '/' + item
+          const segmentPath = currentPath + "/" + item
           this.walkDirectory(fullPath, segmentPath, routes)
-        } else if (item === 'page.tsx' || item === 'page.ts') {
+        } else if (item === "page.tsx" || item === "page.ts") {
           // Found a page file - create route
           const route = this.createRoute(currentPath, fullPath)
           if (route) {
@@ -91,95 +91,95 @@ export class FileRouter {
     // Convert file path to URL path
     const urlPath = this.filePathToUrlPath(routePath)
     const segments = this.parseSegments(routePath)
-    
+
     const isDynamic = segments.some(seg => seg.isDynamic)
-    
+
     return {
       path: urlPath,
       filePath,
       isDynamic,
-      segments
+      segments,
     }
   }
 
   private filePathToUrlPath(routePath: string): string {
-    if (!routePath || routePath === '/') {
-      return '/'
+    if (!routePath || routePath === "/") {
+      return "/"
     }
-    
+
     return routePath
-      .split('/')
-      .filter(segment => segment !== '')
+      .split("/")
+      .filter(segment => segment !== "")
       .map(segment => this.convertSegment(segment))
-      .join('/')
-      .replace(/^/, '/')
+      .join("/")
+      .replace(/^/, "/")
   }
 
   private convertSegment(segment: string): string {
     // [id] → :id (dynamic segment)
-    if (segment.startsWith('[') && segment.endsWith(']')) {
+    if (segment.startsWith("[") && segment.endsWith("]")) {
       const inner = segment.slice(1, -1)
-      
+
       // [...slug] → *slug (catch-all)
-      if (inner.startsWith('...')) {
-        return '*' + inner.slice(3)
+      if (inner.startsWith("...")) {
+        return "*" + inner.slice(3)
       }
-      
+
       // [[...slug]] → *slug (optional catch-all)
-      if (inner.startsWith('[...') && inner.endsWith(']')) {
-        return '*' + inner.slice(4, -1)
+      if (inner.startsWith("[...") && inner.endsWith("]")) {
+        return "*" + inner.slice(4, -1)
       }
-      
+
       // [id] → :id (regular dynamic segment)
-      return ':' + inner
+      return ":" + inner
     }
-    
+
     return segment
   }
 
   private parseSegments(routePath: string): RouteSegment[] {
-    if (!routePath || routePath === '/') {
+    if (!routePath || routePath === "/") {
       return []
     }
-    
+
     return routePath
-      .split('/')
-      .filter(segment => segment !== '')
+      .split("/")
+      .filter(segment => segment !== "")
       .map(segment => {
-        if (segment.startsWith('[') && segment.endsWith(']')) {
+        if (segment.startsWith("[") && segment.endsWith("]")) {
           const inner = segment.slice(1, -1)
-          
-          if (inner.startsWith('...')) {
+
+          if (inner.startsWith("...")) {
             return {
               name: inner.slice(3),
               isDynamic: true,
               isCatchAll: true,
-              isOptional: false
+              isOptional: false,
             }
           }
-          
-          if (inner.startsWith('[...') && inner.endsWith(']')) {
+
+          if (inner.startsWith("[...") && inner.endsWith("]")) {
             return {
               name: inner.slice(4, -1),
               isDynamic: true,
               isCatchAll: true,
-              isOptional: true
+              isOptional: true,
             }
           }
-          
+
           return {
             name: inner,
             isDynamic: true,
             isCatchAll: false,
-            isOptional: false
+            isOptional: false,
           }
         }
-        
+
         return {
           name: segment,
           isDynamic: false,
           isCatchAll: false,
-          isOptional: false
+          isOptional: false,
         }
       })
   }
@@ -193,7 +193,7 @@ export class FileRouter {
     if (exactRoute && !exactRoute.isDynamic) {
       return { route: exactRoute, params: {} }
     }
-    
+
     // Try dynamic routes
     for (const route of this.routes.values()) {
       if (route.isDynamic) {
@@ -203,20 +203,20 @@ export class FileRouter {
         }
       }
     }
-    
+
     return null
   }
 
   private matchDynamicRoute(urlPath: string, route: RouteInfo): Record<string, string> | null {
-    const urlSegments = urlPath.split('/').filter(s => s !== '')
+    const urlSegments = urlPath.split("/").filter(s => s !== "")
     const routeSegments = route.segments
-    
+
     const params: Record<string, string> = {}
     let urlIndex = 0
-    
+
     for (let i = 0; i < routeSegments.length; i++) {
       const segment = routeSegments[i]
-      
+
       if (!segment.isDynamic) {
         // Static segment - must match exactly
         if (urlSegments[urlIndex] !== segment.name) {
@@ -226,7 +226,7 @@ export class FileRouter {
       } else if (segment.isCatchAll) {
         // Catch-all segment - captures remaining path
         if (segment.isOptional || urlIndex < urlSegments.length) {
-          const remainingPath = urlSegments.slice(urlIndex).join('/')
+          const remainingPath = urlSegments.slice(urlIndex).join("/")
           params[segment.name] = remainingPath
           return params
         }
@@ -239,12 +239,12 @@ export class FileRouter {
         urlIndex++
       }
     }
-    
+
     // Check if we consumed all URL segments
     if (urlIndex === urlSegments.length) {
       return params
     }
-    
+
     return null
   }
 

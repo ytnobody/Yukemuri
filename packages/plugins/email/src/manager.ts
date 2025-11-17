@@ -2,114 +2,116 @@
  * Email configuration interfaces
  */
 export interface EmailConfig {
-  provider: 'smtp' | 'sendgrid' | 'mailgun';
-  from: string;
-  replyTo?: string;
-  smtpConfig?: SMTPConfig;
-  sendgridConfig?: SendGridConfig;
-  mailgunConfig?: MailgunConfig;
+  provider: "smtp" | "sendgrid" | "mailgun"
+  from: string
+  replyTo?: string
+  smtpConfig?: SMTPConfig
+  sendgridConfig?: SendGridConfig
+  mailgunConfig?: MailgunConfig
 }
 
 /**
  * SMTP configuration
  */
 export interface SMTPConfig {
-  host: string;
-  port: number;
-  secure: boolean;
+  host: string
+  port: number
+  secure: boolean
   auth: {
-    user: string;
-    pass: string;
-  };
+    user: string
+    pass: string
+  }
 }
 
 /**
  * SendGrid configuration
  */
 export interface SendGridConfig {
-  apiKey: string;
+  apiKey: string
 }
 
 /**
  * Mailgun configuration
  */
 export interface MailgunConfig {
-  apiKey: string;
-  domain: string;
+  apiKey: string
+  domain: string
 }
 
 /**
  * Email recipient
  */
 export interface EmailRecipient {
-  email: string;
-  name?: string;
+  email: string
+  name?: string
 }
 
 /**
  * Email attachment
  */
 export interface EmailAttachment {
-  filename: string;
-  content: Buffer | string;
-  contentType?: string;
+  filename: string
+  content: Buffer | string
+  contentType?: string
 }
 
 /**
  * Email message
  */
 export interface EmailMessage {
-  to: EmailRecipient | EmailRecipient[];
-  cc?: EmailRecipient | EmailRecipient[];
-  bcc?: EmailRecipient | EmailRecipient[];
-  subject: string;
-  html?: string;
-  text?: string;
-  attachments?: EmailAttachment[];
-  replyTo?: string;
-  headers?: Record<string, string>;
+  to: EmailRecipient | EmailRecipient[]
+  cc?: EmailRecipient | EmailRecipient[]
+  bcc?: EmailRecipient | EmailRecipient[]
+  subject: string
+  html?: string
+  text?: string
+  attachments?: EmailAttachment[]
+  replyTo?: string
+  headers?: Record<string, string>
 }
 
 /**
  * Email send result
  */
 export interface EmailSendResult {
-  success: boolean;
-  messageId?: string;
-  error?: string;
+  success: boolean
+  messageId?: string
+  error?: string
 }
 
 /**
  * Email manager for handling email operations
  */
 export class EmailManager {
-  private config: EmailConfig | null = null;
-  private smtpTransport: any = null;
-  private sendgridClient: any = null;
-  private mailgunClient: any = null;
+  private config: EmailConfig | null = null
+  private smtpTransport: any = null
+  private sendgridClient: any = null
+  private mailgunClient: any = null
 
   /**
    * Initialize email manager with configuration
    */
   async connect(config: EmailConfig): Promise<void> {
     try {
-      this.config = config;
+      this.config = config
 
       switch (config.provider) {
-        case 'smtp':
-          await this.initializeSMTP(config);
-          break;
-        case 'sendgrid':
-          await this.initializeSendGrid(config);
-          break;
-        case 'mailgun':
-          await this.initializeMailgun(config);
-          break;
+        case "smtp":
+          await this.initializeSMTP(config)
+          break
+        case "sendgrid":
+          await this.initializeSendGrid(config)
+          break
+        case "mailgun":
+          await this.initializeMailgun(config)
+          break
         default:
-          throw new Error(`Unknown email provider: ${config.provider}`);
+          throw new Error(`Unknown email provider: ${config.provider}`)
       }
     } catch (error) {
-      throw new Error(`Failed to initialize email service: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to initialize email service: ${error instanceof Error ? error.message : "Unknown error"}`
+      )
     }
   }
 
@@ -118,12 +120,12 @@ export class EmailManager {
    */
   private async initializeSMTP(config: EmailConfig): Promise<void> {
     if (!config.smtpConfig) {
-      throw new Error('SMTP configuration required for SMTP provider');
+      throw new Error("SMTP configuration required for SMTP provider")
     }
 
     // Note: In a real implementation, would import nodemailer
     // For now, store config for mock implementation
-    console.log('SMTP transport initialized');
+    console.log("SMTP transport initialized")
   }
 
   /**
@@ -131,12 +133,12 @@ export class EmailManager {
    */
   private async initializeSendGrid(config: EmailConfig): Promise<void> {
     if (!config.sendgridConfig) {
-      throw new Error('SendGrid configuration required for SendGrid provider');
+      throw new Error("SendGrid configuration required for SendGrid provider")
     }
 
     // Note: In a real implementation, would import @sendgrid/mail
     // For now, store config for mock implementation
-    console.log('SendGrid client initialized');
+    console.log("SendGrid client initialized")
   }
 
   /**
@@ -144,12 +146,12 @@ export class EmailManager {
    */
   private async initializeMailgun(config: EmailConfig): Promise<void> {
     if (!config.mailgunConfig) {
-      throw new Error('Mailgun configuration required for Mailgun provider');
+      throw new Error("Mailgun configuration required for Mailgun provider")
     }
 
     // Note: In a real implementation, would import mailgun.js
     // For now, store config for mock implementation
-    console.log('Mailgun client initialized');
+    console.log("Mailgun client initialized")
   }
 
   /**
@@ -157,25 +159,25 @@ export class EmailManager {
    */
   async send(message: EmailMessage): Promise<EmailSendResult> {
     if (!this.config) {
-      throw new Error('Email service not initialized');
+      throw new Error("Email service not initialized")
     }
 
     try {
       switch (this.config.provider) {
-        case 'smtp':
-          return await this.sendViaSMTP(message);
-        case 'sendgrid':
-          return await this.sendViaSendGrid(message);
-        case 'mailgun':
-          return await this.sendViaMailgun(message);
+        case "smtp":
+          return await this.sendViaSMTP(message)
+        case "sendgrid":
+          return await this.sendViaSendGrid(message)
+        case "mailgun":
+          return await this.sendViaMailgun(message)
         default:
-          throw new Error(`Unknown email provider: ${this.config.provider}`);
+          throw new Error(`Unknown email provider: ${this.config.provider}`)
       }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
+        error: error instanceof Error ? error.message : "Unknown error",
+      }
     }
   }
 
@@ -185,24 +187,24 @@ export class EmailManager {
   private async sendViaSMTP(message: EmailMessage): Promise<EmailSendResult> {
     try {
       if (!this.config) {
-        throw new Error('Email service not initialized');
+        throw new Error("Email service not initialized")
       }
 
       // Mock implementation - in production would use nodemailer
-      const recipients = Array.isArray(message.to) ? message.to : [message.to];
-      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@${this.config.from.split('@')[1]}>`;
+      const recipients = Array.isArray(message.to) ? message.to : [message.to]
+      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@${this.config.from.split("@")[1]}>`
 
-      console.log(`Sending email via SMTP to ${recipients.map((r) => r.email).join(', ')}`);
+      console.log(`Sending email via SMTP to ${recipients.map(r => r.email).join(", ")}`)
 
       return {
         success: true,
-        messageId
-      };
+        messageId,
+      }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'SMTP send failed'
-      };
+        error: error instanceof Error ? error.message : "SMTP send failed",
+      }
     }
   }
 
@@ -212,24 +214,24 @@ export class EmailManager {
   private async sendViaSendGrid(message: EmailMessage): Promise<EmailSendResult> {
     try {
       if (!this.config) {
-        throw new Error('Email service not initialized');
+        throw new Error("Email service not initialized")
       }
 
       // Mock implementation - in production would use @sendgrid/mail
-      const recipients = Array.isArray(message.to) ? message.to : [message.to];
-      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@sendgrid>`;
+      const recipients = Array.isArray(message.to) ? message.to : [message.to]
+      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@sendgrid>`
 
-      console.log(`Sending email via SendGrid to ${recipients.map((r) => r.email).join(', ')}`);
+      console.log(`Sending email via SendGrid to ${recipients.map(r => r.email).join(", ")}`)
 
       return {
         success: true,
-        messageId
-      };
+        messageId,
+      }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'SendGrid send failed'
-      };
+        error: error instanceof Error ? error.message : "SendGrid send failed",
+      }
     }
   }
 
@@ -239,24 +241,24 @@ export class EmailManager {
   private async sendViaMailgun(message: EmailMessage): Promise<EmailSendResult> {
     try {
       if (!this.config) {
-        throw new Error('Email service not initialized');
+        throw new Error("Email service not initialized")
       }
 
       // Mock implementation - in production would use mailgun.js
-      const recipients = Array.isArray(message.to) ? message.to : [message.to];
-      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@mailgun>`;
+      const recipients = Array.isArray(message.to) ? message.to : [message.to]
+      const messageId = `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@mailgun>`
 
-      console.log(`Sending email via Mailgun to ${recipients.map((r) => r.email).join(', ')}`);
+      console.log(`Sending email via Mailgun to ${recipients.map(r => r.email).join(", ")}`)
 
       return {
         success: true,
-        messageId
-      };
+        messageId,
+      }
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Mailgun send failed'
-      };
+        error: error instanceof Error ? error.message : "Mailgun send failed",
+      }
     }
   }
 
@@ -270,28 +272,28 @@ export class EmailManager {
     options?: { cc?: EmailRecipient[]; bcc?: EmailRecipient[] }
   ): Promise<EmailSendResult> {
     if (!this.config) {
-      throw new Error('Email service not initialized');
+      throw new Error("Email service not initialized")
     }
 
     try {
       // Load template (mock implementation)
-      const template = this.loadTemplate(templateName);
-      const html = this.renderTemplate(template, variables);
+      const template = this.loadTemplate(templateName)
+      const html = this.renderTemplate(template, variables)
 
       const message: EmailMessage = {
         to,
         subject: variables.subject || template.subject,
         html,
         cc: options?.cc,
-        bcc: options?.bcc
-      };
+        bcc: options?.bcc,
+      }
 
-      return await this.send(message);
+      return await this.send(message)
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Template send failed'
-      };
+        error: error instanceof Error ? error.message : "Template send failed",
+      }
     }
   }
 
@@ -302,43 +304,46 @@ export class EmailManager {
     // Mock templates - in production would load from files
     const templates: Record<string, any> = {
       welcome: {
-        subject: 'Welcome to {{appName}}',
-        html: '<h1>Welcome {{firstName}}!</h1><p>Thank you for joining {{appName}}.</p>',
-        text: 'Welcome {{firstName}}! Thank you for joining {{appName}}.'
+        subject: "Welcome to {{appName}}",
+        html: "<h1>Welcome {{firstName}}!</h1><p>Thank you for joining {{appName}}.</p>",
+        text: "Welcome {{firstName}}! Thank you for joining {{appName}}.",
       },
       resetPassword: {
-        subject: 'Reset your password',
+        subject: "Reset your password",
         html: '<h1>Password Reset</h1><p>Click <a href="{{resetLink}}">here</a> to reset your password.</p>',
-        text: 'Password Reset: {{resetLink}}'
+        text: "Password Reset: {{resetLink}}",
       },
       verifyEmail: {
-        subject: 'Verify your email',
+        subject: "Verify your email",
         html: '<h1>Email Verification</h1><p>Click <a href="{{verifyLink}}">here</a> to verify your email.</p>',
-        text: 'Email Verification: {{verifyLink}}'
-      }
-    };
-
-    const template = templates[name];
-    if (!template) {
-      throw new Error(`Template not found: ${name}`);
+        text: "Email Verification: {{verifyLink}}",
+      },
     }
 
-    return template;
+    const template = templates[name]
+    if (!template) {
+      throw new Error(`Template not found: ${name}`)
+    }
+
+    return template
   }
 
   /**
    * Render template with variables
    */
-  private renderTemplate(template: { subject: string; html: string; text?: string }, variables: Record<string, any>): string {
-    let html = template.html;
+  private renderTemplate(
+    template: { subject: string; html: string; text?: string },
+    variables: Record<string, any>
+  ): string {
+    let html = template.html
 
     // Replace all template variables
     for (const [key, value] of Object.entries(variables)) {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      html = html.replace(regex, String(value));
+      const regex = new RegExp(`{{${key}}}`, "g")
+      html = html.replace(regex, String(value))
     }
 
-    return html;
+    return html
   }
 
   /**
@@ -346,7 +351,7 @@ export class EmailManager {
    */
   registerTemplate(name: string, template: { subject: string; html: string; text?: string }): void {
     // In production, would store in a template registry
-    console.log(`Template registered: ${name}`);
+    console.log(`Template registered: ${name}`)
   }
 
   /**
@@ -356,14 +361,14 @@ export class EmailManager {
     try {
       if (this.smtpTransport) {
         // Close SMTP connection
-        console.log('SMTP connection closed');
+        console.log("SMTP connection closed")
       }
-      this.config = null;
-      this.smtpTransport = null;
-      this.sendgridClient = null;
-      this.mailgunClient = null;
+      this.config = null
+      this.smtpTransport = null
+      this.sendgridClient = null
+      this.mailgunClient = null
     } catch (error) {
-      console.error('Error disconnecting email service:', error);
+      console.error("Error disconnecting email service:", error)
     }
   }
 
@@ -371,13 +376,13 @@ export class EmailManager {
    * Get email configuration
    */
   getConfig(): EmailConfig | null {
-    return this.config;
+    return this.config
   }
 
   /**
    * Get connection status
    */
   isConnected(): boolean {
-    return this.config !== null;
+    return this.config !== null
   }
 }

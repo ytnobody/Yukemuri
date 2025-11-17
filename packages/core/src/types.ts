@@ -1,4 +1,4 @@
-import type { Hono, Context, MiddlewareHandler } from 'hono';
+import type { Hono, Context, MiddlewareHandler } from "hono"
 
 // ===== Basic Type Definitions =====
 
@@ -7,19 +7,19 @@ import type { Hono, Context, MiddlewareHandler } from 'hono';
  */
 export interface YukemuriConfig {
   /** Application name */
-  name: string;
+  name: string
   /** Version */
-  version?: string;
+  version?: string
   /** Whether in development mode */
-  dev?: boolean;
+  dev?: boolean
   /** Database configuration */
-  database?: DatabaseConfig;
+  database?: DatabaseConfig
   /** Plugin configuration */
-  plugins?: YukemuriPlugin[];
+  plugins?: YukemuriPlugin[]
   /** Custom routes */
-  routes?: RouteConfig[];
+  routes?: RouteConfig[]
   /** Middleware configuration */
-  middleware?: MiddlewareConfig[];
+  middleware?: MiddlewareConfig[]
 }
 
 /**
@@ -27,11 +27,11 @@ export interface YukemuriConfig {
  */
 export interface DatabaseConfig {
   /** Database URL */
-  url: string;
+  url: string
   /** Authentication token */
-  authToken?: string;
+  authToken?: string
   /** Execute migrations */
-  migrate?: boolean;
+  migrate?: boolean
 }
 
 /**
@@ -39,13 +39,13 @@ export interface DatabaseConfig {
  */
 export interface RouteConfig {
   /** HTTP method */
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS"
   /** Path */
-  path: string;
+  path: string
   /** Route handler */
-  handler: (c: Context) => Response | Promise<Response>;
+  handler: (c: Context) => Response | Promise<Response>
   /** Middleware */
-  middleware?: MiddlewareFunction[];
+  middleware?: MiddlewareFunction[]
 }
 
 /**
@@ -53,15 +53,15 @@ export interface RouteConfig {
  */
 export interface MiddlewareConfig {
   /** Path pattern */
-  path?: string;
+  path?: string
   /** Middleware function */
-  middleware: MiddlewareFunction;
+  middleware: MiddlewareFunction
 }
 
 /**
  * Middleware function type
  */
-export type MiddlewareFunction = MiddlewareHandler;
+export type MiddlewareFunction = MiddlewareHandler
 
 // ===== Plugin-Related Types =====
 
@@ -70,171 +70,171 @@ export type MiddlewareFunction = MiddlewareHandler;
  */
 export interface YukemuriPlugin {
   /** Plugin name */
-  name: string;
+  name: string
   /** Version */
-  version: string;
+  version: string
   /** Description */
-  description?: string;
+  description?: string
   /** Author */
-  author?: string;
+  author?: string
   /** License */
-  license?: string;
+  license?: string
   /** Homepage */
-  homepage?: string;
+  homepage?: string
   /** Repository */
-  repository?: string;
+  repository?: string
   /** Dependencies */
-  dependencies?: string[];
+  dependencies?: string[]
   /** Peer dependencies */
-  peerDependencies?: string[];
+  peerDependencies?: string[]
   /** Engine requirements */
   engines?: {
-    yukemuri?: string;
-    node?: string;
-  };
+    yukemuri?: string
+    node?: string
+  }
   /** Configuration schema */
-  configSchema?: ConfigSchema;
+  configSchema?: ConfigSchema
   /** Default configuration */
-  defaultConfig?: any;
+  defaultConfig?: any
   /** Plugin initialization function */
-  init?: InitHook;
+  init?: InitHook
   /** Setup hook */
-  setup?: SetupHook;
+  setup?: SetupHook
   /** Teardown hook */
-  teardown?: TeardownHook;
+  teardown?: TeardownHook
   /** Additional routes */
-  routes?: RouteConfig[];
+  routes?: RouteConfig[]
   /** Additional middleware */
-  middleware?: MiddlewareConfig[];
+  middleware?: MiddlewareConfig[]
   /** Static files */
-  assets?: AssetConfig[];
+  assets?: AssetConfig[]
   /** CLI commands */
-  commands?: CommandConfig[];
+  commands?: CommandConfig[]
   /** Client extensions */
-  clientExtensions?: ClientExtensions;
+  clientExtensions?: ClientExtensions
 }
 
 /**
  * Configuration schema
  */
 export interface ConfigSchema {
-  type: 'object';
-  properties?: Record<string, ConfigProperty>;
-  required?: string[];
-  additionalProperties?: boolean;
+  type: "object"
+  properties?: Record<string, ConfigProperty>
+  required?: string[]
+  additionalProperties?: boolean
 }
 
 /**
  * Configuration property
  */
 export interface ConfigProperty {
-  type: 'string' | 'number' | 'boolean' | 'object' | 'array';
-  description?: string;
-  default?: any;
-  enum?: any[];
-  minimum?: number;
-  maximum?: number;
-  pattern?: string;
-  items?: ConfigProperty;
-  properties?: Record<string, ConfigProperty>;
-  required?: boolean;
-  validation?: (value: any) => boolean | string;
+  type: "string" | "number" | "boolean" | "object" | "array"
+  description?: string
+  default?: any
+  enum?: any[]
+  minimum?: number
+  maximum?: number
+  pattern?: string
+  items?: ConfigProperty
+  properties?: Record<string, ConfigProperty>
+  required?: boolean
+  validation?: (value: any) => boolean | string
 }
 
 /**
  * Plugin context
  */
 export interface PluginContext {
-  app: YukemuriApp;
-  config: any;
-  logger: Logger;
-  utils: PluginUtils;
-  dependencies: Record<string, any>;
+  app: YukemuriApp
+  config: any
+  logger: Logger
+  utils: PluginUtils
+  dependencies: Record<string, any>
 }
 
 /**
  * Lifecycle hooks
  */
-export type InitHook = (context: PluginContext) => Promise<void> | void;
-export type SetupHook = (context: PluginContext) => Promise<void> | void;
-export type TeardownHook = (context: PluginContext) => Promise<void> | void;
+export type InitHook = (context: PluginContext) => Promise<void> | void
+export type SetupHook = (context: PluginContext) => Promise<void> | void
+export type TeardownHook = (context: PluginContext) => Promise<void> | void
 
 /**
  * Client extensions
  */
 export interface ClientExtensions {
-  components?: ComponentConfig[];
-  hooks?: HookConfig[];
-  utilities?: UtilityConfig[];
+  components?: ComponentConfig[]
+  hooks?: HookConfig[]
+  utilities?: UtilityConfig[]
 }
 
 /**
  * Component configuration
  */
 export interface ComponentConfig {
-  name: string;
-  component: () => Promise<any>;
-  props?: Record<string, any>;
+  name: string
+  component: () => Promise<any>
+  props?: Record<string, any>
 }
 
 /**
  * Hook configuration
  */
 export interface HookConfig {
-  name: string;
-  hook: () => Promise<any>;
+  name: string
+  hook: () => Promise<any>
 }
 
 /**
  * Utility configuration
  */
 export interface UtilityConfig {
-  name: string;
-  utility: () => Promise<any>;
+  name: string
+  utility: () => Promise<any>
 }
 
 /**
  * Command configuration
  */
 export interface CommandConfig {
-  name: string;
-  description?: string;
-  options?: CommandOption[];
-  handler: (args: any[], options: Record<string, any>) => Promise<void> | void;
+  name: string
+  description?: string
+  options?: CommandOption[]
+  handler: (args: any[], options: Record<string, any>) => Promise<void> | void
 }
 
 /**
  * Command option
  */
 export interface CommandOption {
-  name: string;
-  alias?: string;
-  description?: string;
-  type?: 'string' | 'number' | 'boolean';
-  required?: boolean;
-  default?: any;
+  name: string
+  alias?: string
+  description?: string
+  type?: "string" | "number" | "boolean"
+  required?: boolean
+  default?: any
 }
 
 /**
  * Plugin utilities
  */
 export interface PluginUtils {
-  env(key: string, fallback?: string): string | undefined;
-  createLogger(scope: string): Logger;
-  registerGlobal(name: string, value: any): void;
-  schedule(fn: () => void | Promise<void>, delay: number): void;
-  getDatabase(name?: string): any;
+  env(key: string, fallback?: string): string | undefined
+  createLogger(scope: string): Logger
+  registerGlobal(name: string, value: any): void
+  schedule(fn: () => void | Promise<void>, delay: number): void
+  getDatabase(name?: string): any
 }
 
 /**
  * Logger
  */
 export interface Logger {
-  info(message: string, ...args: any[]): void;
-  warn(message: string, ...args: any[]): void;
-  error(message: string, ...args: any[]): void;
-  debug(message: string, ...args: any[]): void;
-  child(metadata: Record<string, any>): Logger;
+  info(message: string, ...args: any[]): void
+  warn(message: string, ...args: any[]): void
+  error(message: string, ...args: any[]): void
+  debug(message: string, ...args: any[]): void
+  child(metadata: Record<string, any>): Logger
 }
 
 /**
@@ -242,9 +242,9 @@ export interface Logger {
  */
 export interface AssetConfig {
   /** Local path */
-  from: string;
+  from: string
   /** Public path */
-  to: string;
+  to: string
 }
 
 // ===== Application Types =====
@@ -254,19 +254,19 @@ export interface AssetConfig {
  */
 export interface YukemuriApp {
   /** Internal Hono instance */
-  hono: Hono;
+  hono: Hono
   /** Configuration */
-  config: YukemuriConfig;
+  config: YukemuriConfig
   /** Add a plugin */
-  use(plugin: YukemuriPlugin, config?: any): Promise<YukemuriApp>;
+  use(plugin: YukemuriPlugin, config?: any): Promise<YukemuriApp>
   /** Add a route */
-  route(config: RouteConfig): YukemuriApp;
+  route(config: RouteConfig): YukemuriApp
   /** Add middleware */
-  middleware(config: MiddlewareConfig): YukemuriApp;
+  middleware(config: MiddlewareConfig): YukemuriApp
   /** Start the application */
-  start(port?: number): Promise<void>;
+  start(port?: number): Promise<void>
   /** Get request handler (for Cloudflare Workers) */
-  fetch: (request: Request) => Promise<Response>;
+  fetch: (request: Request) => Promise<Response>
 }
 
 // ===== CLI-Related Types =====
@@ -275,19 +275,19 @@ export interface YukemuriApp {
  * CLI command type
  */
 export interface CLICommand {
-  name: string;
-  description: string;
-  options?: CLIOption[];
-  action: (...args: any[]) => Promise<void> | void;
+  name: string
+  description: string
+  options?: CLIOption[]
+  action: (...args: any[]) => Promise<void> | void
 }
 
 /**
  * CLI option type
  */
 export interface CLIOption {
-  flags: string;
-  description: string;
-  default?: any;
+  flags: string
+  description: string
+  default?: any
 }
 
 // ===== Template-Related Types =====
@@ -296,21 +296,21 @@ export interface CLIOption {
  * Project template
  */
 export interface ProjectTemplate {
-  name: string;
-  description: string;
-  files: TemplateFile[];
-  dependencies: string[];
-  devDependencies?: string[];
-  scripts?: Record<string, string>;
+  name: string
+  description: string
+  files: TemplateFile[]
+  dependencies: string[]
+  devDependencies?: string[]
+  scripts?: Record<string, string>
 }
 
 /**
  * Template file
  */
 export interface TemplateFile {
-  path: string;
-  content: string;
-  template?: boolean; // Whether this is a Mustache template
+  path: string
+  content: string
+  template?: boolean // Whether this is a Mustache template
 }
 
 // ===== Yukemuri Client API Types =====
@@ -320,7 +320,7 @@ export interface TemplateFile {
  */
 export interface PWAInstallPrompt {
   prompt(): Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
 }
 
 /**
@@ -386,8 +386,8 @@ export interface QRCodeOptions {
     dark?: string
     light?: string
   }
-  errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
-  type?: 'image/png' | 'image/jpeg' | 'image/webp'
+  errorCorrectionLevel?: "L" | "M" | "Q" | "H"
+  type?: "image/png" | "image/jpeg" | "image/webp"
   quality?: number
 }
 
@@ -397,7 +397,11 @@ export interface QRCodeOptions {
 export interface StorageManager {
   local: <T>(key: string, defaultValue: T, options?: StorageOptions<T>) => StorageController<T>
   session: <T>(key: string, defaultValue: T, options?: StorageOptions<T>) => StorageController<T>
-  persistent: <T>(key: string, defaultValue: T, options?: PersistentOptions<T>) => PersistentController<T>
+  persistent: <T>(
+    key: string,
+    defaultValue: T,
+    options?: PersistentOptions<T>
+  ) => PersistentController<T>
 }
 
 /**
@@ -434,8 +438,8 @@ export interface StorageOptions<T = any> {
  * Persistent storage options
  */
 export interface PersistentOptions<T = any> extends StorageOptions<T> {
-  syncStrategy?: 'immediate' | 'batched' | 'manual'
-  conflictResolution?: 'client-wins' | 'server-wins' | 'merge'
+  syncStrategy?: "immediate" | "batched" | "manual"
+  conflictResolution?: "client-wins" | "server-wins" | "merge"
   ttl?: number // Time to live in milliseconds
 }
 
@@ -464,12 +468,20 @@ export interface NetworkStatus {
 /**
  * Connection type
  */
-export type ConnectionType = 'bluetooth' | 'cellular' | 'ethernet' | 'none' | 'wifi' | 'wimax' | 'other' | 'unknown'
+export type ConnectionType =
+  | "bluetooth"
+  | "cellular"
+  | "ethernet"
+  | "none"
+  | "wifi"
+  | "wimax"
+  | "other"
+  | "unknown"
 
 /**
  * Effective connection type
  */
-export type EffectiveConnectionType = 'slow-2g' | '2g' | '3g' | '4g'
+export type EffectiveConnectionType = "slow-2g" | "2g" | "3g" | "4g"
 
 /**
  * Offline sync management
@@ -493,7 +505,7 @@ export interface QueuedRequest {
   method: string
   headers?: Record<string, string>
   body?: any
-  priority?: 'high' | 'normal' | 'low'
+  priority?: "high" | "normal" | "low"
   maxRetries?: number
 }
 
@@ -515,7 +527,7 @@ export interface DeviceManager {
   mediaQuery: (query: string) => boolean
   mediaQueries: (queries: Record<string, string>) => Record<string, boolean>
   onViewportChange: (callback: (viewport: ViewportInfo) => void) => () => void
-  onOrientationChange: (callback: (orientation: 'portrait' | 'landscape') => void) => () => void
+  onOrientationChange: (callback: (orientation: "portrait" | "landscape") => void) => () => void
 }
 
 /**
@@ -528,7 +540,7 @@ export interface DeviceInfo {
   isTouchDevice: boolean
   userAgent: string
   viewport: ViewportInfo
-  orientation: 'portrait' | 'landscape'
+  orientation: "portrait" | "landscape"
   pixelRatio: number
   platform: string
 }

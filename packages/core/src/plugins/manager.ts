@@ -1,48 +1,44 @@
-import type { 
-  YukemuriPlugin, 
-  YukemuriApp, 
-  ConfigSchema,
-  PluginContext,
-  Logger 
-} from '../types.js';
+import type { YukemuriPlugin, YukemuriApp, ConfigSchema, PluginContext, Logger } from "../types.js"
 
 /**
  * Plugin Manager
  * Handles plugin lifecycle, dependency resolution, and runtime management
  */
 export class PluginManager {
-  private plugins: Map<string, LoadedPlugin> = new Map();
-  private loadOrder: string[] = [];
-  private logger: Logger;
-  private app: YukemuriApp;
+  private plugins: Map<string, LoadedPlugin> = new Map()
+  private loadOrder: string[] = []
+  private logger: Logger
+  private app: YukemuriApp
 
   constructor(app: YukemuriApp, logger: Logger) {
-    this.app = app;
-    this.logger = logger;
+    this.app = app
+    this.logger = logger
   }
 
   /**
    * Register a plugin
    */
   async register(plugin: YukemuriPlugin, config: any = {}): Promise<void> {
-    this.logger.info(`Registering plugin: ${plugin.name}@${plugin.version}`);
+    this.logger.info(`Registering plugin: ${plugin.name}@${plugin.version}`)
 
     // Validate plugin
-    this.validatePlugin(plugin);
+    this.validatePlugin(plugin)
 
     // Validate configuration
     if (plugin.configSchema) {
-      const validation = this.validateConfig(config, plugin.configSchema);
+      const validation = this.validateConfig(config, plugin.configSchema)
       if (!validation.valid) {
-        throw new Error(`Plugin ${plugin.name} configuration invalid: ${validation.errors.join(', ')}`);
+        throw new Error(
+          `Plugin ${plugin.name} configuration invalid: ${validation.errors.join(", ")}`
+        )
       }
     }
 
     // Merge with default config
-    const finalConfig = { ...plugin.defaultConfig, ...config };
+    const finalConfig = { ...plugin.defaultConfig, ...config }
 
     // Check dependencies
-    await this.checkDependencies(plugin);
+    await this.checkDependencies(plugin)
 
     // Store plugin
     const loadedPlugin: LoadedPlugin = {
@@ -50,46 +46,46 @@ export class PluginManager {
       config: finalConfig,
       loaded: false,
       initialized: false,
-      context: null
-    };
+      context: null,
+    }
 
-    this.plugins.set(plugin.name, loadedPlugin);
-    this.logger.info(`Plugin ${plugin.name} registered successfully`);
+    this.plugins.set(plugin.name, loadedPlugin)
+    this.logger.info(`Plugin ${plugin.name} registered successfully`)
   }
 
   /**
    * Load all registered plugins in dependency order
    */
   async loadAll(): Promise<void> {
-    this.logger.info('Loading all plugins...');
+    this.logger.info("Loading all plugins...")
 
     // Resolve load order
-    this.loadOrder = this.resolveDependencyOrder();
+    this.loadOrder = this.resolveDependencyOrder()
 
     // Load plugins in order
     for (const pluginName of this.loadOrder) {
-      await this.loadPlugin(pluginName);
+      await this.loadPlugin(pluginName)
     }
 
-    this.logger.info('All plugins loaded successfully');
+    this.logger.info("All plugins loaded successfully")
   }
 
   /**
    * Load a specific plugin
    */
   async loadPlugin(pluginName: string): Promise<void> {
-    const loadedPlugin = this.plugins.get(pluginName);
+    const loadedPlugin = this.plugins.get(pluginName)
     if (!loadedPlugin) {
-      throw new Error(`Plugin ${pluginName} not found`);
+      throw new Error(`Plugin ${pluginName} not found`)
     }
 
     if (loadedPlugin.loaded) {
-      return; // Already loaded
+      return // Already loaded
     }
 
-    this.logger.info(`Loading plugin: ${pluginName}`);
+    this.logger.info(`Loading plugin: ${pluginName}`)
 
-    const { plugin, config } = loadedPlugin;
+    const { plugin, config } = loadedPlugin
 
     // Create plugin context
     const context: PluginContext = {
@@ -97,21 +93,21 @@ export class PluginManager {
       config,
       logger: this.logger.child({ plugin: pluginName }),
       utils: new PluginUtils(this.app, this.logger),
-      dependencies: this.getDependencies(plugin)
-    };
+      dependencies: this.getDependencies(plugin),
+    }
 
-    loadedPlugin.context = context;
+    loadedPlugin.context = context
 
     try {
       // Initialize plugin
       if (plugin.init) {
-        await plugin.init(context);
+        await plugin.init(context)
       }
 
       // Register middleware
       if (plugin.middleware) {
         for (const middleware of plugin.middleware) {
-          this.app.hono.use(middleware.path || '*', middleware.middleware);
+          this.app.hono.use(middleware.path || "*", middleware.middleware)
         }
       }
 
@@ -119,23 +115,23 @@ export class PluginManager {
       if (plugin.routes) {
         for (const route of plugin.routes) {
           switch (route.method.toLowerCase()) {
-            case 'get':
-              this.app.hono.get(route.path, route.handler);
-              break;
-            case 'post':
-              this.app.hono.post(route.path, route.handler);
-              break;
-            case 'put':
-              this.app.hono.put(route.path, route.handler);
-              break;
-            case 'delete':
-              this.app.hono.delete(route.path, route.handler);
-              break;
-            case 'patch':
-              this.app.hono.patch(route.path, route.handler);
-              break;
+            case "get":
+              this.app.hono.get(route.path, route.handler)
+              break
+            case "post":
+              this.app.hono.post(route.path, route.handler)
+              break
+            case "put":
+              this.app.hono.put(route.path, route.handler)
+              break
+            case "delete":
+              this.app.hono.delete(route.path, route.handler)
+              break
+            case "patch":
+              this.app.hono.patch(route.path, route.handler)
+              break
             default:
-              throw new Error(`Unsupported HTTP method: ${route.method}`);
+              throw new Error(`Unsupported HTTP method: ${route.method}`)
           }
         }
       }
@@ -143,21 +139,21 @@ export class PluginManager {
       // Register assets
       if (plugin.assets) {
         for (const asset of plugin.assets) {
-          this.app.hono.get(`${asset.to}/*`, async (c) => {
-            const filePath = c.req.path.replace(asset.to, asset.from);
-            return c.notFound();
-          });
+          this.app.hono.get(`${asset.to}/*`, async c => {
+            const filePath = c.req.path.replace(asset.to, asset.from)
+            return c.notFound()
+          })
         }
       }
 
-      loadedPlugin.loaded = true;
-      loadedPlugin.initialized = true;
+      loadedPlugin.loaded = true
+      loadedPlugin.initialized = true
 
-      this.logger.info(`Plugin ${pluginName} loaded successfully`);
+      this.logger.info(`Plugin ${pluginName} loaded successfully`)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`Failed to load plugin ${pluginName}: ${message}`);
-      throw error;
+      const message = error instanceof Error ? error.message : "Unknown error"
+      this.logger.error(`Failed to load plugin ${pluginName}: ${message}`)
+      throw error
     }
   }
 
@@ -165,27 +161,27 @@ export class PluginManager {
    * Unload a plugin
    */
   async unloadPlugin(pluginName: string): Promise<void> {
-    const loadedPlugin = this.plugins.get(pluginName);
+    const loadedPlugin = this.plugins.get(pluginName)
     if (!loadedPlugin || !loadedPlugin.loaded) {
-      return;
+      return
     }
 
-    this.logger.info(`Unloading plugin: ${pluginName}`);
+    this.logger.info(`Unloading plugin: ${pluginName}`)
 
     try {
       // Call teardown hook
       if (loadedPlugin.plugin.teardown && loadedPlugin.context) {
-        await loadedPlugin.plugin.teardown(loadedPlugin.context);
+        await loadedPlugin.plugin.teardown(loadedPlugin.context)
       }
 
-      loadedPlugin.loaded = false;
-      loadedPlugin.initialized = false;
-      loadedPlugin.context = null;
+      loadedPlugin.loaded = false
+      loadedPlugin.initialized = false
+      loadedPlugin.context = null
 
-      this.logger.info(`Plugin ${pluginName} unloaded successfully`);
+      this.logger.info(`Plugin ${pluginName} unloaded successfully`)
     } catch (error) {
-      this.logger.error(`Failed to unload plugin ${pluginName}:`, error);
-      throw error;
+      this.logger.error(`Failed to unload plugin ${pluginName}:`, error)
+      throw error
     }
   }
 
@@ -193,22 +189,22 @@ export class PluginManager {
    * Get loaded plugin information
    */
   getPlugin(name: string): LoadedPlugin | undefined {
-    return this.plugins.get(name);
+    return this.plugins.get(name)
   }
 
   /**
    * Get all loaded plugins
    */
   getAllPlugins(): LoadedPlugin[] {
-    return Array.from(this.plugins.values());
+    return Array.from(this.plugins.values())
   }
 
   /**
    * Check if plugin is loaded
    */
   isLoaded(name: string): boolean {
-    const plugin = this.plugins.get(name);
-    return plugin?.loaded || false;
+    const plugin = this.plugins.get(name)
+    return plugin?.loaded || false
   }
 
   /**
@@ -216,23 +212,23 @@ export class PluginManager {
    */
   private validatePlugin(plugin: YukemuriPlugin): void {
     if (!plugin.name) {
-      throw new Error('Plugin must have a name');
+      throw new Error("Plugin must have a name")
     }
 
     if (!plugin.version) {
-      throw new Error('Plugin must have a version');
+      throw new Error("Plugin must have a version")
     }
 
     // Validate name format
-    const nameRegex = /^[a-z0-9-_@\/]+$/;
+    const nameRegex = /^[a-z0-9-_@/]+$/
     if (!nameRegex.test(plugin.name)) {
-      throw new Error(`Invalid plugin name: ${plugin.name}`);
+      throw new Error(`Invalid plugin name: ${plugin.name}`)
     }
 
     // Validate version format
-    const versionRegex = /^\d+\.\d+\.\d+(-[a-zA-Z0-9-]+)?$/;
+    const versionRegex = /^\d+\.\d+\.\d+(-[a-zA-Z0-9-]+)?$/
     if (!versionRegex.test(plugin.version)) {
-      throw new Error(`Invalid plugin version: ${plugin.version}`);
+      throw new Error(`Invalid plugin version: ${plugin.version}`)
     }
   }
 
@@ -240,18 +236,18 @@ export class PluginManager {
    * Validate plugin configuration
    */
   private validateConfig(config: any, schema: ConfigSchema): { valid: boolean; errors: string[] } {
-    const errors: string[] = [];
+    const errors: string[] = []
 
-    if (schema.type !== 'object') {
-      errors.push('Config schema must be of type object');
-      return { valid: false, errors };
+    if (schema.type !== "object") {
+      errors.push("Config schema must be of type object")
+      return { valid: false, errors }
     }
 
     // Check required properties
     if (schema.required) {
       for (const required of schema.required) {
         if (!(required in config)) {
-          errors.push(`Required property "${required}" is missing`);
+          errors.push(`Required property "${required}" is missing`)
         }
       }
     }
@@ -260,65 +256,65 @@ export class PluginManager {
     if (schema.properties) {
       for (const [key, property] of Object.entries(schema.properties)) {
         if (key in config) {
-          const value = config[key];
-          const result = this.validateProperty(value, property, key);
-          errors.push(...result);
+          const value = config[key]
+          const result = this.validateProperty(value, property, key)
+          errors.push(...result)
         }
       }
     }
 
     return {
       valid: errors.length === 0,
-      errors
-    };
+      errors,
+    }
   }
 
   /**
    * Validate a single property
    */
   private validateProperty(value: any, property: any, path: string): string[] {
-    const errors: string[] = [];
+    const errors: string[] = []
 
     // Type validation
     if (!this.checkType(value, property.type)) {
-      errors.push(`Property "${path}" must be of type ${property.type}`);
-      return errors;
+      errors.push(`Property "${path}" must be of type ${property.type}`)
+      return errors
     }
 
     // Enum validation
     if (property.enum && !property.enum.includes(value)) {
-      errors.push(`Property "${path}" must be one of: ${property.enum.join(', ')}`);
+      errors.push(`Property "${path}" must be one of: ${property.enum.join(", ")}`)
     }
 
     // Range validation for numbers
-    if (property.type === 'number') {
+    if (property.type === "number") {
       if (property.minimum !== undefined && value < property.minimum) {
-        errors.push(`Property "${path}" must be >= ${property.minimum}`);
+        errors.push(`Property "${path}" must be >= ${property.minimum}`)
       }
       if (property.maximum !== undefined && value > property.maximum) {
-        errors.push(`Property "${path}" must be <= ${property.maximum}`);
+        errors.push(`Property "${path}" must be <= ${property.maximum}`)
       }
     }
 
     // Pattern validation for strings
-    if (property.type === 'string' && property.pattern) {
-      const regex = new RegExp(property.pattern);
+    if (property.type === "string" && property.pattern) {
+      const regex = new RegExp(property.pattern)
       if (!regex.test(value)) {
-        errors.push(`Property "${path}" must match pattern: ${property.pattern}`);
+        errors.push(`Property "${path}" must match pattern: ${property.pattern}`)
       }
     }
 
     // Custom validation
     if (property.validation) {
-      const result = property.validation(value);
-      if (typeof result === 'string') {
-        errors.push(`Property "${path}": ${result}`);
+      const result = property.validation(value)
+      if (typeof result === "string") {
+        errors.push(`Property "${path}": ${result}`)
       } else if (!result) {
-        errors.push(`Property "${path}" failed validation`);
+        errors.push(`Property "${path}" failed validation`)
       }
     }
 
-    return errors;
+    return errors
   }
 
   /**
@@ -326,18 +322,18 @@ export class PluginManager {
    */
   private checkType(value: any, expectedType: string): boolean {
     switch (expectedType) {
-      case 'string':
-        return typeof value === 'string';
-      case 'number':
-        return typeof value === 'number' && !isNaN(value);
-      case 'boolean':
-        return typeof value === 'boolean';
-      case 'object':
-        return typeof value === 'object' && value !== null && !Array.isArray(value);
-      case 'array':
-        return Array.isArray(value);
+      case "string":
+        return typeof value === "string"
+      case "number":
+        return typeof value === "number" && !isNaN(value)
+      case "boolean":
+        return typeof value === "boolean"
+      case "object":
+        return typeof value === "object" && value !== null && !Array.isArray(value)
+      case "array":
+        return Array.isArray(value)
       default:
-        return true;
+        return true
     }
   }
 
@@ -346,12 +342,12 @@ export class PluginManager {
    */
   private async checkDependencies(plugin: YukemuriPlugin): Promise<void> {
     if (!plugin.dependencies) {
-      return;
+      return
     }
 
     for (const dependency of plugin.dependencies) {
       if (!this.plugins.has(dependency)) {
-        throw new Error(`Plugin ${plugin.name} requires dependency: ${dependency}`);
+        throw new Error(`Plugin ${plugin.name} requires dependency: ${dependency}`)
       }
     }
   }
@@ -360,56 +356,56 @@ export class PluginManager {
    * Resolve plugin loading order based on dependencies
    */
   private resolveDependencyOrder(): string[] {
-    const visited = new Set<string>();
-    const visiting = new Set<string>();
-    const order: string[] = [];
+    const visited = new Set<string>()
+    const visiting = new Set<string>()
+    const order: string[] = []
 
     const visit = (pluginName: string) => {
       if (visited.has(pluginName)) {
-        return;
+        return
       }
 
       if (visiting.has(pluginName)) {
-        throw new Error(`Circular dependency detected involving plugin: ${pluginName}`);
+        throw new Error(`Circular dependency detected involving plugin: ${pluginName}`)
       }
 
-      visiting.add(pluginName);
+      visiting.add(pluginName)
 
-      const plugin = this.plugins.get(pluginName);
+      const plugin = this.plugins.get(pluginName)
       if (plugin && plugin.plugin.dependencies) {
         for (const dependency of plugin.plugin.dependencies) {
-          visit(dependency);
+          visit(dependency)
         }
       }
 
-      visiting.delete(pluginName);
-      visited.add(pluginName);
-      order.push(pluginName);
-    };
-
-    for (const pluginName of this.plugins.keys()) {
-      visit(pluginName);
+      visiting.delete(pluginName)
+      visited.add(pluginName)
+      order.push(pluginName)
     }
 
-    return order;
+    for (const pluginName of this.plugins.keys()) {
+      visit(pluginName)
+    }
+
+    return order
   }
 
   /**
    * Get plugin dependencies
    */
   private getDependencies(plugin: YukemuriPlugin): Record<string, any> {
-    const dependencies: Record<string, any> = {};
+    const dependencies: Record<string, any> = {}
 
     if (plugin.dependencies) {
       for (const depName of plugin.dependencies) {
-        const dep = this.plugins.get(depName);
+        const dep = this.plugins.get(depName)
         if (dep?.context) {
-          dependencies[depName] = dep.context;
+          dependencies[depName] = dep.context
         }
       }
     }
 
-    return dependencies;
+    return dependencies
   }
 }
 
@@ -426,36 +422,36 @@ export class PluginUtils {
    * Get environment variable with fallback
    */
   env(key: string, fallback?: string): string | undefined {
-    return process.env[key] || fallback;
+    return process.env[key] || fallback
   }
 
   /**
    * Create a scoped logger
    */
   createLogger(scope: string): Logger {
-    return this.logger.child({ scope });
+    return this.logger.child({ scope })
   }
 
   /**
    * Register a global utility
    */
   registerGlobal(name: string, value: any): void {
-    (globalThis as any)[name] = value;
+    ;(globalThis as any)[name] = value
   }
 
   /**
    * Schedule a task
    */
   schedule(fn: () => void | Promise<void>, delay: number): void {
-    setTimeout(fn, delay);
+    setTimeout(fn, delay)
   }
 
   /**
    * Create a database connection (if database plugin is loaded)
    */
-  getDatabase(name: string = 'default'): any {
+  getDatabase(name: string = "default"): any {
     // This would integrate with database plugin
-    return null;
+    return null
   }
 }
 
@@ -463,11 +459,11 @@ export class PluginUtils {
  * Loaded plugin interface
  */
 export interface LoadedPlugin {
-  plugin: YukemuriPlugin;
-  config: any;
-  loaded: boolean;
-  initialized: boolean;
-  context: PluginContext | null;
+  plugin: YukemuriPlugin
+  config: any
+  loaded: boolean
+  initialized: boolean
+  context: PluginContext | null
 }
 
 /**
@@ -478,8 +474,8 @@ export class PluginDev {
    * Hot reload a plugin
    */
   static async hotReload(manager: PluginManager, pluginName: string): Promise<void> {
-    await manager.unloadPlugin(pluginName);
-    await manager.loadPlugin(pluginName);
+    await manager.unloadPlugin(pluginName)
+    await manager.loadPlugin(pluginName)
   }
 
   /**
@@ -487,7 +483,7 @@ export class PluginDev {
    */
   static watchPlugin(pluginPath: string, onChange: () => void): void {
     // File watching implementation
-    console.log(`Watching plugin at ${pluginPath}`);
+    console.log(`Watching plugin at ${pluginPath}`)
     // This would use fs.watch or chokidar
   }
 }

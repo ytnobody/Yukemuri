@@ -1,6 +1,6 @@
-import { h } from 'preact'
-import { useState, useEffect } from 'preact/hooks'
-import { Yukemuri } from '../lib/yukemuri'
+import { h } from "preact"
+import { useState, useEffect } from "preact/hooks"
+import { Yukemuri } from "../lib/yukemuri"
 
 interface QRCodeComponentProps {
   value: string
@@ -10,36 +10,40 @@ interface QRCodeComponentProps {
 
 const yu = new Yukemuri()
 
-export default function QRCodeComponent({ value, size = 200, className = '' }: QRCodeComponentProps) {
-  const [qrDataURL, setQrDataURL] = useState<string>('')
-  const [error, setError] = useState<string>('')
+export default function QRCodeComponent({
+  value,
+  size = 200,
+  className = "",
+}: QRCodeComponentProps) {
+  const [qrDataURL, setQrDataURL] = useState<string>("")
+  const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const generateQR = async () => {
       if (!value) return
-      
+
       setIsLoading(true)
-      setError('')
-      
+      setError("")
+
       try {
-        console.log('♨️ Generating QR code with Yukemuri API:', value)
-        
+        console.log("♨️ Generating QR code with Yukemuri API:", value)
+
         const dataURL = await yu.qr.generate(value, {
           size,
           margin: 2,
           color: {
-            dark: '#000000',
-            light: '#FFFFFF'
+            dark: "#000000",
+            light: "#FFFFFF",
           },
-          errorCorrectionLevel: 'M'
+          errorCorrectionLevel: "M",
         })
-        
+
         setQrDataURL(dataURL)
-        console.log('✅ QR code generated successfully')
+        console.log("✅ QR code generated successfully")
       } catch (err) {
-        setError('Failed to generate QR code')
-        console.error('❌ QR code generation error:', err)
+        setError("Failed to generate QR code")
+        console.error("❌ QR code generation error:", err)
       } finally {
         setIsLoading(false)
       }
@@ -50,7 +54,7 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
 
   const handleDownload = () => {
     if (qrDataURL) {
-      console.log('♨️ Downloading QR code with Yukemuri API')
+      console.log("♨️ Downloading QR code with Yukemuri API")
       yu.qr.download(qrDataURL, `qr-${Date.now()}.png`)
     }
   }
@@ -59,8 +63,8 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
     return (
       <div className={`text-center text-red-500 ${className}`}>
         <p>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="mt-2 text-sm text-blue-500 hover:text-blue-700"
         >
           Retry
@@ -72,7 +76,10 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
   if (isLoading || !qrDataURL) {
     return (
       <div className={`text-center ${className}`}>
-        <div className="animate-pulse bg-gray-200 rounded flex items-center justify-center" style={{ width: `${size}px`, height: `${size}px`, margin: '0 auto' }}>
+        <div
+          className="animate-pulse bg-gray-200 rounded flex items-center justify-center"
+          style={{ width: `${size}px`, height: `${size}px`, margin: "0 auto" }}
+        >
           <span className="text-gray-500 text-sm">Loading QR...</span>
         </div>
       </div>
@@ -82,8 +89,8 @@ export default function QRCodeComponent({ value, size = 200, className = '' }: Q
   return (
     <div className={`text-center ${className}`}>
       <div className="inline-block">
-        <img 
-          src={qrDataURL} 
+        <img
+          src={qrDataURL}
           alt={`QR Code for ${value}`}
           className="mx-auto rounded shadow-sm"
           style={{ width: `${size}px`, height: `${size}px` }}

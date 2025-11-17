@@ -1,5 +1,5 @@
-import { h } from 'preact'
-import { useState, useEffect } from 'preact/hooks'
+import { h } from "preact"
+import { useState, useEffect } from "preact/hooks"
 
 interface User {
   id: number
@@ -10,7 +10,7 @@ interface User {
 export default function Users() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>("")
 
   useEffect(() => {
     fetchUsers()
@@ -19,14 +19,14 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/users')
+      const response = await fetch("/api/users")
       if (!response.ok) {
-        throw new Error('Failed to fetch users')
+        throw new Error("Failed to fetch users")
       }
       const data = await response.json()
       setUsers(data.users || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error")
     } finally {
       setLoading(false)
     }
@@ -47,7 +47,7 @@ export default function Users() {
       <div className="container">
         <div className="text-center py-8">
           <div className="text-red-600 text-xl">Error: {error}</div>
-          <button 
+          <button
             onClick={fetchUsers}
             className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
           >
@@ -62,16 +62,14 @@ export default function Users() {
     <div className="container">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Users</h1>
-        <p className="text-xl text-gray-600">
-          Manage application users
-        </p>
+        <p className="text-xl text-gray-600">Manage application users</p>
       </div>
 
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">User List</h2>
-            <button 
+            <button
               onClick={fetchUsers}
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
             >
@@ -99,11 +97,9 @@ export default function Users() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
+              {users.map(user => (
                 <tr key={user.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.id}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
                   </td>
@@ -111,10 +107,7 @@ export default function Users() {
                     <div className="text-sm text-gray-500">{user.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a 
-                      href={`/users/${user.id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
+                    <a href={`/users/${user.id}`} className="text-blue-600 hover:text-blue-900">
                       View Details
                     </a>
                   </td>
@@ -132,7 +125,7 @@ export default function Users() {
       </div>
 
       <div className="mt-8 text-center">
-        <a 
+        <a
           href="/"
           className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium"
         >

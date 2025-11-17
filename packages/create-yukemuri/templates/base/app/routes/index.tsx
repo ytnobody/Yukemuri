@@ -1,15 +1,15 @@
-import { h } from 'preact'
-import Router, { Route } from 'preact-router'
+import { h } from "preact"
+import Router, { Route } from "preact-router"
 
 // Import page components
-import Home from '../pages/home'
-import About from '../pages/about'
-import Users from '../pages/users'
-import UserDetail from '../pages/user'
-import Storage from '../pages/storage'
-import Docs from '../pages/docs'
-import Examples from '../pages/examples'
-import Sitemap from '../pages/sitemap'
+import Home from "../pages/home"
+import About from "../pages/about"
+import Users from "../pages/users"
+import UserDetail from "../pages/user"
+import Storage from "../pages/storage"
+import Docs from "../pages/docs"
+import Examples from "../pages/examples"
+import Sitemap from "../pages/sitemap"
 
 // Navigation component
 function Navigation() {
@@ -34,10 +34,16 @@ function Navigation() {
               <a href="/storage" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded">
                 Storage
               </a>
-              <a href="/docs" className="text-blue-600 hover:text-blue-700 px-3 py-2 rounded font-medium">
+              <a
+                href="/docs"
+                className="text-blue-600 hover:text-blue-700 px-3 py-2 rounded font-medium"
+              >
                 Docs
               </a>
-              <a href="/examples" className="text-green-600 hover:text-green-700 px-3 py-2 rounded font-medium">
+              <a
+                href="/examples"
+                className="text-green-600 hover:text-green-700 px-3 py-2 rounded font-medium"
+              >
                 Examples
               </a>
             </div>
@@ -53,17 +59,26 @@ function Layout({ children }: { children: any }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <main>
-        {children}
-      </main>
+      <main>{children}</main>
       <footer className="bg-gray-900 text-white py-8 mt-12">
         <div className="container text-center">
           <p className="mb-4">Built with Yukemuri ♨️ - A Hono + Preact PWA Framework</p>
           <div className="space-x-4 text-sm">
-            <a href="/docs" className="text-blue-300 hover:text-blue-100">Documentation</a>
-            <a href="/examples" className="text-green-300 hover:text-green-100">Examples</a>
-            <a href="/sitemap" className="text-gray-300 hover:text-white">Sitemap</a>
-            <a href="https://github.com/ytnobody/Yukemuri" className="text-gray-300 hover:text-white">GitHub</a>
+            <a href="/docs" className="text-blue-300 hover:text-blue-100">
+              Documentation
+            </a>
+            <a href="/examples" className="text-green-300 hover:text-green-100">
+              Examples
+            </a>
+            <a href="/sitemap" className="text-gray-300 hover:text-white">
+              Sitemap
+            </a>
+            <a
+              href="https://github.com/ytnobody/Yukemuri"
+              className="text-gray-300 hover:text-white"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </footer>

@@ -1,24 +1,28 @@
-import { h } from 'preact'
-import { yu } from '../lib/yukemuri'
-import { useState, useEffect } from 'preact/hooks'
+import { h } from "preact"
+import { yu } from "../lib/yukemuri"
+import { useState, useEffect } from "preact/hooks"
 
 export default function StoragePage() {
-  const [localValue, setLocalValue] = useState('')
-  const [sessionValue, setSessionValue] = useState('')
-  const [persistentValue, setPersistentValue] = useState('')
-  const [userSettings, setUserSettings] = useState({ theme: 'light', language: 'ja' })
+  const [localValue, setLocalValue] = useState("")
+  const [sessionValue, setSessionValue] = useState("")
+  const [persistentValue, setPersistentValue] = useState("")
+  const [userSettings, setUserSettings] = useState({ theme: "light", language: "ja" })
   const [counters, setCounters] = useState({ local: 0, session: 0, persistent: 0 })
   const [isSyncing, setIsSyncing] = useState(false)
   const [lastSynced, setLastSynced] = useState<Date | null>(null)
 
   // Storage controllers
-  const localController = yu.storage.local('demo-local', '')
-  const sessionController = yu.storage.session('demo-session', '')
-  const persistentController = yu.storage.persistent('demo-persistent', '')
-  const settingsController = yu.storage.local('user-settings', { theme: 'light', language: 'ja' }, {
-    syncAcrossTabs: true
-  })
-  const counterController = yu.storage.local('counters', { local: 0, session: 0, persistent: 0 })
+  const localController = yu.storage.local("demo-local", "")
+  const sessionController = yu.storage.session("demo-session", "")
+  const persistentController = yu.storage.persistent("demo-persistent", "")
+  const settingsController = yu.storage.local(
+    "user-settings",
+    { theme: "light", language: "ja" },
+    {
+      syncAcrossTabs: true,
+    }
+  )
+  const counterController = yu.storage.local("counters", { local: 0, session: 0, persistent: 0 })
 
   useEffect(() => {
     // Initialize values
@@ -108,12 +112,13 @@ export default function StoragePage() {
           <input
             type="text"
             value={localValue}
-            onChange={(e) => updateLocalValue((e.target as HTMLInputElement).value)}
+            onChange={e => updateLocalValue((e.target as HTMLInputElement).value)}
             placeholder="Enter local storage value..."
             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="text-sm text-blue-700">
-            Current value: <code className="bg-blue-100 px-2 py-1 rounded">{localValue || '(empty)'}</code>
+            Current value:{" "}
+            <code className="bg-blue-100 px-2 py-1 rounded">{localValue || "(empty)"}</code>
           </div>
         </div>
       </div>
@@ -130,12 +135,13 @@ export default function StoragePage() {
           <input
             type="text"
             value={sessionValue}
-            onChange={(e) => updateSessionValue((e.target as HTMLInputElement).value)}
+            onChange={e => updateSessionValue((e.target as HTMLInputElement).value)}
             placeholder="Enter session storage value..."
             className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <div className="text-sm text-green-700">
-            Current value: <code className="bg-green-100 px-2 py-1 rounded">{sessionValue || '(empty)'}</code>
+            Current value:{" "}
+            <code className="bg-green-100 px-2 py-1 rounded">{sessionValue || "(empty)"}</code>
           </div>
         </div>
       </div>
@@ -152,24 +158,27 @@ export default function StoragePage() {
           <input
             type="text"
             value={persistentValue}
-            onChange={(e) => updatePersistentValue((e.target as HTMLInputElement).value)}
+            onChange={e => updatePersistentValue((e.target as HTMLInputElement).value)}
             placeholder="Enter persistent storage value..."
             className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <div className="flex items-center justify-between">
             <div className="text-sm text-purple-700">
-              Current value: <code className="bg-purple-100 px-2 py-1 rounded">{persistentValue || '(empty)'}</code>
+              Current value:{" "}
+              <code className="bg-purple-100 px-2 py-1 rounded">
+                {persistentValue || "(empty)"}
+              </code>
             </div>
             <button
               onClick={manualSync}
               disabled={isSyncing}
               className="px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
             >
-              {isSyncing ? 'Syncing...' : 'Manual Sync'}
+              {isSyncing ? "Syncing..." : "Manual Sync"}
             </button>
           </div>
           <div className="text-xs text-purple-600">
-            {lastSynced ? `Last synced: ${lastSynced.toLocaleTimeString()}` : 'Not synced yet'}
+            {lastSynced ? `Last synced: ${lastSynced.toLocaleTimeString()}` : "Not synced yet"}
           </div>
         </div>
       </div>
@@ -179,15 +188,13 @@ export default function StoragePage() {
         <h2 className="text-xl font-semibold text-yellow-800 mb-3">
           ⚙️ User Settings (Cross-Tab Sync)
         </h2>
-        <p className="text-yellow-600 mb-3">
-          Settings that sync across browser tabs in real-time.
-        </p>
+        <p className="text-yellow-600 mb-3">Settings that sync across browser tabs in real-time.</p>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-yellow-700 mb-1">Theme</label>
             <select
               value={userSettings.theme}
-              onChange={(e) => updateTheme((e.target as HTMLSelectElement).value)}
+              onChange={e => updateTheme((e.target as HTMLSelectElement).value)}
               className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
             >
               <option value="light">Light</option>
@@ -199,7 +206,7 @@ export default function StoragePage() {
             <label className="block text-sm font-medium text-yellow-700 mb-1">Language</label>
             <select
               value={userSettings.language}
-              onChange={(e) => updateLanguage((e.target as HTMLSelectElement).value)}
+              onChange={e => updateLanguage((e.target as HTMLSelectElement).value)}
               className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
             >
               <option value="ja">日本語</option>
@@ -209,18 +216,15 @@ export default function StoragePage() {
           </div>
         </div>
         <div className="mt-3 text-sm text-yellow-700">
-          Current settings: <code className="bg-yellow-100 px-2 py-1 rounded">
-            {JSON.stringify(userSettings)}
-          </code>
+          Current settings:{" "}
+          <code className="bg-yellow-100 px-2 py-1 rounded">{JSON.stringify(userSettings)}</code>
         </div>
       </div>
 
       {/* Controls */}
       <div className="bg-red-50 rounded-lg p-6">
         <h2 className="text-xl font-semibold text-red-800 mb-3">🗑️ Clear Storage</h2>
-        <p className="text-red-600 mb-3">
-          Clear all storage data for testing purposes.
-        </p>
+        <p className="text-red-600 mb-3">Clear all storage data for testing purposes.</p>
         <button
           onClick={clearAllStorage}
           className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -233,11 +237,23 @@ export default function StoragePage() {
       <div className="bg-gray-50 rounded-lg p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">🧪 Test Instructions</h2>
         <ul className="space-y-2 text-gray-700">
-          <li>• <strong>Local Storage:</strong> Values persist after page refresh</li>
-          <li>• <strong>Session Storage:</strong> Values cleared when tab is closed</li>
-          <li>• <strong>Persistent Storage:</strong> Uses IndexedDB, check DevTools → Application → IndexedDB</li>
-          <li>• <strong>Cross-Tab Sync:</strong> Open this page in multiple tabs to see real-time syncing</li>
-          <li>• <strong>Counters:</strong> Track how many times each storage type has been updated</li>
+          <li>
+            • <strong>Local Storage:</strong> Values persist after page refresh
+          </li>
+          <li>
+            • <strong>Session Storage:</strong> Values cleared when tab is closed
+          </li>
+          <li>
+            • <strong>Persistent Storage:</strong> Uses IndexedDB, check DevTools → Application →
+            IndexedDB
+          </li>
+          <li>
+            • <strong>Cross-Tab Sync:</strong> Open this page in multiple tabs to see real-time
+            syncing
+          </li>
+          <li>
+            • <strong>Counters:</strong> Track how many times each storage type has been updated
+          </li>
         </ul>
       </div>
     </div>

@@ -40,8 +40,8 @@ interface QRCodeOptions {
     dark?: string
     light?: string
   }
-  errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
-  type?: 'image/png' | 'image/jpeg' | 'image/webp'
+  errorCorrectionLevel?: "L" | "M" | "Q" | "H"
+  type?: "image/png" | "image/jpeg" | "image/webp"
   quality?: number
 }
 
@@ -55,7 +55,11 @@ interface QRCodeManager {
 interface StorageManager {
   local: <T>(key: string, defaultValue: T, options?: StorageOptions<T>) => StorageController<T>
   session: <T>(key: string, defaultValue: T, options?: StorageOptions<T>) => StorageController<T>
-  persistent: <T>(key: string, defaultValue: T, options?: PersistentOptions<T>) => PersistentController<T>
+  persistent: <T>(
+    key: string,
+    defaultValue: T,
+    options?: PersistentOptions<T>
+  ) => PersistentController<T>
 }
 
 interface StorageController<T> {
@@ -80,7 +84,7 @@ interface StorageOptions<T = any> {
 }
 
 interface PersistentOptions<T = any> extends StorageOptions<T> {
-  syncStrategy?: 'immediate' | 'batched' | 'manual'
+  syncStrategy?: "immediate" | "batched" | "manual"
 }
 
 // Local implementations for templates (similar to core implementations)
@@ -94,19 +98,19 @@ class PWAManagerImpl implements PWAManager {
   }
 
   private async init() {
-    if (this.isInitialized || typeof window === 'undefined') return
+    if (this.isInitialized || typeof window === "undefined") return
     this.isInitialized = true
 
-    console.log('♨️ Initializing Yukemuri PWA (Template)...')
-    
-    if ('serviceWorker' in navigator) {
+    console.log("♨️ Initializing Yukemuri PWA (Template)...")
+
+    if ("serviceWorker" in navigator) {
       try {
-        this.swRegistration = await navigator.serviceWorker.register('/sw.js', {
-          scope: '/'
+        this.swRegistration = await navigator.serviceWorker.register("/sw.js", {
+          scope: "/",
         })
-        console.log('✅ Service Worker registered:', this.swRegistration.scope)
+        console.log("✅ Service Worker registered:", this.swRegistration.scope)
       } catch (error) {
-        console.error('❌ Service Worker registration failed:', error)
+        console.error("❌ Service Worker registration failed:", error)
       }
     }
 
@@ -114,16 +118,16 @@ class PWAManagerImpl implements PWAManager {
   }
 
   private setupInstallPrompt() {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('📱 PWA install prompt ready')
+    window.addEventListener("beforeinstallprompt", e => {
+      console.log("📱 PWA install prompt ready")
       e.preventDefault()
       this.installPrompt = e
     })
 
-    window.addEventListener('appinstalled', () => {
-      console.log('🎉 PWA installed successfully')
+    window.addEventListener("appinstalled", () => {
+      console.log("🎉 PWA installed successfully")
       this.installPrompt = null
     })
   }
@@ -133,298 +137,301 @@ class PWAManagerImpl implements PWAManager {
   }
 
   isInstalled(): boolean {
-    if (typeof window === 'undefined') return false
-    
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           window.matchMedia('(display-mode: fullscreen)').matches ||
-           (window.navigator as any).standalone === true
+    if (typeof window === "undefined") return false
+
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      (window.navigator as any).standalone === true
+    )
   }
 
   getStatus(): PWAStatus {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return {
         hasServiceWorker: false,
         hasManifest: false,
         isHTTPS: false,
         installPromptAvailable: false,
         isInstalled: false,
-        notificationPermission: 'default' as NotificationPermission
+        notificationPermission: "default" as NotificationPermission,
       }
     }
 
     return {
       hasServiceWorker: !!this.swRegistration,
       hasManifest: !!document.querySelector('link[rel="manifest"]'),
-      isHTTPS: location.protocol === 'https:' || location.hostname === 'localhost',
+      isHTTPS: location.protocol === "https:" || location.hostname === "localhost",
       installPromptAvailable: !!this.installPrompt,
       isInstalled: this.isInstalled(),
-      notificationPermission: 'Notification' in window ? Notification.permission : 'default' as NotificationPermission
+      notificationPermission:
+        "Notification" in window ? Notification.permission : ("default" as NotificationPermission),
     }
   }
 
   async install(): Promise<boolean> {
     if (!this.installPrompt) {
-      console.warn('⚠️ Install prompt not available')
+      console.warn("⚠️ Install prompt not available")
       return false
     }
 
     try {
       await this.installPrompt.prompt()
       const result = await this.installPrompt.userChoice
-      
-      console.log('📊 Install prompt result:', result.outcome)
-      
-      if (result.outcome === 'accepted') {
-        console.log('✅ User accepted PWA install')
+
+      console.log("📊 Install prompt result:", result.outcome)
+
+      if (result.outcome === "accepted") {
+        console.log("✅ User accepted PWA install")
         return true
       } else {
-        console.log('❌ User dismissed PWA install')
+        console.log("❌ User dismissed PWA install")
         return false
       }
     } catch (error) {
-      console.error('❌ Install prompt failed:', error)
+      console.error("❌ Install prompt failed:", error)
       return false
     }
   }
 }
 
 class NotificationManagerImpl implements NotificationManager {
-  
   async requestPermission(): Promise<NotificationPermission> {
-    console.log('🔔 NotificationManager: requestPermission called')
-    
-    if (typeof window === 'undefined') {
-      console.log('🔔 Window is undefined, returning default')
-      return 'default'
+    console.log("🔔 NotificationManager: requestPermission called")
+
+    if (typeof window === "undefined") {
+      console.log("🔔 Window is undefined, returning default")
+      return "default"
     }
 
     // Check if notifications are supported
-    if (!('Notification' in window)) {
-      console.warn('⚠️ This browser does not support notifications')
-      alert('このブラウザは通知機能をサポートしていません。')
-      return 'denied'
+    if (!("Notification" in window)) {
+      console.warn("⚠️ This browser does not support notifications")
+      alert("このブラウザは通知機能をサポートしていません。")
+      return "denied"
     }
 
-    console.log('🔔 Current Notification.permission:', Notification.permission)
-    console.log('🔔 Browser User Agent:', navigator.userAgent)
-    console.log('🔔 Is HTTPS:', location.protocol === 'https:')
+    console.log("🔔 Current Notification.permission:", Notification.permission)
+    console.log("🔔 Browser User Agent:", navigator.userAgent)
+    console.log("🔔 Is HTTPS:", location.protocol === "https:")
 
     // Check current permission status
-    if (Notification.permission === 'granted') {
-      console.log('🔔 Permission already granted')
-      return 'granted'
+    if (Notification.permission === "granted") {
+      console.log("🔔 Permission already granted")
+      return "granted"
     }
 
-    if (Notification.permission === 'denied') {
-      console.log('🔔 Permission previously denied')
-      console.log('🔔 User needs to manually enable notifications in browser settings')
-      alert('通知が拒否されています。ブラウザの設定（アドレスバーの🔒または🛡️アイコン）から通知を有効にしてください。\n\n手順:\n1. アドレスバーの左側のアイコンをクリック\n2. 「通知」を「許可」に変更\n3. ページを再読み込み')
-      return 'denied'
+    if (Notification.permission === "denied") {
+      console.log("🔔 Permission previously denied")
+      console.log("🔔 User needs to manually enable notifications in browser settings")
+      alert(
+        "通知が拒否されています。ブラウザの設定（アドレスバーの🔒または🛡️アイコン）から通知を有効にしてください。\n\n手順:\n1. アドレスバーの左側のアイコンをクリック\n2. 「通知」を「許可」に変更\n3. ページを再読み込み"
+      )
+      return "denied"
     }
 
-    console.log('🔔 Permission status is default, requesting permission...')
-    
+    console.log("🔔 Permission status is default, requesting permission...")
+
     // Ensure we're in a user interaction context
     if (!document.hasFocus()) {
-      console.warn('⚠️ Document does not have focus, permission request might fail')
+      console.warn("⚠️ Document does not have focus, permission request might fail")
     }
 
     try {
-      console.log('🔔 Calling Notification.requestPermission()...')
-      
+      console.log("🔔 Calling Notification.requestPermission()...")
+
       // Check if the old callback style is needed (older browsers)
       let permission: NotificationPermission
-      
-      if (typeof Notification.requestPermission === 'function') {
+
+      if (typeof Notification.requestPermission === "function") {
         // Modern promise-based API
         if (Notification.requestPermission.length === 0) {
           permission = await Notification.requestPermission()
         } else {
           // Fallback for older browsers with callback
-          permission = await new Promise((resolve) => {
-            Notification.requestPermission((result) => {
+          permission = await new Promise(resolve => {
+            Notification.requestPermission(result => {
               resolve(result as NotificationPermission)
             })
           })
         }
       } else {
-        console.error('❌ Notification.requestPermission is not a function')
-        return 'denied'
+        console.error("❌ Notification.requestPermission is not a function")
+        return "denied"
       }
-      
-      console.log('🔔 Notification permission result:', permission)
-      
+
+      console.log("🔔 Notification permission result:", permission)
+
       // Additional verification
       const finalPermission = Notification.permission
-      console.log('🔔 Final Notification.permission after request:', finalPermission)
-      
+      console.log("🔔 Final Notification.permission after request:", finalPermission)
+
       if (permission !== finalPermission) {
-        console.warn('⚠️ Permission mismatch detected, using final permission:', finalPermission)
+        console.warn("⚠️ Permission mismatch detected, using final permission:", finalPermission)
       }
-      
+
       return finalPermission
     } catch (error) {
-      console.error('❌ Error requesting notification permission:', error)
-      console.error('❌ Error details:', {
+      console.error("❌ Error requesting notification permission:", error)
+      console.error("❌ Error details:", {
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       })
-      
+
       // Try to get current permission even if request failed
       const fallbackPermission = Notification.permission
-      console.log('🔔 Fallback permission check:', fallbackPermission)
-      
+      console.log("🔔 Fallback permission check:", fallbackPermission)
+
       return fallbackPermission
     }
   }
 
   async sendNotification(title: string, options?: NotificationOptions): Promise<void> {
-    console.log('📢 NotificationManager: sendNotification called', title, options)
-    
-    if (typeof window === 'undefined') return
+    console.log("📢 NotificationManager: sendNotification called", title, options)
+
+    if (typeof window === "undefined") return
 
     const permission = await this.requestPermission()
-    console.log('📢 Permission check result:', permission)
-    
-    if (permission === 'granted') {
-      console.log('📢 Creating notification...')
+    console.log("📢 Permission check result:", permission)
+
+    if (permission === "granted") {
+      console.log("📢 Creating notification...")
       try {
         const notification = new Notification(title, {
           body: options?.body,
-          icon: options?.icon || '/icons/icon-192x192.png',
-          badge: options?.badge || '/icons/icon-72x72.png',
-          tag: options?.tag || 'yukemuri-notification',
-          data: options?.data
+          icon: options?.icon || "/icons/icon-192x192.png",
+          badge: options?.badge || "/icons/icon-72x72.png",
+          tag: options?.tag || "yukemuri-notification",
+          data: options?.data,
         })
-        
+
         notification.onclick = () => {
-          console.log('📢 Notification clicked')
+          console.log("📢 Notification clicked")
           window.focus()
         }
-        
-        notification.onerror = (error) => {
-          console.error('❌ Notification error:', error)
+
+        notification.onerror = error => {
+          console.error("❌ Notification error:", error)
         }
-        
-        console.log('✅ Notification created successfully')
+
+        console.log("✅ Notification created successfully")
       } catch (error) {
-        console.error('❌ Error creating notification:', error)
+        console.error("❌ Error creating notification:", error)
       }
     } else {
-      console.warn('⚠️ Notification permission not granted:', permission)
+      console.warn("⚠️ Notification permission not granted:", permission)
     }
   }
 
   async subscribeToPush(): Promise<PushSubscription | null> {
-    console.log('📬 Push subscription (template stub)')
+    console.log("📬 Push subscription (template stub)")
     return null
   }
 
   getPermissionStatus(): NotificationPermission {
-    if (typeof window === 'undefined') return 'default'
-    
-    return 'Notification' in window ? Notification.permission : 'default'
+    if (typeof window === "undefined") return "default"
+
+    return "Notification" in window ? Notification.permission : "default"
   }
 }
 
 class QRCodeManagerImpl implements QRCodeManager {
-  
   async generate(value: string, options?: QRCodeOptions): Promise<string> {
-    if (typeof window === 'undefined') return ''
+    if (typeof window === "undefined") return ""
 
     try {
       // Try to use the existing qrcode library
-      const QRCode = await import('qrcode')
-      
+      const QRCode = await import("qrcode")
+
       const dataURL = await QRCode.toDataURL(value, {
         width: options?.size || 200,
         margin: options?.margin || 2,
         color: {
-          dark: options?.color?.dark || '#000000',
-          light: options?.color?.light || '#FFFFFF'
+          dark: options?.color?.dark || "#000000",
+          light: options?.color?.light || "#FFFFFF",
         },
-        errorCorrectionLevel: options?.errorCorrectionLevel || 'M'
+        errorCorrectionLevel: options?.errorCorrectionLevel || "M",
       })
-      
+
       return dataURL
     } catch (error) {
-      console.error('❌ QR code generation failed:', error)
+      console.error("❌ QR code generation failed:", error)
       return this.generateFallbackQR(value, options)
     }
   }
 
   async getCurrentURL(options?: QRCodeOptions): Promise<string> {
-    if (typeof window === 'undefined') return ''
-    
+    if (typeof window === "undefined") return ""
+
     return this.generate(window.location.href, options)
   }
 
-  download(qrDataURL: string, filename: string = 'qrcode.png'): void {
-    if (typeof window === 'undefined' || !qrDataURL) return
+  download(qrDataURL: string, filename: string = "qrcode.png"): void {
+    if (typeof window === "undefined" || !qrDataURL) return
 
     try {
-      const link = document.createElement('a')
+      const link = document.createElement("a")
       link.download = filename
       link.href = qrDataURL
-      
+
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      
-      console.log('📥 QR code downloaded:', filename)
+
+      console.log("📥 QR code downloaded:", filename)
     } catch (error) {
-      console.error('❌ QR code download failed:', error)
+      console.error("❌ QR code download failed:", error)
     }
   }
 
   async generateSVG(value: string, options?: QRCodeOptions): Promise<string> {
-    console.log('📐 SVG generation (template stub)')
+    console.log("📐 SVG generation (template stub)")
     return this.generateFallbackSVG(value, options)
   }
 
   private generateFallbackQR(value: string, options?: QRCodeOptions): string {
-    const canvas = document.createElement('canvas')
+    const canvas = document.createElement("canvas")
     const size = options?.size || 200
     canvas.width = size
     canvas.height = size
-    
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return ''
+
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return ""
 
     // 背景色
-    ctx.fillStyle = options?.color?.light || '#FFFFFF'
+    ctx.fillStyle = options?.color?.light || "#FFFFFF"
     ctx.fillRect(0, 0, size, size)
 
     // 境界線
-    ctx.strokeStyle = options?.color?.dark || '#000000'
+    ctx.strokeStyle = options?.color?.dark || "#000000"
     ctx.lineWidth = 2
     ctx.strokeRect(1, 1, size - 2, size - 2)
 
     // 中央にテキストを表示
-    ctx.fillStyle = options?.color?.dark || '#000000'
-    ctx.font = '12px monospace'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    
-    const shortValue = value.length > 30 ? value.substring(0, 27) + '...' : value
-    ctx.fillText(shortValue, size / 2, size / 2 - 10)
-    ctx.fillText('(QR Fallback)', size / 2, size / 2 + 10)
+    ctx.fillStyle = options?.color?.dark || "#000000"
+    ctx.font = "12px monospace"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
 
-    return canvas.toDataURL('image/png')
+    const shortValue = value.length > 30 ? value.substring(0, 27) + "..." : value
+    ctx.fillText(shortValue, size / 2, size / 2 - 10)
+    ctx.fillText("(QR Fallback)", size / 2, size / 2 + 10)
+
+    return canvas.toDataURL("image/png")
   }
 
   private generateFallbackSVG(value: string, options?: QRCodeOptions): string {
     const size = options?.size || 200
-    const dark = options?.color?.dark || '#000000'
-    const light = options?.color?.light || '#FFFFFF'
-    
+    const dark = options?.color?.dark || "#000000"
+    const light = options?.color?.light || "#FFFFFF"
+
     return `
       <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
         <rect width="${size}" height="${size}" fill="${light}" stroke="${dark}" stroke-width="2"/>
-        <text x="${size/2}" y="${size/2}" font-family="monospace" font-size="12" 
+        <text x="${size / 2}" y="${size / 2}" font-family="monospace" font-size="12" 
               text-anchor="middle" dominant-baseline="central" fill="${dark}">
-          QR: ${value.substring(0, 20)}${value.length > 20 ? '...' : ''}
+          QR: ${value.substring(0, 20)}${value.length > 20 ? "..." : ""}
         </text>
       </svg>
     `.trim()
@@ -437,7 +444,7 @@ class StorageManagerImpl implements StorageManager {
 
   local<T>(key: string, defaultValue: T, options?: StorageOptions<T>): StorageController<T> {
     const controllerId = `local:${key}`
-    
+
     if (this.controllers.has(controllerId)) {
       return this.controllers.get(controllerId) as StorageController<T>
     }
@@ -449,7 +456,7 @@ class StorageManagerImpl implements StorageManager {
 
   session<T>(key: string, defaultValue: T, options?: StorageOptions<T>): StorageController<T> {
     const controllerId = `session:${key}`
-    
+
     if (this.controllers.has(controllerId)) {
       return this.controllers.get(controllerId) as StorageController<T>
     }
@@ -459,9 +466,13 @@ class StorageManagerImpl implements StorageManager {
     return controller
   }
 
-  persistent<T>(key: string, defaultValue: T, options?: PersistentOptions<T>): PersistentController<T> {
+  persistent<T>(
+    key: string,
+    defaultValue: T,
+    options?: PersistentOptions<T>
+  ): PersistentController<T> {
     const controllerId = `persistent:${key}`
-    
+
     if (this.persistentControllers.has(controllerId)) {
       return this.persistentControllers.get(controllerId) as PersistentController<T>
     }
@@ -482,7 +493,7 @@ class LocalStorageController<T> implements StorageController<T> {
     private options?: StorageOptions<T>
   ) {
     this.currentValue = this.loadValue()
-    
+
     if (options?.syncAcrossTabs) {
       this.setupStorageListener()
     }
@@ -493,9 +504,8 @@ class LocalStorageController<T> implements StorageController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.saveValue(newValue)
@@ -508,7 +518,7 @@ class LocalStorageController<T> implements StorageController<T> {
       this.currentValue = this.defaultValue
       this.notifyListeners(this.defaultValue)
     } catch (error) {
-      console.warn('Failed to clear localStorage:', error)
+      console.warn("Failed to clear localStorage:", error)
     }
   }
 
@@ -522,11 +532,9 @@ class LocalStorageController<T> implements StorageController<T> {
       const stored = localStorage.getItem(this.key)
       if (stored === null) return this.defaultValue
 
-      return this.options?.serializer 
-        ? this.options.serializer.parse(stored)
-        : JSON.parse(stored)
+      return this.options?.serializer ? this.options.serializer.parse(stored) : JSON.parse(stored)
     } catch (error) {
-      console.warn('Failed to load from localStorage:', error)
+      console.warn("Failed to load from localStorage:", error)
       return this.defaultValue
     }
   }
@@ -536,25 +544,25 @@ class LocalStorageController<T> implements StorageController<T> {
       const serialized = this.options?.serializer
         ? this.options.serializer.stringify(value)
         : JSON.stringify(value)
-      
+
       localStorage.setItem(this.key, serialized)
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error)
+      console.warn("Failed to save to localStorage:", error)
     }
   }
 
   private setupStorageListener(): void {
-    window.addEventListener('storage', (event) => {
+    window.addEventListener("storage", event => {
       if (event.key === this.key && event.newValue !== null) {
         try {
           const newValue = this.options?.serializer
             ? this.options.serializer.parse(event.newValue)
             : JSON.parse(event.newValue)
-          
+
           this.currentValue = newValue
           this.notifyListeners(newValue)
         } catch (error) {
-          console.warn('Failed to parse storage event:', error)
+          console.warn("Failed to parse storage event:", error)
         }
       }
     })
@@ -565,7 +573,7 @@ class LocalStorageController<T> implements StorageController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }
@@ -588,9 +596,8 @@ class SessionStorageController<T> implements StorageController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.saveValue(newValue)
@@ -603,7 +610,7 @@ class SessionStorageController<T> implements StorageController<T> {
       this.currentValue = this.defaultValue
       this.notifyListeners(this.defaultValue)
     } catch (error) {
-      console.warn('Failed to clear sessionStorage:', error)
+      console.warn("Failed to clear sessionStorage:", error)
     }
   }
 
@@ -617,11 +624,9 @@ class SessionStorageController<T> implements StorageController<T> {
       const stored = sessionStorage.getItem(this.key)
       if (stored === null) return this.defaultValue
 
-      return this.options?.serializer 
-        ? this.options.serializer.parse(stored)
-        : JSON.parse(stored)
+      return this.options?.serializer ? this.options.serializer.parse(stored) : JSON.parse(stored)
     } catch (error) {
-      console.warn('Failed to load from sessionStorage:', error)
+      console.warn("Failed to load from sessionStorage:", error)
       return this.defaultValue
     }
   }
@@ -631,10 +636,10 @@ class SessionStorageController<T> implements StorageController<T> {
       const serialized = this.options?.serializer
         ? this.options.serializer.stringify(value)
         : JSON.stringify(value)
-      
+
       sessionStorage.setItem(this.key, serialized)
     } catch (error) {
-      console.warn('Failed to save to sessionStorage:', error)
+      console.warn("Failed to save to sessionStorage:", error)
     }
   }
 
@@ -643,7 +648,7 @@ class SessionStorageController<T> implements StorageController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }
@@ -654,8 +659,8 @@ class PersistentStorageController<T> implements PersistentController<T> {
   private currentValue: T
   private isCurrentlySyncing = false
   private lastSyncTime: Date | null = null
-  private dbName = 'yukemuri-persistent'
-  private storeName = 'storage'
+  private dbName = "yukemuri-persistent"
+  private storeName = "storage"
 
   constructor(
     private key: string,
@@ -671,15 +676,14 @@ class PersistentStorageController<T> implements PersistentController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.notifyListeners(newValue)
 
-    const strategy = this.options?.syncStrategy || 'immediate'
-    if (strategy === 'immediate') {
+    const strategy = this.options?.syncStrategy || "immediate"
+    if (strategy === "immediate") {
       this.sync()
     }
   }
@@ -703,7 +707,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
       await this.saveToDB(this.currentValue)
       this.lastSyncTime = new Date()
     } catch (error) {
-      console.warn('Failed to sync to IndexedDB:', error)
+      console.warn("Failed to sync to IndexedDB:", error)
     } finally {
       this.isCurrentlySyncing = false
     }
@@ -725,18 +729,18 @@ class PersistentStorageController<T> implements PersistentController<T> {
         this.lastSyncTime = new Date()
       }
     } catch (error) {
-      console.warn('Failed to load from IndexedDB:', error)
+      console.warn("Failed to load from IndexedDB:", error)
     }
   }
 
   private async getDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1)
-      
+
       request.onerror = () => reject(request.error)
       request.onsuccess = () => resolve(request.result)
-      
-      request.onupgradeneeded = (event) => {
+
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName)
@@ -748,9 +752,9 @@ class PersistentStorageController<T> implements PersistentController<T> {
   private async loadFromDB(): Promise<T | null> {
     try {
       const db = await this.getDB()
-      const transaction = db.transaction([this.storeName], 'readonly')
+      const transaction = db.transaction([this.storeName], "readonly")
       const store = transaction.objectStore(this.storeName)
-      
+
       return new Promise((resolve, reject) => {
         const request = store.get(this.key)
         request.onerror = () => reject(request.error)
@@ -759,27 +763,23 @@ class PersistentStorageController<T> implements PersistentController<T> {
           if (result === undefined) {
             resolve(null)
           } else {
-            const value = this.options?.serializer
-              ? this.options.serializer.parse(result)
-              : result
+            const value = this.options?.serializer ? this.options.serializer.parse(result) : result
             resolve(value)
           }
         }
       })
     } catch (error) {
-      console.warn('Failed to load from IndexedDB:', error)
+      console.warn("Failed to load from IndexedDB:", error)
       return null
     }
   }
 
   private async saveToDB(value: T): Promise<void> {
     const db = await this.getDB()
-    const transaction = db.transaction([this.storeName], 'readwrite')
+    const transaction = db.transaction([this.storeName], "readwrite")
     const store = transaction.objectStore(this.storeName)
-    
-    const serialized = this.options?.serializer
-      ? this.options.serializer.stringify(value)
-      : value
+
+    const serialized = this.options?.serializer ? this.options.serializer.stringify(value) : value
 
     return new Promise((resolve, reject) => {
       const request = store.put(serialized, this.key)
@@ -791,16 +791,16 @@ class PersistentStorageController<T> implements PersistentController<T> {
   private async deleteFromDB(): Promise<void> {
     try {
       const db = await this.getDB()
-      const transaction = db.transaction([this.storeName], 'readwrite')
+      const transaction = db.transaction([this.storeName], "readwrite")
       const store = transaction.objectStore(this.storeName)
-      
+
       return new Promise((resolve, reject) => {
         const request = store.delete(this.key)
         request.onerror = () => reject(request.error)
         request.onsuccess = () => resolve()
       })
     } catch (error) {
-      console.warn('Failed to delete from IndexedDB:', error)
+      console.warn("Failed to delete from IndexedDB:", error)
     }
   }
 
@@ -809,7 +809,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }

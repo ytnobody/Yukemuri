@@ -1,9 +1,14 @@
-import type { UtilsManager, ClipboardManager, ShareManager, FullscreenManager, ShareData } from '../types.js'
+import type {
+  UtilsManager,
+  ClipboardManager,
+  ShareManager,
+  FullscreenManager,
+  ShareData,
+} from "../types.js"
 
 class ClipboardManagerImpl implements ClipboardManager {
-  
   async copy(text: string): Promise<boolean> {
-    if (typeof window === 'undefined') return false
+    if (typeof window === "undefined") return false
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
@@ -11,94 +16,92 @@ class ClipboardManagerImpl implements ClipboardManager {
         return true
       } else {
         // Fallback for insecure contexts
-        const textArea = document.createElement('textarea')
+        const textArea = document.createElement("textarea")
         textArea.value = text
         document.body.appendChild(textArea)
         textArea.select()
-        const success = document.execCommand('copy')
+        const success = document.execCommand("copy")
         document.body.removeChild(textArea)
         return success
       }
     } catch (error) {
-      console.error('❌ Clipboard copy failed:', error)
+      console.error("❌ Clipboard copy failed:", error)
       return false
     }
   }
 
   async paste(): Promise<string> {
-    if (typeof window === 'undefined') return ''
+    if (typeof window === "undefined") return ""
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
         return await navigator.clipboard.readText()
       } else {
-        console.warn('⚠️ Clipboard paste not available in insecure context')
-        return ''
+        console.warn("⚠️ Clipboard paste not available in insecure context")
+        return ""
       }
     } catch (error) {
-      console.error('❌ Clipboard paste failed:', error)
-      return ''
+      console.error("❌ Clipboard paste failed:", error)
+      return ""
     }
   }
 
   get isSupported(): boolean {
-    if (typeof window === 'undefined') return false
-    
+    if (typeof window === "undefined") return false
+
     return !!(navigator.clipboard || document.execCommand)
   }
 
   get isSecureContext(): boolean {
-    if (typeof window === 'undefined') return false
-    
+    if (typeof window === "undefined") return false
+
     return window.isSecureContext
   }
 }
 
 class ShareManagerImpl implements ShareManager {
-  
   async share(data: ShareData): Promise<boolean> {
-    if (typeof window === 'undefined') return false
+    if (typeof window === "undefined") return false
 
     try {
       if (navigator.share && this.canShare(data)) {
         await navigator.share(data)
         return true
       } else {
-        console.warn('⚠️ Web Share API not supported')
+        console.warn("⚠️ Web Share API not supported")
         return false
       }
     } catch (error) {
-      console.error('❌ Share failed:', error)
+      console.error("❌ Share failed:", error)
       return false
     }
   }
 
   canShare(data?: ShareData): boolean {
-    if (typeof window === 'undefined') return false
-    
+    if (typeof window === "undefined") return false
+
     if (!navigator.share) return false
-    
+
     if (!data) return true
-    
+
     // Check if navigator.canShare exists and call it if available
     if (navigator.canShare) {
       return navigator.canShare(data)
     }
-    
+
     return true
   }
 
   get isSupported(): boolean {
-    if (typeof window === 'undefined') return false
-    
+    if (typeof window === "undefined") return false
+
     return !!navigator.share
   }
 }
 
 class FullscreenManagerImpl implements FullscreenManager {
-  
   async enter(element?: HTMLElement): Promise<void> {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
 
     const target = element || document.documentElement
 
@@ -111,12 +114,12 @@ class FullscreenManagerImpl implements FullscreenManager {
         await (target as any).msRequestFullscreen()
       }
     } catch (error) {
-      console.error('❌ Fullscreen enter failed:', error)
+      console.error("❌ Fullscreen enter failed:", error)
     }
   }
 
   async exit(): Promise<void> {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
 
     try {
       if (document.exitFullscreen) {
@@ -127,7 +130,7 @@ class FullscreenManagerImpl implements FullscreenManager {
         await (document as any).msExitFullscreen()
       }
     } catch (error) {
-      console.error('❌ Fullscreen exit failed:', error)
+      console.error("❌ Fullscreen exit failed:", error)
     }
   }
 
@@ -140,28 +143,34 @@ class FullscreenManagerImpl implements FullscreenManager {
   }
 
   get isFullscreen(): boolean {
-    if (typeof window === 'undefined') return false
-    
-    return !!(document.fullscreenElement || 
-             (document as any).webkitFullscreenElement ||
-             (document as any).msFullscreenElement)
+    if (typeof window === "undefined") return false
+
+    return !!(
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement ||
+      (document as any).msFullscreenElement
+    )
   }
 
   get isSupported(): boolean {
-    if (typeof window === 'undefined') return false
-    
-    return !!(document.documentElement.requestFullscreen ||
-             (document.documentElement as any).webkitRequestFullscreen ||
-             (document.documentElement as any).msRequestFullscreen)
+    if (typeof window === "undefined") return false
+
+    return !!(
+      document.documentElement.requestFullscreen ||
+      (document.documentElement as any).webkitRequestFullscreen ||
+      (document.documentElement as any).msRequestFullscreen
+    )
   }
 
   get element(): Element | null {
-    if (typeof window === 'undefined') return null
-    
-    return document.fullscreenElement || 
-           (document as any).webkitFullscreenElement ||
-           (document as any).msFullscreenElement ||
-           null
+    if (typeof window === "undefined") return null
+
+    return (
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement ||
+      (document as any).msFullscreenElement ||
+      null
+    )
   }
 }
 

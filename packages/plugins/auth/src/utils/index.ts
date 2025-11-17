@@ -12,8 +12,8 @@ export {
   decodeToken,
   validateToken,
   hashPassword,
-  comparePasswords
-} from './auth';
+  comparePasswords,
+} from "./auth"
 
-export type { AuthState } from '../hooks/useAuth';
-export type { UserProfile } from '../hooks/useUser';
+export type { AuthState } from "../hooks/useAuth"
+export type { UserProfile } from "../hooks/useUser"

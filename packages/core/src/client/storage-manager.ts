@@ -1,10 +1,10 @@
-import type { 
-  StorageManager, 
-  StorageController, 
+import type {
+  StorageManager,
+  StorageController,
   PersistentController,
   StorageOptions,
-  PersistentOptions
-} from '../types.js'
+  PersistentOptions,
+} from "../types.js"
 
 /**
  * StorageManager implementation
@@ -16,7 +16,7 @@ export class StorageManagerImpl implements StorageManager {
 
   local<T>(key: string, defaultValue: T, options?: StorageOptions<T>): StorageController<T> {
     const controllerId = `local:${key}`
-    
+
     if (this.controllers.has(controllerId)) {
       return this.controllers.get(controllerId) as StorageController<T>
     }
@@ -28,7 +28,7 @@ export class StorageManagerImpl implements StorageManager {
 
   session<T>(key: string, defaultValue: T, options?: StorageOptions<T>): StorageController<T> {
     const controllerId = `session:${key}`
-    
+
     if (this.controllers.has(controllerId)) {
       return this.controllers.get(controllerId) as StorageController<T>
     }
@@ -38,9 +38,13 @@ export class StorageManagerImpl implements StorageManager {
     return controller
   }
 
-  persistent<T>(key: string, defaultValue: T, options?: PersistentOptions<T>): PersistentController<T> {
+  persistent<T>(
+    key: string,
+    defaultValue: T,
+    options?: PersistentOptions<T>
+  ): PersistentController<T> {
     const controllerId = `persistent:${key}`
-    
+
     if (this.persistentControllers.has(controllerId)) {
       return this.persistentControllers.get(controllerId) as PersistentController<T>
     }
@@ -64,7 +68,7 @@ class LocalStorageController<T> implements StorageController<T> {
     private options?: StorageOptions<T>
   ) {
     this.currentValue = this.loadValue()
-    
+
     // Enable cross-tab sync if specified
     if (options?.syncAcrossTabs) {
       this.setupStorageListener()
@@ -76,9 +80,8 @@ class LocalStorageController<T> implements StorageController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.saveValue(newValue)
@@ -91,7 +94,7 @@ class LocalStorageController<T> implements StorageController<T> {
       this.currentValue = this.defaultValue
       this.notifyListeners(this.defaultValue)
     } catch (error) {
-      console.warn('Failed to clear localStorage:', error)
+      console.warn("Failed to clear localStorage:", error)
     }
   }
 
@@ -105,11 +108,9 @@ class LocalStorageController<T> implements StorageController<T> {
       const stored = localStorage.getItem(this.key)
       if (stored === null) return this.defaultValue
 
-      return this.options?.serializer 
-        ? this.options.serializer.parse(stored)
-        : JSON.parse(stored)
+      return this.options?.serializer ? this.options.serializer.parse(stored) : JSON.parse(stored)
     } catch (error) {
-      console.warn('Failed to load from localStorage:', error)
+      console.warn("Failed to load from localStorage:", error)
       return this.defaultValue
     }
   }
@@ -119,25 +120,25 @@ class LocalStorageController<T> implements StorageController<T> {
       const serialized = this.options?.serializer
         ? this.options.serializer.stringify(value)
         : JSON.stringify(value)
-      
+
       localStorage.setItem(this.key, serialized)
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error)
+      console.warn("Failed to save to localStorage:", error)
     }
   }
 
   private setupStorageListener(): void {
-    window.addEventListener('storage', (event) => {
+    window.addEventListener("storage", event => {
       if (event.key === this.key && event.newValue !== null) {
         try {
           const newValue = this.options?.serializer
             ? this.options.serializer.parse(event.newValue)
             : JSON.parse(event.newValue)
-          
+
           this.currentValue = newValue
           this.notifyListeners(newValue)
         } catch (error) {
-          console.warn('Failed to parse storage event:', error)
+          console.warn("Failed to parse storage event:", error)
         }
       }
     })
@@ -148,7 +149,7 @@ class LocalStorageController<T> implements StorageController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }
@@ -174,9 +175,8 @@ class SessionStorageController<T> implements StorageController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.saveValue(newValue)
@@ -189,7 +189,7 @@ class SessionStorageController<T> implements StorageController<T> {
       this.currentValue = this.defaultValue
       this.notifyListeners(this.defaultValue)
     } catch (error) {
-      console.warn('Failed to clear sessionStorage:', error)
+      console.warn("Failed to clear sessionStorage:", error)
     }
   }
 
@@ -203,11 +203,9 @@ class SessionStorageController<T> implements StorageController<T> {
       const stored = sessionStorage.getItem(this.key)
       if (stored === null) return this.defaultValue
 
-      return this.options?.serializer 
-        ? this.options.serializer.parse(stored)
-        : JSON.parse(stored)
+      return this.options?.serializer ? this.options.serializer.parse(stored) : JSON.parse(stored)
     } catch (error) {
-      console.warn('Failed to load from sessionStorage:', error)
+      console.warn("Failed to load from sessionStorage:", error)
       return this.defaultValue
     }
   }
@@ -217,10 +215,10 @@ class SessionStorageController<T> implements StorageController<T> {
       const serialized = this.options?.serializer
         ? this.options.serializer.stringify(value)
         : JSON.stringify(value)
-      
+
       sessionStorage.setItem(this.key, serialized)
     } catch (error) {
-      console.warn('Failed to save to sessionStorage:', error)
+      console.warn("Failed to save to sessionStorage:", error)
     }
   }
 
@@ -229,7 +227,7 @@ class SessionStorageController<T> implements StorageController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }
@@ -243,8 +241,8 @@ class PersistentStorageController<T> implements PersistentController<T> {
   private currentValue: T
   private isCurrentlySyncing = false
   private lastSyncTime: Date | null = null
-  private dbName = 'yukemuri-persistent'
-  private storeName = 'storage'
+  private dbName = "yukemuri-persistent"
+  private storeName = "storage"
   private batchedChanges: T | null = null
   private batchTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -262,18 +260,17 @@ class PersistentStorageController<T> implements PersistentController<T> {
   }
 
   set(value: T | ((prev: T) => T)): void {
-    const newValue = typeof value === 'function' 
-      ? (value as (prev: T) => T)(this.currentValue)
-      : value
+    const newValue =
+      typeof value === "function" ? (value as (prev: T) => T)(this.currentValue) : value
 
     this.currentValue = newValue
     this.notifyListeners(newValue)
 
     // Save according to sync strategy
-    const strategy = this.options?.syncStrategy || 'immediate'
-    if (strategy === 'immediate') {
+    const strategy = this.options?.syncStrategy || "immediate"
+    if (strategy === "immediate") {
       this.sync()
-    } else if (strategy === 'batched') {
+    } else if (strategy === "batched") {
       this.enqueueBatchedSync(newValue)
     }
   }
@@ -282,7 +279,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
     this.currentValue = this.defaultValue
     this.notifyListeners(this.defaultValue)
     this.deleteFromDB()
-    
+
     // Clear any pending batched sync
     if (this.batchTimeout) {
       clearTimeout(this.batchTimeout)
@@ -309,7 +306,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
         this.batchTimeout = null
       }
     } catch (error) {
-      console.warn('Failed to sync to IndexedDB:', error)
+      console.warn("Failed to sync to IndexedDB:", error)
     } finally {
       this.isCurrentlySyncing = false
     }
@@ -325,12 +322,12 @@ class PersistentStorageController<T> implements PersistentController<T> {
 
   private enqueueBatchedSync(value: T): void {
     this.batchedChanges = value
-    
+
     // Clear existing timeout
     if (this.batchTimeout) {
       clearTimeout(this.batchTimeout)
     }
-    
+
     // Set new timeout for batched sync (300ms debounce)
     this.batchTimeout = setTimeout(() => {
       this.sync()
@@ -349,28 +346,27 @@ class PersistentStorageController<T> implements PersistentController<T> {
         this.lastSyncTime = new Date()
       }
     } catch (error) {
-      console.warn('Failed to load from IndexedDB:', error)
+      console.warn("Failed to load from IndexedDB:", error)
     }
   }
 
   private isIndexedDBAvailable(): boolean {
-    if (typeof window === 'undefined') return false
-    return typeof indexedDB !== 'undefined' && indexedDB !== null
+    if (typeof window === "undefined") return false
+    return typeof indexedDB !== "undefined" && indexedDB !== null
   }
-
 
   private async getDB(): Promise<IDBDatabase> {
     if (!this.isIndexedDBAvailable()) {
-      throw new Error('IndexedDB is not available in this environment')
+      throw new Error("IndexedDB is not available in this environment")
     }
 
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1)
-      
+
       request.onerror = () => reject(request.error)
       request.onsuccess = () => resolve(request.result)
-      
-      request.onupgradeneeded = (event) => {
+
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName)
@@ -386,9 +382,9 @@ class PersistentStorageController<T> implements PersistentController<T> {
       }
 
       const db = await this.getDB()
-      const transaction = db.transaction([this.storeName], 'readonly')
+      const transaction = db.transaction([this.storeName], "readonly")
       const store = transaction.objectStore(this.storeName)
-      
+
       return new Promise((resolve, reject) => {
         const request = store.get(this.key)
         request.onerror = () => reject(request.error)
@@ -397,32 +393,28 @@ class PersistentStorageController<T> implements PersistentController<T> {
           if (result === undefined) {
             resolve(null)
           } else {
-            const value = this.options?.serializer
-              ? this.options.serializer.parse(result)
-              : result
+            const value = this.options?.serializer ? this.options.serializer.parse(result) : result
             resolve(value)
           }
         }
       })
     } catch (error) {
-      console.warn('Failed to load from IndexedDB:', error)
+      console.warn("Failed to load from IndexedDB:", error)
       return null
     }
   }
 
   private async saveToDB(value: T): Promise<void> {
     if (!this.isIndexedDBAvailable()) {
-      console.warn('IndexedDB is not available, skipping persistent storage sync')
+      console.warn("IndexedDB is not available, skipping persistent storage sync")
       return
     }
 
     const db = await this.getDB()
-    const transaction = db.transaction([this.storeName], 'readwrite')
+    const transaction = db.transaction([this.storeName], "readwrite")
     const store = transaction.objectStore(this.storeName)
-    
-    const serialized = this.options?.serializer
-      ? this.options.serializer.stringify(value)
-      : value
+
+    const serialized = this.options?.serializer ? this.options.serializer.stringify(value) : value
 
     return new Promise((resolve, reject) => {
       const request = store.put(serialized, this.key)
@@ -438,16 +430,16 @@ class PersistentStorageController<T> implements PersistentController<T> {
       }
 
       const db = await this.getDB()
-      const transaction = db.transaction([this.storeName], 'readwrite')
+      const transaction = db.transaction([this.storeName], "readwrite")
       const store = transaction.objectStore(this.storeName)
-      
+
       return new Promise((resolve, reject) => {
         const request = store.delete(this.key)
         request.onerror = () => reject(request.error)
         request.onsuccess = () => resolve()
       })
     } catch (error) {
-      console.warn('Failed to delete from IndexedDB:', error)
+      console.warn("Failed to delete from IndexedDB:", error)
     }
   }
 
@@ -456,7 +448,7 @@ class PersistentStorageController<T> implements PersistentController<T> {
       try {
         listener(value)
       } catch (error) {
-        console.warn('Storage listener error:', error)
+        console.warn("Storage listener error:", error)
       }
     })
   }

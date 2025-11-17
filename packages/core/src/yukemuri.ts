@@ -1,7 +1,7 @@
-import { createApp } from './app.js';
-import type { 
-  YukemuriConfig, 
-  YukemuriApp, 
+import { createApp } from "./app.js"
+import type {
+  YukemuriConfig,
+  YukemuriApp,
   YukemuriClient,
   PWAManager,
   NotificationManager,
@@ -10,8 +10,8 @@ import type {
   NetworkManager,
   DeviceManager,
   RouterManager,
-  UtilsManager
-} from './types.js';
+  UtilsManager,
+} from "./types.js"
 import {
   PWAManagerImpl,
   NotificationManagerImpl,
@@ -20,14 +20,14 @@ import {
   NetworkManagerImpl,
   DeviceManagerImpl,
   RouterManagerImpl,
-  UtilsManagerImpl
-} from './client/index.js';
+  UtilsManagerImpl,
+} from "./client/index.js"
 
 /**
  * Yukemuriフレームワークのファクトリー関数
  */
 export function YukemuriFactory(config?: Partial<YukemuriConfig>): YukemuriApp {
-  return createApp(config);
+  return createApp(config)
 }
 
 /**
@@ -64,7 +64,7 @@ export function createDevApp(config?: Partial<YukemuriConfig>): YukemuriApp {
   return createApp({
     dev: true,
     ...config,
-  });
+  })
 }
 
 /**
@@ -74,5 +74,5 @@ export function createProdApp(config?: Partial<YukemuriConfig>): YukemuriApp {
   return createApp({
     dev: false,
     ...config,
-  });
+  })
 }

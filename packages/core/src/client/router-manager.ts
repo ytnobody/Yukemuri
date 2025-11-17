@@ -1,4 +1,4 @@
-import type { RouterManager } from '../types.js'
+import type { RouterManager } from "../types.js"
 
 /**
  * Router parameter matcher for file-based routing
@@ -17,51 +17,51 @@ class RoutePatternMatcher {
   }
 
   private parsePattern(pattern: string): SegmentPattern[] {
-    if (!pattern || pattern === '/') return []
+    if (!pattern || pattern === "/") return []
 
     return pattern
-      .split('/')
-      .filter(s => s !== '')
+      .split("/")
+      .filter(s => s !== "")
       .map(segment => {
-        if (segment.startsWith(':')) {
+        if (segment.startsWith(":")) {
           // Dynamic segment :id
-          return { type: 'dynamic', name: segment.slice(1) }
-        } else if (segment.startsWith('**')) {
+          return { type: "dynamic", name: segment.slice(1) }
+        } else if (segment.startsWith("**")) {
           // Optional catch-all segment **slug
-          return { type: 'catchall', name: segment.slice(2) }
-        } else if (segment.startsWith('*')) {
+          return { type: "catchall", name: segment.slice(2) }
+        } else if (segment.startsWith("*")) {
           // Catch-all segment *slug
-          return { type: 'catchall', name: segment.slice(1) }
+          return { type: "catchall", name: segment.slice(1) }
         } else {
           // Static segment
-          return { type: 'static', name: segment }
+          return { type: "static", name: segment }
         }
       })
   }
 
   match(url: string): Record<string, string> | null {
-    const urlSegments = url.split('/').filter(s => s !== '')
+    const urlSegments = url.split("/").filter(s => s !== "")
     const params: Record<string, string> = {}
     let urlIndex = 0
 
     for (const segment of this.segments) {
-      if (segment.type === 'static') {
+      if (segment.type === "static") {
         // Static segment must match exactly
         if (urlIndex >= urlSegments.length || urlSegments[urlIndex] !== segment.name) {
           return null
         }
         urlIndex++
-      } else if (segment.type === 'dynamic') {
+      } else if (segment.type === "dynamic") {
         // Dynamic segment captures one URL segment
         if (urlIndex >= urlSegments.length) {
           return null
         }
         params[segment.name] = urlSegments[urlIndex]
         urlIndex++
-      } else if (segment.type === 'catchall') {
+      } else if (segment.type === "catchall") {
         // Catch-all captures remaining segments
         if (urlIndex < urlSegments.length) {
-          params[segment.name] = urlSegments.slice(urlIndex).join('/')
+          params[segment.name] = urlSegments.slice(urlIndex).join("/")
         }
         return params
       }
@@ -77,7 +77,7 @@ class RoutePatternMatcher {
 }
 
 interface SegmentPattern {
-  type: 'static' | 'dynamic' | 'catchall'
+  type: "static" | "dynamic" | "catchall"
   name: string
 }
 
@@ -96,11 +96,11 @@ export class RouterManagerImpl implements RouterManager {
   }
 
   private init(): void {
-    if (this.isInitialized || typeof window === 'undefined') return
+    if (this.isInitialized || typeof window === "undefined") return
     this.isInitialized = true
 
     // Listen for browser back/forward
-    window.addEventListener('popstate', () => {
+    window.addEventListener("popstate", () => {
       this.updateParams()
       this.triggerNavigationEvent()
     })
@@ -110,38 +110,38 @@ export class RouterManagerImpl implements RouterManager {
   }
 
   push(path: string, state?: any): void {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
 
-    window.history.pushState(state, '', path)
+    window.history.pushState(state, "", path)
     this.updateParams()
     this.triggerNavigationEvent()
   }
 
   replace(path: string, state?: any): void {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
 
-    window.history.replaceState(state, '', path)
+    window.history.replaceState(state, "", path)
     this.updateParams()
     this.triggerNavigationEvent()
   }
 
   back(): void {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
     window.history.back()
   }
 
   forward(): void {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
     window.history.forward()
   }
 
   go(delta: number): void {
-    if (typeof window === 'undefined') return
+    if (typeof window === "undefined") return
     window.history.go(delta)
   }
 
   getCurrentPath(): string {
-    if (typeof window === 'undefined') return '/'
+    if (typeof window === "undefined") return "/"
     return window.location.pathname
   }
 
@@ -150,7 +150,7 @@ export class RouterManagerImpl implements RouterManager {
   }
 
   getQuery(): URLSearchParams {
-    if (typeof window === 'undefined') return new URLSearchParams()
+    if (typeof window === "undefined") return new URLSearchParams()
     return new URLSearchParams(window.location.search)
   }
 
@@ -162,7 +162,7 @@ export class RouterManagerImpl implements RouterManager {
     }
 
     // Partial match - check if current path starts with the given path
-    return currentPath.startsWith(path === '/' ? '/' : path)
+    return currentPath.startsWith(path === "/" ? "/" : path)
   }
 
   onNavigate(callback: (path: string) => void): () => void {
@@ -239,14 +239,14 @@ export class RouterManagerImpl implements RouterManager {
       try {
         callback(path)
       } catch (error) {
-        console.warn('Navigation listener error:', error)
+        console.warn("Navigation listener error:", error)
       }
     })
 
     // Also dispatch custom event for DOM listeners
-    if (typeof window !== 'undefined') {
-      const event = new CustomEvent('yukemuri:navigate', {
-        detail: { path, params: this.currentParams }
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("yukemuri:navigate", {
+        detail: { path, params: this.currentParams },
       })
       window.dispatchEvent(event)
     }

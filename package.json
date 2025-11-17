@@ -7,13 +7,15 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "test": "turbo run test",
-    "lint": "turbo run lint",
+    "lint": "./node_modules/.pnpm/@biomejs+cli-linux-x64@2.3.6/node_modules/@biomejs/cli-linux-x64/biome lint --write .",
+    "format": "./node_modules/.pnpm/@biomejs+cli-linux-x64@2.3.6/node_modules/@biomejs/cli-linux-x64/biome format --write .",
     "type-check": "turbo run type-check",
     "clean": "turbo run clean",
     "create": "pnpm --filter create-yukemuri build && node packages/create-yukemuri/dist/index.js",
     "setup": "pnpm install && pnpm build && pnpm --filter create-yukemuri link --global"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.6",
     "@types/node": "^20.0.0",
     "turbo": "^2.5.8",
     "typescript": "^5.0.0"

@@ -1,26 +1,24 @@
-import { h } from 'preact'
+import { h } from "preact"
 
 export default function About() {
   return (
     <div className="container">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">About Yukemuri</h1>
-        <p className="text-xl text-gray-600">
-          Learn more about this PWA framework
-        </p>
+        <p className="text-xl text-gray-600">Learn more about this PWA framework</p>
       </div>
 
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">♨️ What is Yukemuri?</h2>
           <p className="text-gray-700 mb-4">
-            Yukemuri (湯けむり) means "steam from hot springs" in Japanese. Just like the gentle, 
-            warming steam from natural hot springs, this framework provides a comfortable and 
+            Yukemuri (湯けむり) means "steam from hot springs" in Japanese. Just like the gentle,
+            warming steam from natural hot springs, this framework provides a comfortable and
             soothing development experience.
           </p>
           <p className="text-gray-700">
-            Built on modern web standards with Hono, Preact, and TypeScript, Yukemuri enables 
-            rapid development of progressive web applications that work seamlessly across all devices.
+            Built on modern web standards with Hono, Preact, and TypeScript, Yukemuri enables rapid
+            development of progressive web applications that work seamlessly across all devices.
           </p>
         </div>
 
@@ -47,7 +45,7 @@ export default function About() {
         </div>
 
         <div className="text-center">
-          <a 
+          <a
             href="/"
             className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium"
           >

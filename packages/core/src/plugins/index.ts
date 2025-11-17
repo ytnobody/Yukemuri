@@ -1,44 +1,44 @@
-import type { 
-  YukemuriPlugin, 
+import type {
+  YukemuriPlugin,
   ConfigSchema,
   ConfigProperty,
   InitHook,
   SetupHook,
   TeardownHook,
-  RouteConfig, 
+  RouteConfig,
   MiddlewareConfig,
   AssetConfig,
   CommandConfig,
-  ClientExtensions
-} from '../types.js';
+  ClientExtensions,
+} from "../types.js"
 
 /**
  * Create a plugin
  */
 export function createPlugin(options: {
-  name: string;
-  version: string;
-  description?: string;
-  author?: string;
-  license?: string;
-  homepage?: string;
-  repository?: string;
-  dependencies?: string[];
-  peerDependencies?: string[];
+  name: string
+  version: string
+  description?: string
+  author?: string
+  license?: string
+  homepage?: string
+  repository?: string
+  dependencies?: string[]
+  peerDependencies?: string[]
   engines?: {
-    yukemuri?: string;
-    node?: string;
-  };
-  configSchema?: ConfigSchema;
-  defaultConfig?: any;
-  init?: InitHook;
-  setup?: SetupHook;
-  teardown?: TeardownHook;
-  routes?: RouteConfig[];
-  middleware?: MiddlewareConfig[];
-  assets?: AssetConfig[];
-  commands?: CommandConfig[];
-  clientExtensions?: ClientExtensions;
+    yukemuri?: string
+    node?: string
+  }
+  configSchema?: ConfigSchema
+  defaultConfig?: any
+  init?: InitHook
+  setup?: SetupHook
+  teardown?: TeardownHook
+  routes?: RouteConfig[]
+  middleware?: MiddlewareConfig[]
+  assets?: AssetConfig[]
+  commands?: CommandConfig[]
+  clientExtensions?: ClientExtensions
 }): YukemuriPlugin {
   return {
     name: options.name,
@@ -61,52 +61,55 @@ export function createPlugin(options: {
     assets: options.assets || [],
     commands: options.commands || [],
     clientExtensions: options.clientExtensions,
-  };
+  }
 }
 
 /**
  * Create a plugin configuration schema
  */
-export function createConfigSchema(properties: Record<string, any>, required?: string[]): ConfigSchema {
+export function createConfigSchema(
+  properties: Record<string, any>,
+  required?: string[]
+): ConfigSchema {
   return {
-    type: 'object',
+    type: "object",
     properties,
     required,
-    additionalProperties: false
-  };
+    additionalProperties: false,
+  }
 }
 
 /**
  * Create a plugin bundle (combine multiple plugins)
  */
 export function createPluginBundle(options: {
-  name: string;
-  version: string;
-  description?: string;
-  plugins: YukemuriPlugin[];
+  name: string
+  version: string
+  description?: string
+  plugins: YukemuriPlugin[]
 }): YukemuriPlugin {
-  const allRoutes = options.plugins.flatMap(p => p.routes || []);
-  const allMiddleware = options.plugins.flatMap(p => p.middleware || []);
-  const allAssets = options.plugins.flatMap(p => p.assets || []);
-  const allCommands = options.plugins.flatMap(p => p.commands || []);
+  const allRoutes = options.plugins.flatMap(p => p.routes || [])
+  const allMiddleware = options.plugins.flatMap(p => p.middleware || [])
+  const allAssets = options.plugins.flatMap(p => p.assets || [])
+  const allCommands = options.plugins.flatMap(p => p.commands || [])
 
   return createPlugin({
     name: options.name,
     version: options.version,
     description: options.description,
-    init: async (context) => {
+    init: async context => {
       // Initialize all bundled plugins
       for (const plugin of options.plugins) {
         if (plugin.init) {
-          await plugin.init(context);
+          await plugin.init(context)
         }
       }
     },
     routes: allRoutes,
     middleware: allMiddleware,
     assets: allAssets,
-    commands: allCommands
-  });
+    commands: allCommands,
+  })
 }
 
 /**
@@ -116,29 +119,29 @@ export function validatePluginConfig(
   config: any,
   schema: Record<string, ConfigProperty>
 ): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
+  const errors: string[] = []
 
   for (const [key, property] of Object.entries(schema)) {
-    const value = config[key];
+    const value = config[key]
 
     // Check if required property is present
     if (property.required && (value === undefined || value === null)) {
-      errors.push(`Required property "${key}" is missing`);
-      continue;
+      errors.push(`Required property "${key}" is missing`)
+      continue
     }
 
     // Type checking
     if (value !== undefined && !checkType(value, property.type)) {
-      errors.push(`Property "${key}" must be of type ${property.type}`);
+      errors.push(`Property "${key}" must be of type ${property.type}`)
     }
 
     // Custom validation
     if (value !== undefined && property.validation) {
-      const result = property.validation(value);
-      if (typeof result === 'string') {
-        errors.push(`Property "${key}": ${result}`);
+      const result = property.validation(value)
+      if (typeof result === "string") {
+        errors.push(`Property "${key}": ${result}`)
       } else if (!result) {
-        errors.push(`Property "${key}" failed validation`);
+        errors.push(`Property "${key}" failed validation`)
       }
     }
   }
@@ -146,7 +149,7 @@ export function validatePluginConfig(
   return {
     valid: errors.length === 0,
     errors,
-  };
+  }
 }
 
 /**
@@ -154,18 +157,18 @@ export function validatePluginConfig(
  */
 function checkType(value: any, expectedType: string): boolean {
   switch (expectedType) {
-    case 'string':
-      return typeof value === 'string';
-    case 'number':
-      return typeof value === 'number';
-    case 'boolean':
-      return typeof value === 'boolean';
-    case 'object':
-      return typeof value === 'object' && value !== null && !Array.isArray(value);
-    case 'array':
-      return Array.isArray(value);
+    case "string":
+      return typeof value === "string"
+    case "number":
+      return typeof value === "number"
+    case "boolean":
+      return typeof value === "boolean"
+    case "object":
+      return typeof value === "object" && value !== null && !Array.isArray(value)
+    case "array":
+      return Array.isArray(value)
     default:
-      return true;
+      return true
   }
 }
 
@@ -173,12 +176,12 @@ function checkType(value: any, expectedType: string): boolean {
  * Merge plugin routes
  */
 export function mergeRoutes(...routeArrays: RouteConfig[][]): RouteConfig[] {
-  return routeArrays.flat();
+  return routeArrays.flat()
 }
 
 /**
  * Merge plugin middleware
  */
 export function mergeMiddleware(...middlewareArrays: MiddlewareConfig[][]): MiddlewareConfig[] {
-  return middlewareArrays.flat();
+  return middlewareArrays.flat()
 }

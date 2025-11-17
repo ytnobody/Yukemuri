@@ -1,66 +1,66 @@
-import { h } from 'preact'
-import { useState, useEffect } from 'preact/hooks'
-import { Yukemuri } from '../lib/yukemuri'
+import { h } from "preact"
+import { useState, useEffect } from "preact/hooks"
+import { Yukemuri } from "../lib/yukemuri"
 
 const yu = new Yukemuri()
 
 export default function CurrentURLQRCode() {
-  const [qrDataURL, setQrDataURL] = useState<string>('')
-  const [currentURL, setCurrentURL] = useState<string>('')
+  const [qrDataURL, setQrDataURL] = useState<string>("")
+  const [currentURL, setCurrentURL] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>("")
 
   useEffect(() => {
     const generateCurrentURLQR = async () => {
-      if (typeof window === 'undefined') return
-      
+      if (typeof window === "undefined") return
+
       setIsLoading(true)
-      setError('')
-      
+      setError("")
+
       try {
         const url = window.location.href
         setCurrentURL(url)
-        
-        console.log('♨️ Generating current URL QR with Yukemuri API')
-        
+
+        console.log("♨️ Generating current URL QR with Yukemuri API")
+
         // Using the new yu.qr.getCurrentURL() API
-        const dataURL = await yu.qr.getCurrentURL({ 
+        const dataURL = await yu.qr.getCurrentURL({
           size: 200,
           margin: 2,
-          errorCorrectionLevel: 'M'
+          errorCorrectionLevel: "M",
         })
-        
+
         setQrDataURL(dataURL)
-        console.log('✅ Current URL QR code generated successfully')
+        console.log("✅ Current URL QR code generated successfully")
       } catch (err) {
-        setError('Failed to generate QR code for current URL')
-        console.error('❌ Current URL QR generation error:', err)
+        setError("Failed to generate QR code for current URL")
+        console.error("❌ Current URL QR generation error:", err)
       } finally {
         setIsLoading(false)
       }
     }
 
     generateCurrentURLQR()
-    
+
     // Listen for URL changes
     const handleLocationChange = () => {
       setTimeout(generateCurrentURLQR, 100) // Small delay to ensure URL is updated
     }
 
-    window.addEventListener('popstate', handleLocationChange)
-    
+    window.addEventListener("popstate", handleLocationChange)
+
     // Custom navigation event from router
-    window.addEventListener('yukemuri:navigate', handleLocationChange)
-    
+    window.addEventListener("yukemuri:navigate", handleLocationChange)
+
     return () => {
-      window.removeEventListener('popstate', handleLocationChange)
-      window.removeEventListener('yukemuri:navigate', handleLocationChange)
+      window.removeEventListener("popstate", handleLocationChange)
+      window.removeEventListener("yukemuri:navigate", handleLocationChange)
     }
   }, [])
 
   const handleDownload = () => {
     if (qrDataURL) {
-      console.log('♨️ Downloading current URL QR code with Yukemuri API')
+      console.log("♨️ Downloading current URL QR code with Yukemuri API")
       yu.qr.download(qrDataURL, `current-url-qr-${Date.now()}.png`)
     }
   }
@@ -70,19 +70,19 @@ export default function CurrentURLQRCode() {
       try {
         if (navigator.share) {
           await navigator.share({
-            title: 'Current Page',
-            text: 'Check out this page',
-            url: currentURL
+            title: "Current Page",
+            text: "Check out this page",
+            url: currentURL,
           })
-          console.log('✅ URL shared successfully')
+          console.log("✅ URL shared successfully")
         } else {
           // Fallback: copy to clipboard
           await navigator.clipboard.writeText(currentURL)
-          console.log('✅ URL copied to clipboard')
+          console.log("✅ URL copied to clipboard")
           // You could show a toast notification here
         }
       } catch (err) {
-        console.error('❌ Share failed:', err)
+        console.error("❌ Share failed:", err)
       }
     }
   }
@@ -92,8 +92,8 @@ export default function CurrentURLQRCode() {
       <div className="mb-8 text-center">
         <div className="text-red-500">
           <p>{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-2 text-sm text-blue-500 hover:text-blue-700"
           >
             Retry
@@ -106,9 +106,14 @@ export default function CurrentURLQRCode() {
   if (isLoading || !qrDataURL) {
     return (
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Current Page QR Code</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+          Current Page QR Code
+        </h3>
         <div className="text-center">
-          <div className="animate-pulse bg-gray-200 rounded flex items-center justify-center" style={{ width: '200px', height: '200px', margin: '0 auto' }}>
+          <div
+            className="animate-pulse bg-gray-200 rounded flex items-center justify-center"
+            style={{ width: "200px", height: "200px", margin: "0 auto" }}
+          >
             <span className="text-gray-500">Loading QR...</span>
           </div>
         </div>
@@ -121,11 +126,11 @@ export default function CurrentURLQRCode() {
       <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Current Page QR Code</h3>
       <div className="text-center">
         <div className="inline-block mb-4">
-          <img 
-            src={qrDataURL} 
+          <img
+            src={qrDataURL}
             alt={`QR Code for ${currentURL}`}
             className="mx-auto rounded shadow-sm"
-            style={{ width: '200px', height: '200px' }}
+            style={{ width: "200px", height: "200px" }}
           />
           <div className="mt-2 flex justify-center space-x-2">
             <button
@@ -144,9 +149,7 @@ export default function CurrentURLQRCode() {
             </button>
           </div>
         </div>
-        <p className="text-xs text-gray-500 break-all px-4">
-          {currentURL}
-        </p>
+        <p className="text-xs text-gray-500 break-all px-4">{currentURL}</p>
       </div>
     </div>
   )

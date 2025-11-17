@@ -34,7 +34,7 @@
     "tsx": "^4.7.0"
   },
   "peerDependencies": {
-    "@yukemuri/core": "^1.0.0"
+    "@yukemuri/core": "workspace:*"
   },
   "engines": {
     "node": ">=18.0.0",

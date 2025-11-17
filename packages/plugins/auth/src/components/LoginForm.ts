@@ -3,40 +3,40 @@
  * Login form for user authentication
  */
 export interface LoginFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
-  onSuccess?: () => void;
+  onSubmit: (email: string, password: string) => Promise<void>
+  isLoading?: boolean
+  error?: string | null
+  onSuccess?: () => void
 }
 
 export function LoginForm(props: LoginFormProps) {
-  let email = '';
-  let password = '';
+  let email = ""
+  let password = ""
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     if (!email || !password) {
-      return;
+      return
     }
 
     try {
-      await props.onSubmit(email, password);
+      await props.onSubmit(email, password)
       if (props.onSuccess) {
-        props.onSuccess();
+        props.onSuccess()
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error)
     }
-  };
+  }
 
   const handleEmailChange = (e: any) => {
-    email = e.target.value;
-  };
+    email = e.target.value
+  }
 
   const handlePasswordChange = (e: any) => {
-    password = e.target.value;
-  };
+    password = e.target.value
+  }
 
   return `
     <form onsubmit="${handleSubmit}">
@@ -66,11 +66,11 @@ export function LoginForm(props: LoginFormProps) {
         </label>
       </div>
 
-      ${props.error ? `<div class="error">${props.error}</div>` : ''}
+      ${props.error ? `<div class="error">${props.error}</div>` : ""}
 
       <button type="submit" disabled="${props.isLoading}">
-        ${props.isLoading ? 'Logging in...' : 'Login'}
+        ${props.isLoading ? "Logging in..." : "Login"}
       </button>
     </form>
-  `;
+  `
 }
