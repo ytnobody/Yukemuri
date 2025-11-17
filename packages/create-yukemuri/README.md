@@ -6,23 +6,61 @@ Project scaffolding tool for creating new Yukemuri applications with templates.
 
 ```bash
 # Using npx (recommended)
-npx @yukemuri/create-yukemuri
+npx @yukemuri/create-yukemuri my-awesome-app
 
 # Or with npm
-npm init @yukemuri/create-yukemuri
+npm init @yukemuri/create-yukemuri my-awesome-app
 
 # Or with pnpm
-pnpm create @yukemuri/create-yukemuri
+pnpm create @yukemuri/create-yukemuri my-awesome-app
+
+# Interactive mode (if no app name provided)
+npx @yukemuri/create-yukemuri
+```
+
+## Features
+
+### Automatic Project Customization
+
+When you create a new project, the tool automatically customizes:
+
+- **package.json**: Project name and description
+- **README.md**: Branded with your project name
+- **manifest.json**: PWA manifest with your app name
+- **Biome configuration**: Ready for code quality checks
+- **Git hooks**: Auto-enabled for format/lint on commit
+
+### Example
+
+```bash
+$ npx @yukemuri/create-yukemuri my-blog-app
+✔ Created project directory
+✔ Generated biome.json
+✔ Generated icon files
+✔ Git hooks configured
+✔ Project my-blog-app created successfully! ♨️
+
+Next steps:
+  cd my-blog-app
+  npm install
+  npm run dev
+```
+
+After creation, your project files contain:
+```
+package.json: { "name": "my-blog-app", "description": "A Yukemuri application - my-blog-app" }
+README.md: # my-blog-app ♨️
+manifest.json: { "name": "My Blog App", "short_name": "My Blog" }
 ```
 
 ## Interactive Setup
 
 The tool will guide you through:
 
-1. **Project Name**: Enter your project name
-2. **Template Selection**: Choose from available templates
-3. **Package Manager**: Select npm, pnpm, or yarn
-4. **Installation**: Automatically install dependencies
+1. **Project Name**: Enter your project name (or provide as argument)
+2. **Validation**: Ensures lowercase letters, numbers, hyphens, underscores only
+3. **Customization**: Automatically updates all configuration files
+4. **Git Hooks**: Pre-commit hooks set up for code quality
 
 ## Templates
 
