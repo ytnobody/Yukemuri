@@ -120,61 +120,97 @@ app.use(emailPlugin, {
 
 ---
 
+#### 4. Rate Limiting Plugin (@yukemuri/plugin-rate-limiting) ✅
+
+API rate limiting and quota management.
+
+**Features:**
+- Token bucket algorithm for smooth rate limiting
+- Sliding window algorithm for precise rate limiting
+- Per-user rate limiting with custom key generation
+- Per-IP rate limiting support
+- Configurable storage backends
+- Rate limit headers in responses (X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After)
+- Custom handler support for limit exceeded scenarios
+- In-memory storage with MemoryStore
+- Flexible rate limit strategies
+
+**Quick Start:**
+```bash
+npm install @yukemuri/plugin-rate-limiting
+```
+
+```typescript
+import { createRateLimit } from '@yukemuri/plugin-rate-limiting';
+
+app.use(createRateLimit({
+  strategy: 'token-bucket',
+  maxRequests: 100,
+  windowMs: 60000,
+  keyGenerator: (c) => c.req.header('x-forwarded-for') || 'default'
+}));
+```
+
+**Documentation:** See [packages/plugins/rate-limiting/README.md](./rate-limiting/README.md)
+
+---
+
+#### 5. Logging Plugin (@yukemuri/plugin-logging) ✅
+
+Structured logging with multi-sink support.
+
+**Features:**
+- Structured JSON logging with timestamps
+- Multiple log levels (debug, info, warn, error) with level filtering
+- Multi-sink architecture for flexible output
+- Built-in sinks: Console, In-Memory (MemoryFileSink)
+- Extensible LogSink interface for custom sinks
+- Async sink support for non-blocking operations
+- Hono middleware for automatic request/response logging
+- Error logging with stack traces
+- Metadata support for contextual information
+- Type-safe logger with ILogger interface
+
+**Quick Start:**
+```bash
+npm install @yukemuri/plugin-logging
+```
+
+```typescript
+import { createLogger, createLoggingMiddleware, MemoryFileSink } from '@yukemuri/plugin-logging';
+
+// Create logger instance
+const logger = createLogger({
+  minLevel: 'info',
+  sinks: [new MemoryFileSink()],
+  console: true
+});
+
+logger.info('Application started');
+logger.error('Error occurred', new Error('Something failed'));
+
+// Or use Hono middleware
+app.use(createLoggingMiddleware({ minLevel: 'debug' }));
+```
+
+**Use Cases:**
+- Application monitoring
+- Error tracking with stack traces
+- Request/response logging
+- Audit logging
+- Debugging
+
+**Documentation:** See [packages/plugins/logging/README.md](./logging/README.md)
+
+---
+
 ### Planned Plugins
 
 The following plugins are planned for implementation in future releases.
 
-#### 1. Rate Limiting Plugin (@yukemuri/plugin-rate-limit) 📋
-
-API rate limiting and quota management.
-
-**Planned Features:**
-- Token bucket algorithm
-- Sliding window algorithm
-- Per-user rate limiting
-- Per-IP rate limiting
-- Per-route rate limiting
-- Distributed rate limiting (Redis support)
-- Quota management
-- Rate limit headers in responses
-- Custom rate limit strategies
-- Whitelist/blacklist support
-
-**Use Cases:**
-- API protection
-- DDoS prevention
-- Resource usage control
-- Fair access policies
-- Premium tier enforcement
-
 ---
 
-#### 2. Logging Plugin (@yukemuri/plugin-logging) 📋
-
-Structured logging with multiple outputs.
-
-**Planned Features:**
-- Pino/Winston integration
-- Multiple log levels (debug, info, warn, error)
-- Structured logging format
-- File-based logging
-- Console logging with colors
-- External service integration (e.g., Datadog, Sentry)
-- Performance monitoring
-- Request/response logging
-- Custom log formatters
-- Log rotation
-
-**Use Cases:**
-- Application monitoring
-- Error tracking
-- Performance analysis
-- Audit logging
-- Debugging
-
----
-
-#### 3. Cache Plugin (@yukemuri/plugin-cache) 📋
+#### 1. Cache Plugin (@yukemuri/plugin-cache) 📋
 
 In-memory and Redis-based caching.
 
@@ -199,7 +235,7 @@ In-memory and Redis-based caching.
 
 ---
 
-#### 4. Analytics Plugin (@yukemuri/plugin-analytics) 📋
+#### 2. Analytics Plugin (@yukemuri/plugin-analytics) 📋
 
 Event tracking and analytics integration.
 
@@ -224,7 +260,7 @@ Event tracking and analytics integration.
 
 ---
 
-#### 5. Payments Plugin (@yukemuri/plugin-payments) 📋
+#### 3. Payments Plugin (@yukemuri/plugin-payments) 📋
 
 Payment processing with multiple providers.
 

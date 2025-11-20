@@ -110,7 +110,7 @@ The following plugins are planned for future releases:
 |--------|--------|----------|
 | **Email** | ✅ Implemented | Email sending via SendGrid/Mailgun/SMTP, template support, rate limiting, queue management |
 | **Rate Limiting** | ✅ Implemented | Token bucket & sliding window algorithms, per-user/IP rate limits, quota management |
-| **Logging** | 🔄 Planned | Structured logging, multi-sink support (file, stdout, external services), log levels |
+| **Logging** | ✅ Implemented | Structured logging, multi-sink support (console, in-memory, custom), log levels, request logging |
 | **Cache** | 🔄 Planned | Redis/In-Memory caching, TTL management, cache invalidation, stampede prevention |
 | **Analytics** | 🔄 Planned | Event tracking, Google Analytics/Plausible integration, custom dashboards |
 | **Payments** | 🔄 Planned | Stripe/PayPal integration, payment flows, invoice management, webhook handling |
